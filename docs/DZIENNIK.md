@@ -44,3 +44,22 @@ Zod dojdzie w Etapie 2 razem z ładowaniem treści (ADR-7).
 - GitHub CLI zalogowany na koncie Arka (zakres `repo` + `workflow`, autoryzacja w przeglądarce za zgodą Arka). Push przez HTTPS z poświadczeniami z gh.
 - Pierwszy przebieg workflow: lint/build/test/e2e zielone, ale automatyczne włączenie Pages z poziomu workflow nie ma uprawnień na tym koncie. Pages włączone jednorazowo przez API (źródło: GitHub Actions), ponowne uruchomienie przeszło. Kolejne pushe publikują automatycznie.
 - Link produkcyjny: https://wendrowycze.github.io/portfolio-runner/ — sprawdzony w Chrome: strona 200, oba pliki assetów 200, brak błędów w konsoli.
+
+---
+
+## Stan na 2026-09-09 (po Etapie 0) i następny krok — przekazanie do sesji w chmurze
+
+**Gotowe i opublikowane:** Etap 0 w całości. Link: https://wendrowycze.github.io/portfolio-runner/ (ekran startowy: panel opowieści po lewej, scena Phasera z tytułem i paletą po prawej). Build, lint, Vitest, Playwright zielone lokalnie i na GitHub Actions; publikacja automatyczna po każdym pushu na `main`. Raport z Etapu 0 wysłany Arkowi, Arek zaakceptował plan Etapu 0 i wprowadził trzy zmiany projektowe (patrz sekcja "Odstępstwa od dokumentów" wyżej) — obowiązują od Etapu 2.
+
+**Nie zrobione (zgodnie z planem):** Etapy 1–5. Brak logiki gry, brak scen poza `BootScene`, brak zod, brak `?layout=`, brak treści w kodzie.
+
+**Sesja w chmurze — polecenie startowe (skopiować jako pierwszą wiadomość):**
+
+> Przeczytaj CLAUDE.md i docs/DZIENNIK.md (cały, zwłaszcza "Odstępstwa od dokumentów" i tę sekcję). Etap 0 jest zrobiony, opublikowany i zaakceptowany — nie ruszaj go. Zrealizuj Etap 1 ("Silnik biegu") z docs/03_PLAN_ETAPOW.md wg promptu prompts/etap_1_silnik_biegu.md. Pamiętaj o decyzjach Arka z 2026-09-09: układ side jest domyślny (bieg po prawej), zła decyzja zatrzymuje bieg (od Etapu 2). Na koniec: build/test/e2e zielone, commit `etap-1: ...`, push, sprawdzony link, raport dla Arka po polsku bez kodu, jedno pytanie o tempo biegu z rekomendacją.
+
+**Uwagi praktyczne dla sesji w chmurze:**
+- Push na GitHub działa przez połączenie sesji z repozytorium — nie trzeba logować GitHub CLI.
+- Playwright wymaga `npx playwright install chromium` (jest w workflow CI; lokalnie w sandboxie trzeba uruchomić raz).
+- Fonty z Google Fonts mogą być niedostępne bez sieci — jest fallback systemowy, testy tego nie wymagają.
+- Ekran startowy używa bazowej rozdzielczości 960×540 i Scale FIT; kolumna runnera to 60% szerokości (`#runner`), panel 40% (`#panel`), przełączane atrybutem `data-layout` na `#game`.
+- Wartości strojenia biegu (prędkość, grawitacja, skok) trzymać w `src/config/tuning.ts` wg GDD sekcja k — plik jeszcze nie istnieje, tworzy go Etap 1.
