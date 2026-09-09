@@ -38,3 +38,9 @@ Zod dojdzie w Etapie 2 razem z ładowaniem treści (ADR-7).
 - Commity podpisywane jako Arkadiusz Klej.
 - Fonty (Press Start 2P, Spectral) z Google Fonts — przy braku sieci działa fallback systemowy.
 - Bazowa rozdzielczość sceny 960×540 (16:9), Scale FIT dopasowuje do prawej kolumny.
+
+### Deploy — pierwsze uruchomienie (2026-09-09)
+
+- GitHub CLI zalogowany na koncie Arka (zakres `repo` + `workflow`, autoryzacja w przeglądarce za zgodą Arka). Push przez HTTPS z poświadczeniami z gh.
+- Pierwszy przebieg workflow: lint/build/test/e2e zielone, ale automatyczne włączenie Pages z poziomu workflow nie ma uprawnień na tym koncie. Pages włączone jednorazowo przez API (źródło: GitHub Actions), ponowne uruchomienie przeszło. Kolejne pushe publikują automatycznie.
+- Link produkcyjny: https://wendrowycze.github.io/portfolio-runner/ — sprawdzony w Chrome: strona 200, oba pliki assetów 200, brak błędów w konsoli.
