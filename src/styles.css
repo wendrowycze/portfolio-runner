@@ -95,3 +95,29 @@ body {
     border-top: 2px solid var(--c-gold);
   }
 }
+
+/* --- Panel: nagłówek i podpowiedzi sterowania (Etap 1) --- */
+.panel-header {
+  margin-bottom: 20px;
+}
+
+.panel-hints {
+  list-style: none;
+  margin: 0;
+  padding: 16px 0 0;
+  border-top: 1px solid rgba(223, 182, 124, 0.3);
+  color: var(--c-text-muted);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.panel-hints kbd {
+  font-family: var(--font-hud);
+  font-size: 9px;
+  color: var(--c-gold);
+  border: 1px solid var(--c-gold);
+  border-radius: 3px;
+  padding: 3px 6px;
+  margin-right: 2px;
+  vertical-align: middle;
+}

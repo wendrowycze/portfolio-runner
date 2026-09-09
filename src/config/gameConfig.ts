@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { PALETTE } from './palette';
+import { TUNING } from './tuning';
 import { BootScene } from '../scenes/BootScene';
+import { RunnerScene } from '../scenes/RunnerScene';
 
 /** Bazowa rozdzielczość sceny biegu; Scale Manager (FIT) dopasowuje ją do kontenera. */
 export const GAME_WIDTH = 960;
@@ -21,9 +23,9 @@ export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameCon
     },
     physics: {
       default: 'arcade',
-      arcade: { gravity: { x: 0, y: 900 }, debug: false },
+      arcade: { gravity: { x: 0, y: TUNING.GRAVITY_Y }, debug: false },
     },
     fps: { target: 60 },
-    scene: [BootScene],
+    scene: [BootScene, RunnerScene],
   };
 }

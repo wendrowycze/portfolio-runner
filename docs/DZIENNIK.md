@@ -63,3 +63,27 @@ Zod dojdzie w Etapie 2 razem z ładowaniem treści (ADR-7).
 - Fonty z Google Fonts mogą być niedostępne bez sieci — jest fallback systemowy, testy tego nie wymagają.
 - Ekran startowy używa bazowej rozdzielczości 960×540 i Scale FIT; kolumna runnera to 60% szerokości (`#runner`), panel 40% (`#panel`), przełączane atrybutem `data-layout` na `#game`.
 - Wartości strojenia biegu (prędkość, grawitacja, skok) trzymać w `src/config/tuning.ts` wg GDD sekcja k — plik jeszcze nie istnieje, tworzy go Etap 1.
+
+---
+
+## 2026-09-09 — Etap 1: Silnik biegu
+
+### Co powstało
+
+- `src/runner/Parallax.ts` — 5 warstw tileSprite (gwiazdy 0.03, panorama miasta 0.12, kolonnada 0.35, latarnie/cyprysy 0.7, marmurowa posadzka 1.0) nad statycznym niebem z księżycem. Przewijanie wyłącznie przez `tilePositionX`.
+- `src/runner/Player.ts` — sylwetka „czarnofigurowa w negatywie” (jasna postać ze złotą przepaską i wieńcem laurowym), 6 klatek biegu + skok + potknięcie + idle generowane kodem w `BootScene`. Arcade Physics, skok tylko z ziemi, potknięcie = przechył + błysk + drgnięcie kamery (wyłączane przez `prefers-reduced-motion`). Kurz spod stóp jako emiter cząstek.
+- `src/runner/Obstacles.ts` — `ObstacleSpawner` z pulą (Phaser Group, `maxSize: 16`), dwa tryby ruchu: `flow` (płynie z prędkością świata — tryb wolnego biegu Etapu 1) i `timed` (pozycja liczona z postępu zegara beatu — przygotowane pod Etap 2, żeby przeszkoda docierała do postaci dokładnie w momencie upływu czasu, niezależnie od easingu time dilation).
+- `src/runner/TimeDilation.ts` — jeden mnożnik czasu w `GameState.timeScale`, tweenowany; potknięcie = natychmiast ×0.5, powrót do ×1.0 w 1000 ms (`Quad.easeOut`). Emituje `time:scale` na magistrali dla UI.
+- `src/runner/Hud.ts` — licznik fragmentów i potknięć (zawsze, prawy górny róg) + HUD debug (FPS, prędkość, mnożnik czasu) włączany `?debug=1` lub `F3`.
+- `src/config/tuning.ts` — wszystkie liczby z GDD sekcja k plus fizyka (grawitacja 1500, skok −620 px/s → wysokość ok. 128 px; test jednostkowy pilnuje, że skok przewyższa najwyższą przeszkodę).
+- `src/config/layout.ts` + `main.ts` — przełącznik `?layout=stack|side` zrobiony już teraz (był potrzebny do testu mobilnego), `VITE_LAYOUT` tylko jako domyślna.
+
+### Decyzje
+
+- **Brak assetów CC0 w Etapie 1.** Postać i przeszkody rysowane kodem wyszły wystarczająco czytelnie, a pobieranie paczek z sieci w sandboxie chmurowym nie działa (proxy). `ASSETS_ATTRIBUTION.md` bez zmian. Podmiana na sprite CC0 = wpis w `manifest.ts` + klatki w `Player.ts`.
+- **Postać rysowana w skali ×1.5 (72×96 px).** Wersja 48×64 była zbyt mała na scenie 960×540 przy skalowaniu do kolumny 60%.
+- **Klucze przeszkód** w słowniku `src/content/obstacles.ts`: `barierka`, `skrzynia`, `kolumna`, `kordon-kamer`, `boty`, `telefony`, `brama`. Nieznany klucz z JSON = fallback `skrzynia` (bez crasha na literówce w treści).
+- **Playwright w sandboxie**: pobranie Chromium przez CDN Playwrighta nie przechodzi przez proxy; konfiguracja czyta opcjonalną zmienną `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` (preinstalowany Chromium). Na CI zmiennej nie ma — działa domyślna instalacja z workflow.
+- **Błędy ładowania Google Fonts w testach e2e są ignorowane** (`tests/e2e/helpers.ts`) — w środowisku bez sieci fonty mają fallback, a to nie jest błąd gry. Wszystkie inne błędy konsoli nadal oblewają test.
+- Favicon jako inline SVG (złota rama na ciemnym tle) — usuwa 404 `favicon.ico` z konsoli.
+- FPS w headless Chromium (software rendering) to ok. 20–25 — nie jest miarodajny; w zwykłej przeglądarce scena to kilkanaście obiektów i celuje w 60 fps.
