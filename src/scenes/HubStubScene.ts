@@ -1,29 +1,34 @@
 import Phaser from 'phaser';
 import { col } from '../assets/generators/draw';
-import { PAINTING_RASTER, textureKey } from '../assets/manifest';
+import { paintingTextureKey, textureKey } from '../assets/manifest';
 import { GAME_HEIGHT, GAME_WIDTH } from '../config/gameConfig';
 import { PALETTE } from '../config/palette';
 import type { UiStrings } from '../content/uiStrings';
+import { format } from '../content/uiStrings';
 import { bus } from '../events/bus';
-import { totalFragments } from '../script/types';
+import type { Case } from '../script/types';
+import type { Progress } from '../state/progress';
+import { hubSlots } from './hubLayout';
 import type { RunnerSceneData } from './RunnerScene';
 
 export interface HubSceneData {
-  restored: boolean;
+  /** Case, który właśnie ukończono (jego obraz dostaje rozbłysk odrestaurowania). */
+  justFinished?: string;
 }
 
 const FONT_HUD = '"Press Start 2P", monospace';
 const FONT_TEXT = 'Spectral, Georgia, serif';
 
 /**
- * HubStubScene — jedna ściana hotelu z jednym obrazem (docs/00_KONCEPCJA.md, „stub hubu”).
- * Zniszczony: zaciemnione kafle + pęknięcia; odrestaurowany: pełny obraz w złotej poświacie.
- * Klik w obraz (albo `hub:enter` z panelu) = przejście do RunnerScene.
- * Pełny hotel do chodzenia — docs/06_BACKLOG_PO_POC.md (P1), nie tutaj.
+ * HubStubScene — jedna ściana hotelu z galerią obrazów: po jednym na case (docs/00_KONCEPCJA.md,
+ * „stub hubu”; pełny hotel do chodzenia — backlog P1). Zniszczony: zaciemnione kafle + pęknięcia;
+ * odrestaurowany: pełny obraz w złotej poświacie. Klik w obraz (albo `hub:enter` z panelu)
+ * przenosi do RunnerScene z wybranym case'em.
  */
 export class HubStubScene extends Phaser.Scene {
   private entering = false;
   private readonly unsubscribe: (() => void)[] = [];
+  private focusText!: Phaser.GameObjects.Text;
 
   constructor() {
     super('HubStubScene');
@@ -33,134 +38,174 @@ export class HubStubScene extends Phaser.Scene {
     this.entering = false;
     const runnerData = this.registry.get('runnerData') as RunnerSceneData | undefined;
     const strings = this.registry.get('uiStrings') as UiStrings | undefined;
-    const kejs = runnerData?.script?.kejs;
-    if (runnerData === undefined || strings === undefined || kejs === undefined) {
+    const cases = (this.registry.get('cases') as Case[] | undefined) ?? [];
+    const progress = this.registry.get('progress') as Progress | undefined;
+    if (runnerData === undefined || strings === undefined || cases.length === 0) {
       this.scene.start('RunnerScene', runnerData ?? {});
       return;
     }
-    const restored = data.restored;
-    document.body.dataset.painting = restored ? 'restored' : 'damaged';
+    const completed = progress?.completed ?? new Set<string>();
+    document.body.dataset.scene = 'hub';
+    document.body.dataset.restored = [...completed].join(' ');
+    if (data.justFinished === undefined) document.body.dataset.painting = 'damaged';
 
     this.drawWall();
 
-    // Obraz: rasteryzowany SVG (960×640) skalowany do ramy.
-    const paintingW = 440;
-    const paintingH = (paintingW * PAINTING_RASTER.height) / PAINTING_RASTER.width;
-    const cx = GAME_WIDTH / 2;
-    const cy = GAME_HEIGHT / 2 - 34;
-
-    if (restored) {
-      const glow = this.add
-        .rectangle(cx, cy, paintingW + 90, paintingH + 90, col('gold'), 0.18)
-        .setDepth(1);
-      this.tweens.add({
-        targets: glow,
-        alpha: 0.35,
-        scaleX: 1.04,
-        scaleY: 1.05,
-        duration: 1600,
-        yoyo: true,
-        repeat: -1,
-        ease: 'Sine.easeInOut',
-      });
-      const sparks = this.add.particles(cx, cy, textureKey('fx.spark'), {
-        x: { min: -paintingW / 2, max: paintingW / 2 },
-        y: { min: -paintingH / 2, max: paintingH / 2 },
-        lifespan: { min: 800, max: 1600 },
-        speedY: { min: -30, max: -8 },
-        scale: { start: 0.9, end: 0 },
-        alpha: { start: 0.9, end: 0 },
-        frequency: 140,
-        quantity: 1,
-      });
-      sparks.setDepth(6);
-    }
-
-    this.drawFrame(cx, cy, paintingW, paintingH);
-
-    const painting = this.add
-      .image(cx, cy, textureKey('painting.current'))
-      .setDisplaySize(paintingW, paintingH)
-      .setDepth(3);
-
-    if (!restored) {
-      this.drawDamage(cx, cy, paintingW, paintingH, kejs.painting.cols, kejs.painting.rows);
-    }
-
-    // Tabliczka pod obrazem.
-    const plaqueY = cy + paintingH / 2 + 52;
-    this.add
-      .rectangle(cx, plaqueY, 380, 58, col('ground'), 1)
-      .setStrokeStyle(2, col('gold'))
-      .setDepth(3);
-    this.add
-      .text(cx, plaqueY - 12, kejs.title, {
-        fontFamily: FONT_HUD,
-        fontSize: '9px',
-        color: PALETTE.bgDeep,
-        align: 'center',
-        wordWrap: { width: 360 },
-      })
-      .setOrigin(0.5)
-      .setDepth(4);
+    // Licznik odrestaurowanych obrazów i nazwa obrazu pod kursorem.
     this.add
       .text(
-        cx,
-        plaqueY + 14,
-        `${kejs.role} · ${restored ? strings.hubRestored : strings.hubDamaged}`,
-        {
-          fontFamily: FONT_TEXT,
-          fontSize: '14px',
-          fontStyle: 'italic',
-          color: PALETTE.bgDeep,
-        },
+        GAME_WIDTH - 16,
+        14,
+        format(strings.hubProgress, { done: completed.size, total: cases.length }),
+        { fontFamily: FONT_HUD, fontSize: '9px', color: PALETTE.gold },
       )
-      .setOrigin(0.5)
-      .setDepth(4);
-
-    const hint = this.add
-      .text(cx, 44, restored ? strings.playAgain : strings.hubHint, {
-        fontFamily: FONT_HUD,
-        fontSize: '10px',
-        color: PALETTE.gold,
+      .setOrigin(1, 0)
+      .setDepth(20);
+    this.focusText = this.add
+      .text(GAME_WIDTH / 2, GAME_HEIGHT - 62, strings.hubHint, {
+        fontFamily: FONT_TEXT,
+        fontSize: '16px',
+        fontStyle: 'italic',
+        color: PALETTE.text,
+        align: 'center',
+        wordWrap: { width: 760 },
       })
       .setOrigin(0.5)
-      .setDepth(4);
-    this.tweens.add({ targets: hint, alpha: 0.35, duration: 900, yoyo: true, repeat: -1 });
+      .setDepth(20);
 
-    // Interakcja: hover unosi obraz, klik wchodzi.
-    const hit = this.add
-      .rectangle(cx, cy, paintingW + 40, paintingH + 40, 0x000000, 0)
-      .setDepth(10)
-      .setInteractive({ useHandCursor: true });
-    hit.on(Phaser.Input.Events.POINTER_OVER, () => {
-      this.tweens.add({ targets: painting, scale: painting.scale * 1.02, duration: 200 });
+    const slots = hubSlots(cases.length);
+    cases.forEach((kejs, index) => {
+      const slot = slots[index];
+      if (slot !== undefined) {
+        this.addPainting(
+          kejs,
+          slot,
+          completed.has(kejs.id),
+          data.justFinished === kejs.id,
+          strings,
+        );
+      }
     });
-    hit.on(Phaser.Input.Events.POINTER_OUT, () => {
-      this.tweens.add({
-        targets: painting,
-        scale: paintingW / PAINTING_RASTER.width,
-        duration: 200,
-      });
-    });
-    hit.on(Phaser.Input.Events.POINTER_DOWN, () => {
-      this.enter(runnerData, cx, cy);
-    });
+
     this.unsubscribe.push(
-      bus.on('hub:enter', () => {
-        this.enter(runnerData, cx, cy);
+      bus.on('hub:enter', (caseId) => {
+        const slot = slots[cases.findIndex((c) => c.id === caseId)];
+        if (slot !== undefined) this.enter(caseId, slot.x, slot.y);
       }),
     );
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       for (const off of this.unsubscribe) off();
       this.unsubscribe.length = 0;
     });
-
     this.cameras.main.fadeIn(600, 0x26, 0x16, 0x19);
-    document.body.dataset.scene = 'hub';
   }
 
-  /** Ściana hotelu: ciepłe tło, boazeria, listwa, kinkiety ze złotym światłem. */
+  private addPainting(
+    kejs: Case,
+    slot: { x: number; y: number; width: number; height: number },
+    restored: boolean,
+    celebrate: boolean,
+    strings: UiStrings,
+  ): void {
+    const { x, y, width: w, height: h } = slot;
+    const container = this.add.container(x, y).setDepth(5);
+
+    if (restored) {
+      const glow = this.add.rectangle(0, 0, w + 44, h + 44, col('gold'), 0.16);
+      container.add(glow);
+      this.tweens.add({
+        targets: glow,
+        alpha: 0.3,
+        duration: 1500,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+    }
+    // Rama.
+    const frame = this.add.graphics();
+    const pad = 10;
+    frame.fillStyle(col('bgDeep'), 0.5);
+    frame.fillRect(-w / 2 - pad + 5, -h / 2 - pad + 7, w + pad * 2, h + pad * 2);
+    frame.fillStyle(col('ground'), 1);
+    frame.fillRect(-w / 2 - pad, -h / 2 - pad, w + pad * 2, h + pad * 2);
+    frame.lineStyle(3, col('gold'), restored ? 1 : 0.8);
+    frame.strokeRect(-w / 2 - pad + 2, -h / 2 - pad + 2, w + pad * 2 - 4, h + pad * 2 - 4);
+    frame.fillStyle(col('gold'), 1);
+    for (const [sx, sy] of [
+      [-1, -1],
+      [1, -1],
+      [-1, 1],
+      [1, 1],
+    ] as const) {
+      frame.fillCircle(sx * (w / 2 + pad - 5), sy * (h / 2 + pad - 5), 3);
+    }
+    container.add(frame);
+
+    const image = this.add.image(0, 0, paintingTextureKey(kejs.id)).setDisplaySize(w, h);
+    container.add(image);
+
+    if (!restored) {
+      container.add(this.drawDamage(w, h, kejs.painting.cols, kejs.painting.rows));
+    }
+
+    // Tabliczka: tytuł (skrócony) i świat.
+    const plaqueY = h / 2 + pad + 16;
+    container.add(
+      this.add.rectangle(0, plaqueY, w + 20, 26, col('ground'), 1).setStrokeStyle(1, col('gold')),
+    );
+    container.add(
+      this.add
+        .text(0, plaqueY, shorten(kejs.title, 30), {
+          fontFamily: FONT_HUD,
+          fontSize: '6px',
+          color: PALETTE.bgDeep,
+          align: 'center',
+          wordWrap: { width: w + 10 },
+        })
+        .setOrigin(0.5),
+    );
+
+    if (celebrate) {
+      const sparks = this.add.particles(x, y, textureKey('fx.spark'), {
+        x: { min: -w / 2, max: w / 2 },
+        y: { min: -h / 2, max: h / 2 },
+        lifespan: { min: 700, max: 1400 },
+        speedY: { min: -30, max: -8 },
+        scale: { start: 0.9, end: 0 },
+        alpha: { start: 0.9, end: 0 },
+        frequency: 120,
+        quantity: 1,
+      });
+      sparks.setDepth(9);
+      this.time.delayedCall(6000, () => {
+        sparks.stop();
+      });
+    }
+
+    const hit = this.add
+      .rectangle(x, y, w + pad * 2, h + pad * 2 + 30, 0x000000, 0)
+      .setDepth(10)
+      .setInteractive({ useHandCursor: true });
+    const label = `${kejs.title} · ${restored ? strings.hubRestored : strings.hubDamaged}`;
+    hit.on(Phaser.Input.Events.POINTER_OVER, () => {
+      this.tweens.add({ targets: container, scale: 1.12, duration: 180, ease: 'Quad.easeOut' });
+      container.setDepth(8);
+      this.focusText.setText(label);
+      bus.emit('hub:focus', kejs.id);
+    });
+    hit.on(Phaser.Input.Events.POINTER_OUT, () => {
+      this.tweens.add({ targets: container, scale: 1, duration: 180 });
+      container.setDepth(5);
+      this.focusText.setText(strings.hubHint);
+      bus.emit('hub:focus', undefined);
+    });
+    hit.on(Phaser.Input.Events.POINTER_DOWN, () => {
+      this.enter(kejs.id, x, y);
+    });
+  }
+
+  /** Ściana hotelu: ciepłe tło, tapeta, boazeria, listwa, kinkiety. */
   private drawWall(): void {
     const g = this.add.graphics().setDepth(0);
     for (let y = 0; y < GAME_HEIGHT; y += 4) {
@@ -174,10 +219,9 @@ export class HubStubScene extends Phaser.Scene {
       g.fillStyle(Phaser.Display.Color.GetColor(color.r, color.g, color.b), 1);
       g.fillRect(0, y, GAME_WIDTH, 4);
     }
-    // Tapeta: delikatny wzór maureskowy w rombach.
     g.lineStyle(1, col('gold'), 0.07);
     for (let x = -40; x < GAME_WIDTH + 40; x += 48) {
-      for (let y = 0; y < GAME_HEIGHT - 120; y += 48) {
+      for (let y = 0; y < GAME_HEIGHT - 100; y += 48) {
         g.strokeRect(x + 12, y + 12, 24, 24);
         g.lineBetween(x + 24, y, x + 48, y + 24);
         g.lineBetween(x + 48, y + 24, x + 24, y + 48);
@@ -185,92 +229,53 @@ export class HubStubScene extends Phaser.Scene {
         g.lineBetween(x, y + 24, x + 24, y);
       }
     }
-    // Boazeria i podłoga.
     g.fillStyle(col('ground'), 1);
-    g.fillRect(0, GAME_HEIGHT - 120, GAME_WIDTH, 8);
+    g.fillRect(0, GAME_HEIGHT - 96, GAME_WIDTH, 6);
     g.fillStyle(col('bgDeep'), 1);
-    g.fillRect(0, GAME_HEIGHT - 112, GAME_WIDTH, 112);
+    g.fillRect(0, GAME_HEIGHT - 90, GAME_WIDTH, 90);
     g.fillStyle(col('panelBg'), 1);
     for (let x = 0; x < GAME_WIDTH; x += 96) {
-      g.fillRect(x + 6, GAME_HEIGHT - 104, 84, 60);
+      g.fillRect(x + 6, GAME_HEIGHT - 84, 84, 44);
     }
     g.fillStyle(col('ground'), 1);
-    g.fillRect(0, GAME_HEIGHT - 40, GAME_WIDTH, 40);
+    g.fillRect(0, GAME_HEIGHT - 36, GAME_WIDTH, 36);
     g.fillStyle(col('bgDeep'), 0.35);
     for (let x = 0; x < GAME_WIDTH; x += 64) {
-      g.fillRect(x, GAME_HEIGHT - 40, 2, 40);
+      g.fillRect(x, GAME_HEIGHT - 36, 2, 36);
     }
-    // Kinkiety.
-    for (const x of [120, GAME_WIDTH - 120]) {
-      for (let i = 5; i >= 1; i -= 1) {
+    for (const x of [40, GAME_WIDTH - 40]) {
+      for (let i = 4; i >= 1; i -= 1) {
         g.fillStyle(col('gold'), 0.05);
-        g.fillCircle(x, 150, 26 + i * 16);
+        g.fillCircle(x, 250, 20 + i * 14);
       }
       g.fillStyle(col('ground'), 1);
-      g.fillRect(x - 4, 160, 8, 40);
+      g.fillRect(x - 3, 258, 6, 30);
       g.fillStyle(col('gold'), 1);
-      g.fillRect(x - 10, 140, 20, 22);
+      g.fillRect(x - 8, 242, 16, 18);
       g.fillStyle(col('text'), 1);
-      g.fillRect(x - 4, 146, 8, 10);
-    }
-  }
-
-  /** Złota, zdobiona rama. */
-  private drawFrame(cx: number, cy: number, w: number, h: number): void {
-    const g = this.add.graphics().setDepth(2);
-    const pad = 22;
-    g.fillStyle(col('bgDeep'), 0.5);
-    g.fillRect(cx - w / 2 - pad + 8, cy - h / 2 - pad + 12, w + pad * 2, h + pad * 2);
-    g.fillStyle(col('ground'), 1);
-    g.fillRect(cx - w / 2 - pad, cy - h / 2 - pad, w + pad * 2, h + pad * 2);
-    g.lineStyle(4, col('gold'), 1);
-    g.strokeRect(cx - w / 2 - pad + 3, cy - h / 2 - pad + 3, w + pad * 2 - 6, h + pad * 2 - 6);
-    g.lineStyle(2, col('gold'), 0.8);
-    g.strokeRect(cx - w / 2 - 6, cy - h / 2 - 6, w + 12, h + 12);
-    // Narożne rozety.
-    g.fillStyle(col('gold'), 1);
-    for (const [sx, sy] of [
-      [-1, -1],
-      [1, -1],
-      [-1, 1],
-      [1, 1],
-    ] as const) {
-      const x = cx + sx * (w / 2 + pad - 12);
-      const y = cy + sy * (h / 2 + pad - 12);
-      g.fillCircle(x, y, 6);
-      g.fillStyle(col('ground'), 1);
-      g.fillCircle(x, y, 2.5);
-      g.fillStyle(col('gold'), 1);
+      g.fillRect(x - 3, 247, 6, 8);
     }
   }
 
   /** Zniszczenie: przyciemnione kafle (siatka fragmentów) i pęknięcia. */
   private drawDamage(
-    cx: number,
-    cy: number,
     w: number,
     h: number,
     cols: number,
     rows: number,
-  ): void {
-    const g = this.add.graphics().setDepth(4);
+  ): Phaser.GameObjects.Graphics {
+    const g = this.add.graphics();
     const tileW = w / cols;
     const tileH = h / rows;
-    const total = totalFragments({ painting: { cols, rows } } as never);
-    for (let i = 0; i < total; i += 1) {
+    for (let i = 0; i < cols * rows; i += 1) {
       const c = i % cols;
       const r = Math.floor(i / cols);
-      const x = cx - w / 2 + c * tileW;
-      const y = cy - h / 2 + r * tileH;
-      // Środkowy górny kafel zostaje niemal widoczny — zachęta, że coś tu było.
       const alpha = i === Math.floor(cols / 2) ? 0.55 : 0.86;
       g.fillStyle(col('bgDeep'), alpha);
-      g.fillRect(x, y, tileW, tileH);
+      g.fillRect(-w / 2 + c * tileW, -h / 2 + r * tileH, tileW, tileH);
       g.lineStyle(1, col('panelBg'), 0.9);
-      g.strokeRect(x + 0.5, y + 0.5, tileW - 1, tileH - 1);
+      g.strokeRect(-w / 2 + c * tileW + 0.5, -h / 2 + r * tileH + 0.5, tileW - 1, tileH - 1);
     }
-    // Pęknięcia.
-    g.lineStyle(2, col('bgDeep'), 1);
     const cracks: [number, number][][] = [
       [
         [0.05, 0.1],
@@ -285,37 +290,38 @@ export class HubStubScene extends Phaser.Scene {
         [0.72, 0.5],
         [0.6, 0.6],
       ],
-      [
-        [0.3, 0.55],
-        [0.15, 0.7],
-        [0.1, 0.92],
-      ],
     ];
     for (const crack of cracks) {
+      g.lineStyle(1.5, col('gold'), 0.45);
       g.beginPath();
       crack.forEach(([px, py], index) => {
-        const x = cx - w / 2 + px * w;
-        const y = cy - h / 2 + py * h;
+        const x = -w / 2 + px * w;
+        const y = -h / 2 + py * h;
         if (index === 0) g.moveTo(x, y);
         else g.lineTo(x, y);
       });
       g.strokePath();
-      g.lineStyle(1, col('gold'), 0.35);
-      g.strokePath();
-      g.lineStyle(2, col('bgDeep'), 1);
     }
+    return g;
   }
 
-  private enter(runnerData: RunnerSceneData, cx: number, cy: number): void {
+  private enter(caseId: string, cx: number, cy: number): void {
     if (this.entering) return;
     this.entering = true;
     document.body.dataset.scene = 'entering';
+    // main.ts przygotowuje ScriptRunner/panel na ten case i dopisuje `script` do runnerData.
+    bus.emit('hub:selected', caseId);
+    const runnerData = this.registry.get('runnerData') as RunnerSceneData | undefined;
     const camera = this.cameras.main;
     camera.pan(cx, cy, 700, 'Sine.easeInOut');
-    camera.zoomTo(1.7, 700, 'Sine.easeIn');
+    camera.zoomTo(2.4, 700, 'Sine.easeIn');
     camera.fadeOut(650, 0x26, 0x16, 0x19);
     camera.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-      this.scene.start('RunnerScene', runnerData);
+      this.scene.start('RunnerScene', runnerData ?? {});
     });
   }
+}
+
+function shorten(text: string, max: number): string {
+  return text.length <= max ? text : `${text.slice(0, max - 1).trimEnd()}…`;
 }

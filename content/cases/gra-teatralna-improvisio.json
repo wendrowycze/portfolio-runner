@@ -1,0 +1,215 @@
+{
+  "id": "gra-teatralna-improvisio",
+  "world": "kultura",
+  "title": "Stwórz ImproVisio — narzędzie treningowe do improwizacji teatralnej",
+  "lead": "Festiwal „Kalejdoskop” co roku gości ponad 100 młodych aktorów o bardzo różnym poziomie. Organizatorzy potrzebują narzędzia, które uczyni warsztaty przyjaźniejszymi dla wszystkich.",
+  "role": "Twórca narzędzia treningowego dla warsztatów improwizacji",
+  "skills": [
+    "Projektowanie gier",
+    "Prowadzenie warsztatów teatralnych",
+    "Projektowanie narzędzi edukacyjnych"
+  ],
+  "painting": {
+    "src": "assets/paintings/gra-teatralna-improvisio.svg",
+    "cols": 3,
+    "rows": 2,
+    "caption": "ImproVisio: karta sytuacji, karta postaci i karta przedmiotu — kilkadziesiąt ćwiczeń w pudełku wielkości telefonu. Obraz odrestaurowany."
+  },
+  "runner": {
+    "theme": "kultura",
+    "baseSpeed": 220,
+    "choiceSlowdown": 0.35
+  },
+  "beats": [
+    {
+      "id": "b01",
+      "type": "narration",
+      "text": "Na warsztatach spotykają się osoby, które są w teatrze od 5. roku życia, z takimi, które dopiero zagrały pierwszy spektakl. Pojawia się klasyczny problem projektowania zajęć dla niehomogenicznej grupy: w strukturze poleceń i rywalizacji zabawa jest zbyt łatwa dla doświadczonych i demotywująca dla początkujących.",
+      "advance": "tap"
+    },
+    {
+      "id": "b02",
+      "type": "choice",
+      "prompt": "Jaką filozofię przyjmujesz dla narzędzia?",
+      "obstacle": "kolumna",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Easy to play, hard to master — ćwiczenia przepisane na sytuacje, od prostych po metatreść.",
+          "correct": true,
+          "feedback": "Od „pierwszego dnia w pracy” (historia w czasie przeszłym) po „Incepcję in medias res” — mowę performatywną o tym, że właśnie mówisz.",
+          "skill": "Projektowanie gier"
+        },
+        {
+          "text": "Osobne grupy dla zaawansowanych i początkujących.",
+          "correct": false,
+          "feedback": "Podział grupy zabija to, co w warsztatach najcenniejsze: spotkanie różnych poziomów. Narzędzie miało łączyć, nie dzielić."
+        },
+        {
+          "text": "Jedno ćwiczenie dla wszystkich, bez różnicowania.",
+          "correct": false,
+          "feedback": "To właśnie problem wyjściowy: za łatwe dla jednych, demotywujące dla drugich."
+        }
+      ],
+      "reward": {
+        "fragment": 1
+      }
+    },
+    {
+      "id": "b03",
+      "type": "narration",
+      "text": "Klasyczne ćwiczenia improwizacyjne zostają przepisane na sytuacje: od bardzo prostych, jak opisanie pierwszego dnia w pracy w czasie przeszłym, po niezmiernie wymagające, jak „Incepcja in medias res” — wykorzystywanie metatreści własnej wypowiedzi w czasie rzeczywistym.",
+      "advance": "tap"
+    },
+    {
+      "id": "b04",
+      "type": "choice",
+      "prompt": "Gracze „grają na prywacie” — pozornie improwizują, a w rzeczywistości mówią prawdę. Co dodajesz do narzędzia?",
+      "obstacle": "boty",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "System archetypowych postaci z sugerowanym stylem komunikacji i opisem usposobienia.",
+          "correct": true,
+          "feedback": "Postać oddziela gracza od jego prywatnej historii. Improwizacja w cudzej skórze rozwija bardziej niż opowiadanie o sobie.",
+          "skill": "Prowadzenie warsztatów teatralnych"
+        },
+        {
+          "text": "Kary punktowe za mówienie prawdy.",
+          "correct": false,
+          "feedback": "Kary nie uczą improwizacji, tylko ostrożności. Potrzebna była rama, w którą łatwo wejść — postać."
+        },
+        {
+          "text": "Nic — to naturalne i nieszkodliwe.",
+          "correct": false,
+          "feedback": "Naturalne, ale mniej rozwijające. Właśnie po to powstały karty postaci."
+        }
+      ],
+      "reward": {
+        "fragment": 2
+      }
+    },
+    {
+      "id": "b05",
+      "type": "narration",
+      "text": "Pierwotnie karty postaci miały ilustracje. W toku testów okazało się, że lepszy będzie zalaminowany papier, po którym można rysować ścieralnymi markerami — tak, aby karty stawały się wizytówkami lub tagami uczestników. Dzięki temu prowadzący może wykorzystać karty postaci do zbudowania dowolnych interakcji w innych ćwiczeniach.",
+      "advance": "tap"
+    },
+    {
+      "id": "b06",
+      "type": "action",
+      "prompt": "Testy w liceach: kolejna grupa czeka, a karty trzeba jeszcze zetrzeć i rozdać. Przeskocz stertę zalaminowanych kart!",
+      "input": "jump",
+      "obstacle": "dokumenty",
+      "windowMs": 800,
+      "reward": {
+        "fragment": 3
+      }
+    },
+    {
+      "id": "b07",
+      "type": "narration",
+      "text": "Trzecim elementem narzędzia są karty przedmiotów. Zadaniem aktorów jest sprawne wplecenie ich w opowieść. Wszystkie napisano w nawiązaniu do motywów z literatury: pojawia się „regularnie wyrywana wątroba” (Prometeusza, który dał ludziom ogień) lub wyrzucony przez okno fortepian (Chopina w wierszu Norwida).",
+      "advance": "tap"
+    },
+    {
+      "id": "b08",
+      "type": "choice",
+      "prompt": "Aktor losuje przedmiot: „wyrzucony przez okno fortepian”. Skąd pochodzą przedmioty na kartach?",
+      "obstacle": "skrzynia",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Z motywów literackich — fortepian Chopina z wiersza Norwida, wątroba Prometeusza.",
+          "correct": true,
+          "feedback": "Każdy przedmiot niesie historię, którą trzeba rozpoznać i wpleść w scenę — to ćwiczy skojarzenia, nie tylko refleks.",
+          "skill": "Projektowanie narzędzi edukacyjnych"
+        },
+        {
+          "text": "Z katalogu sklepu meblowego.",
+          "correct": false,
+          "feedback": "Fortepian z katalogu nie ma historii. Fortepian z Norwida ma — i o to chodzi w improwizacji."
+        },
+        {
+          "text": "Z losowych słów ze słownika.",
+          "correct": false,
+          "feedback": "Losowe słowo to test refleksu. Motyw literacki to test wyobraźni i wiedzy — narzędzie miało uczyć drugiego."
+        }
+      ],
+      "reward": {
+        "fragment": 4
+      }
+    },
+    {
+      "id": "b09",
+      "type": "narration",
+      "text": "Podstawowy tryb gry: każdy gracz losuje postać, która zostaje z nim na stałe. Co rundę losuje sytuację oraz przedmiot, który musi w niej umieścić. Każda sytuacja ma „kryteria”, których spełnienie oceniają pozostałe osoby — powstaje prosta tabela punktowa. Jeden komplet wystarcza dla ~20 osób, kilka kompatybilnych kompletów obsłuży nawet 100.",
+      "advance": "tap"
+    },
+    {
+      "id": "b10",
+      "type": "action",
+      "prompt": "Sto osób gra naraz na kilku kompletach kart, a Ty musisz dotrzeć do każdej grupy. Przeskocz barierkę między salami!",
+      "input": "jump",
+      "obstacle": "barierka",
+      "windowMs": 800,
+      "reward": {
+        "fragment": 5
+      }
+    },
+    {
+      "id": "b11",
+      "type": "interaction",
+      "widget": "puzzle",
+      "text": "Powstaje obraz narzędzia: trzy rodzaje kart w pudełku wielkości większego telefonu. Ułóż go, zamieniając miejscami fragmenty.",
+      "reward": {
+        "fragment": 6
+      }
+    },
+    {
+      "id": "b12",
+      "type": "results",
+      "stats": [
+        {
+          "skill": "Projektowanie gier",
+          "delta": 10
+        },
+        {
+          "skill": "Prowadzenie warsztatów teatralnych",
+          "delta": 10
+        },
+        {
+          "skill": "Projektowanie narzędzi edukacyjnych",
+          "delta": 10
+        }
+      ],
+      "kpis": [
+        {
+          "label": "Feedback",
+          "value": "uczestnicy oceniają się nawzajem — mniej obciążony prowadzący"
+        },
+        {
+          "label": "Skala",
+          "value": "jeden komplet dla ~20 osób, kilka kompletów do 100 osób"
+        },
+        {
+          "label": "Testy",
+          "value": "licea w Warszawie, SWPS, UJ, UŚ"
+        },
+        {
+          "label": "Pudełko",
+          "value": "kilkadziesiąt ćwiczeń, rok prób bez powtórzenia kompozycji"
+        }
+      ]
+    },
+    {
+      "id": "b13",
+      "type": "finale",
+      "text": "W pudełku wielkości telefonu zamknąłeś kilkadziesiąt ćwiczeń teatralnych, które nie powtórzą się przez rok prób. Nauczyłeś się, że najlepsze narzędzie to takie, po którym inni radzą sobie bez Ciebie.",
+      "cta": {
+        "label": "Poznaj Arka na LinkedIn",
+        "url": "https://www.linkedin.com/in/arkadiusz-klej/"
+      }
+    }
+  ]
+}

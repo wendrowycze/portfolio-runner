@@ -13,10 +13,8 @@ async function waitForBeat(page: Page, id: string): Promise<void> {
   await expect(panel(page)).toHaveAttribute('data-beat', id, { timeout: 30_000 });
 }
 
-/** Z hubu (zniszczony obraz) do sceny biegu — przyciskiem w panelu. */
+/** ?case=_demo pomija hub i startuje bieg od razu. */
 async function enterFromHub(page: Page): Promise<void> {
-  await expect(page.locator('body')).toHaveAttribute('data-scene', 'hub', { timeout: 15_000 });
-  await page.locator('[data-testid="hub-enter"]').click();
   await expect(page.locator('body')).toHaveAttribute('data-scene', 'runner', { timeout: 15_000 });
 }
 

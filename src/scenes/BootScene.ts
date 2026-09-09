@@ -12,7 +12,8 @@ import { generateObstacles } from '../assets/generators/obstacles';
 import { generatePlayer } from '../assets/generators/player';
 import { GAME_HEIGHT, GAME_WIDTH } from '../config/gameConfig';
 import { PALETTE } from '../config/palette';
-import { assetUrl, PAINTING_RASTER, textureKey } from '../assets/manifest';
+import { assetUrl, PAINTING_RASTER, paintingTextureKey } from '../assets/manifest';
+import type { Case } from '../script/types';
 import type { RunnerSceneData } from './RunnerScene';
 
 export const PROJECT_TITLE = 'PORTFOLIO RUNNER';
@@ -26,12 +27,15 @@ export class BootScene extends Phaser.Scene {
     super('BootScene');
   }
 
-  /** Obraz case'a (SVG z ścieżki w JSON) — jedyny plik ładowany z dysku w PoC. */
+  /** Obrazy case'ów (SVG ze ścieżek w JSON) — jedyne pliki ładowane z dysku w PoC. */
   preload(): void {
     const runnerData = this.registry.get('runnerData') as RunnerSceneData | undefined;
-    const painting = runnerData?.script?.kejs.painting;
-    if (painting !== undefined) {
-      this.load.svg(textureKey('painting.current'), assetUrl(painting.src), {
+    const gallery = (this.registry.get('cases') as Case[] | undefined) ?? [];
+    const cases = [...gallery];
+    const current = runnerData?.script?.kejs;
+    if (current !== undefined && !cases.some((c) => c.id === current.id)) cases.push(current);
+    for (const kejs of cases) {
+      this.load.svg(paintingTextureKey(kejs.id), assetUrl(kejs.painting.src), {
         width: PAINTING_RASTER.width,
         height: PAINTING_RASTER.height,
       });
@@ -59,9 +63,15 @@ export class BootScene extends Phaser.Scene {
 
     label.destroy();
     const runnerData = this.registry.get('runnerData') as RunnerSceneData | undefined;
-    if (runnerData?.script !== undefined) {
-      this.scene.start('HubStubScene', { restored: false });
+    const gallery = (this.registry.get('cases') as Case[] | undefined) ?? [];
+    if (runnerData?.startInRunner === true && runnerData.script !== undefined) {
+      // ?case=… startuje historię od razu.
+      this.scene.start('RunnerScene', runnerData);
+    } else if (gallery.length > 0) {
+      // Domyślnie: hub z galerią obrazów.
+      this.scene.start('HubStubScene', {});
     } else {
+      // Tryb wolnego biegu (?free=1).
       this.scene.start('RunnerScene', runnerData ?? {});
     }
   }

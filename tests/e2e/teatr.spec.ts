@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 import { loadCase } from '../../src/content/loader';
+import { hubSlots } from '../../src/scenes/hubLayout';
 import { collectErrors, runThroughNarration } from './helpers';
 
 /**
@@ -48,16 +49,24 @@ test('hub → pełny case „Teatr jest nasz” → odrestaurowany obraz, zero b
   const errors = collectErrors(page);
   await page.goto('./');
   await expect(page.locator('body')).toHaveAttribute('data-game-ready', 'true');
-  await expect(page.locator('body')).toHaveAttribute('data-case-id', 'teatr-jest-nasz');
   await expect(page.locator('body')).toHaveAttribute('data-scene', 'hub', { timeout: 15_000 });
   await expect(page.locator('body')).toHaveAttribute('data-painting', 'damaged');
-  await expect(page.locator('#panel-title')).toHaveText(kejs.title);
+  await expect(page.locator('[data-testid="gallery"] .gallery-item')).toHaveCount(9);
   await page.waitForTimeout(900);
   await shot(page, 'etap3-hub');
 
-  // Klik w obraz na ścianie (środek canvasu).
-  await page.locator('#runner canvas').click();
+  // Klik w pierwszy obraz na ścianie („Teatr jest nasz”) — pozycja z układu galerii.
+  const canvas = await page.locator('#runner canvas').boundingBox();
+  const slot = hubSlots(9)[0];
+  expect(canvas).not.toBeNull();
+  expect(slot).toBeDefined();
+  if (canvas !== null && slot !== undefined) {
+    const scale = canvas.width / 960;
+    await page.mouse.click(canvas.x + slot.x * scale, canvas.y + slot.y * scale);
+  }
   await expect(page.locator('body')).toHaveAttribute('data-scene', 'runner', { timeout: 15_000 });
+  await expect(page.locator('body')).toHaveAttribute('data-case-id', 'teatr-jest-nasz');
+  await expect(page.locator('#panel-title')).toHaveText(kejs.title);
 
   const screenshots = new Set<string>();
   for (const beat of kejs.beats) {
@@ -150,18 +159,25 @@ test('hub → pełny case „Teatr jest nasz” → odrestaurowany obraz, zero b
     timeout: 15_000,
   });
   await expect(page.locator('body')).toHaveAttribute('data-scene', 'hub', { timeout: 15_000 });
-  await expect(page.locator('[data-testid="hub-enter"]')).toBeVisible();
+  await expect(page.locator('body')).toHaveAttribute('data-restored', /teatr-jest-nasz/);
+  await expect(page.locator('.gallery-item.is-restored')).toHaveCount(1);
   await page.waitForTimeout(1200);
   await shot(page, 'etap3-hub-restored');
   expect(errors).toEqual([]);
 });
 
-test('hub: przycisk w panelu też wchodzi w obraz (klawiatura/czytnik ekranu)', async ({ page }) => {
+test('hub: przycisk w panelu wchodzi w wybraną historię (klawiatura/czytnik ekranu)', async ({
+  page,
+}) => {
   const errors = collectErrors(page);
   await page.goto('./?layout=stack');
   await expect(page.locator('body')).toHaveAttribute('data-scene', 'hub', { timeout: 15_000 });
-  await page.locator('[data-testid="hub-enter"]').click();
+  await page.locator('[data-testid="hub-enter"][data-case="kultura-futura"]').click();
   await expect(page.locator('body')).toHaveAttribute('data-scene', 'runner', { timeout: 15_000 });
+  await expect(page.locator('body')).toHaveAttribute('data-case-id', 'kultura-futura');
   await waitForBeat(page, 'b01');
+  // Druga historia ma własny obraz i biegnie na tym samym silniku.
+  await runThroughNarration(page, 'b01');
+  await waitForBeat(page, 'b02');
   expect(errors).toEqual([]);
 });

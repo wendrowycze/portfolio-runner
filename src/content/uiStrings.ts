@@ -47,6 +47,11 @@ const UiStringsSchema = z.strictObject({
   runHint: z.string(),
   runHintTouch: z.string(),
   finaleAssembling: z.string(),
+  hubProgress: z.string(),
+  hubGalleryLead: z.string(),
+  hubWorldKultura: z.string(),
+  hubWorldEdukacja: z.string(),
+  hubWorldBiznes: z.string(),
 });
 
 export type UiStrings = z.infer<typeof UiStringsSchema>;

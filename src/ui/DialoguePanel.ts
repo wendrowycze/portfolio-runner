@@ -87,6 +87,9 @@ export class DialoguePanel {
       bus.on('finale:assembled', () => {
         this.revealFinale();
       }),
+      bus.on('hub:focus', (caseId) => {
+        this.setHubFocus(caseId);
+      }),
     );
     this.bind();
   }
@@ -119,26 +122,80 @@ export class DialoguePanel {
   }
 
   /**
-   * Widok hubu (przed wejściem w obraz i po ukończeniu): lead case'a + przycisk wejścia.
+   * Widok hubu: lista historii z galerii (tytuł, rola, świat, stan obrazu) i przyciski wejścia.
    * Wejście = zdarzenie `hub:enter` na magistrali (scena hubu robi przejście).
    */
-  showHub(kejs: Case, restored: boolean): void {
-    this.mount(kejs);
-    this.root.dataset.phase = restored ? 'hub-restored' : 'hub';
-    const entry = this.appendEntry('entry-narration entry-lead');
-    entry.append(el('p', { className: 'narration-text', text: kejs.lead }));
-    if (restored) {
-      const done = this.appendEntry('entry-feedback is-right');
-      done.append(el('p', { text: this.strings.finaleRestored }));
-      const again = this.appendEntry('entry-narration');
-      again.append(el('p', { className: 'hint', text: this.strings.hubLeadRestored }));
-    } else {
-      entry.append(el('p', { className: 'hint', text: this.strings.hubHint }));
+  showHubGallery(cases: Case[], completed: ReadonlySet<string>): void {
+    this.kejs = undefined;
+    clear(this.header);
+    clear(this.story);
+    clear(this.footer);
+    this.fragmentSlots.length = 0;
+    this.narrationParagraphs.clear();
+    this.root.dataset.phase = 'hub';
+    delete this.root.dataset.beat;
+
+    this.header.append(
+      el('p', {
+        className: 'case-role',
+        text: format(this.strings.hubProgress, { done: completed.size, total: cases.length }),
+      }),
+      el('h1', { className: 'case-title', attrs: { id: 'panel-title' }, text: 'Portfolio Runner' }),
+    );
+    const lead = this.appendEntry('entry-narration entry-lead');
+    lead.append(el('p', { className: 'narration-text', text: this.strings.hubGalleryLead }));
+
+    const list = el('ol', { className: 'gallery', attrs: { 'data-testid': 'gallery' } });
+    for (const kejs of cases) {
+      const restored = completed.has(kejs.id);
+      const worldLabel =
+        kejs.world === 'biznes'
+          ? this.strings.hubWorldBiznes
+          : kejs.world === 'edukacja'
+            ? this.strings.hubWorldEdukacja
+            : this.strings.hubWorldKultura;
+      const button = el('button', {
+        className: 'button gallery-enter',
+        text: restored ? this.strings.playAgain : this.strings.hubEnter,
+        attrs: { type: 'button', 'data-testid': 'hub-enter', 'data-case': kejs.id },
+      });
+      button.addEventListener('click', (event) => {
+        event.stopPropagation();
+        bus.emit('hub:enter', kejs.id);
+      });
+      const item = el('li', {
+        className: `gallery-item${restored ? ' is-restored' : ''}`,
+        attrs: { 'data-case': kejs.id },
+        children: [
+          el('p', {
+            className: 'gallery-meta',
+            children: [
+              el('span', { className: 'gallery-world', text: worldLabel }),
+              el('span', {
+                className: 'gallery-status',
+                text: restored ? this.strings.hubRestored : this.strings.hubDamaged,
+              }),
+            ],
+          }),
+          el('h2', { className: 'gallery-title', text: kejs.title }),
+          el('p', { className: 'gallery-role', text: kejs.role }),
+          button,
+        ],
+      });
+      list.append(item);
     }
-    this.showContinue(restored ? this.strings.playAgain : this.strings.hubEnter, () => {
-      bus.emit('hub:enter');
-    });
-    this.footer.querySelector('button')?.setAttribute('data-testid', 'hub-enter');
+    const entry = this.appendEntry('entry-gallery');
+    entry.append(list);
+    this.story.scrollTop = 0;
+  }
+
+  /** Podświetla pozycję listy odpowiadającą obrazowi pod kursorem w scenie hubu. */
+  setHubFocus(caseId: string | undefined): void {
+    for (const item of this.story.querySelectorAll<HTMLElement>('.gallery-item')) {
+      const focused = caseId !== undefined && item.dataset.case === caseId;
+      item.classList.toggle('is-focus', focused);
+      if (focused) item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
   }
 
   // ----- publiczne API z docs/02_ARCHITEKTURA.md sekcja 3 -----

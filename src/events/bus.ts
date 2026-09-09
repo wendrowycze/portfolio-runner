@@ -17,8 +17,12 @@ export interface BusEvents extends Record<string, unknown[]> {
   'move:direction': [direction: -1 | 0 | 1];
   /** Finał: fragmenty tła złożyły się w obraz — panel może pokazać tekst zamknięcia i CTA. */
   'finale:assembled': [];
-  /** Prośba o wejście w obraz (klik w obraz na hubie albo przycisk w panelu). */
-  'hub:enter': [];
+  /** Prośba o wejście w obraz danego case'a (klik w obraz na hubie albo przycisk w panelu). */
+  'hub:enter': [caseId: string];
+  /** Hub potwierdza wybór case'a i zaczyna przejście — main.ts przygotowuje skrypt i panel. */
+  'hub:selected': [caseId: string];
+  /** Najechanie na obraz w hubie (panel może podświetlić pozycję listy). */
+  'hub:focus': [caseId: string | undefined];
   /** Przełączenie widoczności HUD debug. */
   'debug:toggle': [visible: boolean];
 }

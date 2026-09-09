@@ -49,11 +49,13 @@ export const ASSET_MANIFEST = {
   'obstacle.boty': generated,
   'obstacle.telefony': generated,
   'obstacle.brama': generated,
+  'obstacle.dokumenty': generated,
+  'obstacle.kable': generated,
 
-  // --- obraz case'a: ścieżka pochodzi z JSON case'a (painting.src), klucz tekstury jest stały ---
-  'painting.current': {
+  // --- obrazy case'ów: ścieżki pochodzą z JSON (painting.src); klucz tekstury = painting.<id> ---
+  'painting.*': {
     source: 'case',
-    license: 'placeholder SVG generowany kodem (public/assets/paintings/*)',
+    license: 'placeholder SVG generowany kodem (public/assets/paintings/*, scripts/paintings.mjs)',
   },
 
   // --- efekty ---
@@ -74,6 +76,11 @@ export const PLAYER_RUN_FRAMES = 6;
 
 export function playerRunFrameKey(index: number): string {
   return `${textureKey('player.run')}.${String(index)}`;
+}
+
+/** Klucz tekstury obrazu danego case'a (wpis 'painting.*' w manifeście). */
+export function paintingTextureKey(caseId: string): string {
+  return `painting.${caseId}`;
 }
 
 /** Rozmiar, do jakiego rasteryzowany jest obraz case'a (SVG) w Phaserze — 3:2 jak siatka 3×2. */

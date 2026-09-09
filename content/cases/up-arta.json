@@ -1,0 +1,224 @@
+{
+  "id": "up-arta",
+  "world": "kultura",
+  "title": "Połącz elektronikę, filozofię i design, aby pomóc ludziom rozmawiać o AI",
+  "lead": "Pomóż odwiedzającym wystawy zrozumieć, jak można rozmawiać o sztucznej inteligencji w zrozumiały dla wszystkich sposób.",
+  "role": "Twórca cyfrowego artefaktu, instalacji Ars-electronica",
+  "skills": [
+    "Programowanie (C/Python)",
+    "Design i Ars-electronica",
+    "Produkcja (CNC, Arduino, druk 3D)"
+  ],
+  "painting": {
+    "src": "assets/paintings/up-arta.svg",
+    "cols": 3,
+    "rows": 2,
+    "caption": "UP-art'A: małe pianino z oktawą z każdej z czterech stron — cztery relacje z technologią. Obraz odrestaurowany."
+  },
+  "runner": {
+    "theme": "kultura",
+    "baseSpeed": 220,
+    "choiceSlowdown": 0.35
+  },
+  "beats": [
+    {
+      "id": "b01",
+      "type": "narration",
+      "text": "Ktoś zadał Ci pytanie, które od razu uznałeś za absurdalne: „Jaka sztuczna inteligencja powinna uczyć nasze dzieci grać na pianinie?”. Niemożliwe do odpowiedzi, a w dodatku niebezpieczne, bo sugerujące, że technologie dzielą się na dobre (komputery) i złe (smartfony).",
+      "advance": "tap"
+    },
+    {
+      "id": "b02",
+      "type": "choice",
+      "prompt": "Los nie pozwala Ci przejść obok tego obojętnie. Jak odpowiadasz na niemożliwe pytanie?",
+      "obstacle": "boty",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Zamiast odpowiedzi szukam pytań — fundamentalnych, które pozwolą różnym ludziom rozmawiać.",
+          "correct": true,
+          "feedback": "Odpowiedź ma być opowieścią, interaktywnym doświadczeniem, które tworzy wspólny grunt do rozmowy w oparciu o odmienne wartości.",
+          "skill": "Design i Ars-electronica"
+        },
+        {
+          "text": "Wybieram „dobrą” technologię i bronię jej.",
+          "correct": false,
+          "feedback": "To dokładnie pułapka z pytania: podział na dobre i złe technologie. Muza Ars-electronica podpowiada inaczej."
+        },
+        {
+          "text": "Ignoruję — to pytanie nie ma sensu.",
+          "correct": false,
+          "feedback": "Nie ma sensu jako pytanie o odpowiedź. Ma ogromny sens jako punkt wyjścia do rozmowy."
+        }
+      ],
+      "reward": {
+        "fragment": 1
+      }
+    },
+    {
+      "id": "b03",
+      "type": "narration",
+      "text": "Po ponad 500 godzinach lutowania, programowania i modelowania udaje Ci się zbudować wyjątkowy artefakt — małe pianino. Ma oktawę z każdej z czterech stron, a każda symbolizuje inny model relacji z technologią: asystującą, autorytarną, automatyczną i autonomiczną.",
+      "advance": "tap"
+    },
+    {
+      "id": "b04",
+      "type": "choice",
+      "prompt": "Zwiedzający pyta: która strona pianina gra za mnie?",
+      "obstacle": "kable",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Automatyczna — gra za Ciebie.",
+          "correct": true,
+          "feedback": "Tak. Asystująca podpowiada światłem i dźwiękiem, autorytarna pozwala tylko na właściwe klawisze, a autonomiczna zaczyna grać razem z Tobą, jeśli podoba jej się Twój styl.",
+          "skill": "Programowanie (C/Python)"
+        },
+        {
+          "text": "Asystująca — podpowiada kolejność klawiszy.",
+          "correct": false,
+          "feedback": "Asystująca tylko podpowiada światłem i dźwiękiem. Grać musisz sam — to inna relacja z technologią."
+        },
+        {
+          "text": "Autorytarna — pozwala wciskać tylko właściwe klawisze.",
+          "correct": false,
+          "feedback": "Autorytarna pilnuje tempa i klawiszy, ale nie gra za Ciebie. Ta, która gra sama, to automatyczna."
+        }
+      ],
+      "reward": {
+        "fragment": 2
+      }
+    },
+    {
+      "id": "b05",
+      "type": "action",
+      "prompt": "Ostatnia noc przed pierwszą wystawą: obudowa z drukarki 3D jeszcze ciepła, Arduino na stole. Przeskocz plątaninę kabli i dokończ montaż!",
+      "input": "jump",
+      "obstacle": "kable",
+      "windowMs": 800,
+      "reward": {
+        "fragment": 3
+      }
+    },
+    {
+      "id": "b06",
+      "type": "interaction",
+      "widget": "puzzle",
+      "text": "Ułóż ilustrację pianina z katalogu Gdynia Design Days 2019, zamieniając miejscami fragmenty.",
+      "reward": {
+        "fragment": 4
+      }
+    },
+    {
+      "id": "b07",
+      "type": "narration",
+      "text": "Zbudowanie artefaktu to dopiero początek. Prezentujesz dzieło na wystawach, w galeriach i teatrach. Prowadzisz wykłady na uniwersytetach oraz warsztaty dla dzieci w szkołach podstawowych. Wszystkie doświadczenia zbierasz w krótkiej książce: filozofię projektowania artefaktów cyfrowych i metodologię dla innych twórców.",
+      "advance": "tap"
+    },
+    {
+      "id": "b08",
+      "type": "interaction",
+      "widget": "button",
+      "label": "POKAŻ PIANINO NA WYSTAWACH",
+      "style": "zrzutka",
+      "counter": {
+        "from": 0,
+        "to": 20000,
+        "suffix": " osób"
+      },
+      "text": "Pianino trafia na międzynarodowe wystawy. Kliknij, by zobaczyć, ile osób je zobaczyło.",
+      "reward": {
+        "fragment": 5
+      }
+    },
+    {
+      "id": "b09",
+      "type": "narration",
+      "text": "Jest rok 2019 — sprawy, o których dyskutujesz, wydają się odległą przyszłością dla Twoich dzieci i wnuków. Dopiero za kilka lat w pełni zrozumiesz słowa Williama Gibsona: „przyszłość już tu jest, tylko nie została jeszcze równomiernie rozdystrybuowana”.",
+      "advance": "tap"
+    },
+    {
+      "id": "b10",
+      "type": "choice",
+      "prompt": "Po wykładzie w Auli Uniwersytetu Jagiellońskiego student pyta: czym różni się zwykły obiekt od prawdziwej Ars-electroniki?",
+      "obstacle": "kolumna",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Splątaniem wniosków, które zamknięto w interaktywnym doświadczeniu widza.",
+          "correct": true,
+          "feedback": "To doświadczenie nauczyło Cię właśnie tego: Ars-electronica to nie obiekt, tylko wnioski, które widz przeżywa własnymi rękami.",
+          "skill": "Produkcja (CNC, Arduino, druk 3D)"
+        },
+        {
+          "text": "Liczbą diod i czujników.",
+          "correct": false,
+          "feedback": "Elektronika to środek, nie cel. Pianino działa, bo cztery strony niosą cztery wnioski, a nie bo ma dużo diod."
+        },
+        {
+          "text": "Ceną wykonania.",
+          "correct": false,
+          "feedback": "500 godzin pracy nie czyni z obiektu sztuki. Czyni to doświadczenie, które obiekt wywołuje w widzu."
+        }
+      ],
+      "reward": {
+        "fragment": 6
+      }
+    },
+    {
+      "id": "b11",
+      "type": "narration",
+      "text": "Poprowadziłeś ponad 200 godzin warsztatów, wykładów i wystąpień — od szkół podstawowych i liceów plastycznych po Aulę Uniwersytetu Jagiellońskiego. Twoje doświadczenie w łączeniu sztuki, filozofii i inżynierii zostaje docenione: od kolejnego roku akademickiego zostajesz pomocnikiem w pracowni tworzącej podobne dzieła.",
+      "advance": "tap"
+    },
+    {
+      "id": "b12",
+      "type": "results",
+      "stats": [
+        {
+          "skill": "Programowanie (C/Python)",
+          "delta": 10
+        },
+        {
+          "skill": "Design i Ars-electronica",
+          "delta": 10
+        },
+        {
+          "skill": "Produkcja (CNC, Arduino, druk 3D)",
+          "delta": 10
+        }
+      ],
+      "kpis": [
+        {
+          "label": "Widzowie na wystawach",
+          "value": "ponad 20 000 osób"
+        },
+        {
+          "label": "Warsztaty, wykłady, wystąpienia",
+          "value": "ponad 200 godzin"
+        },
+        {
+          "label": "Budowa artefaktu",
+          "value": "ponad 500 godzin lutowania, programowania i modelowania"
+        },
+        {
+          "label": "Nowa rola",
+          "value": "pomocnik w pracowni artefaktów cyfrowych"
+        },
+        {
+          "label": "Wiedza idzie dalej",
+          "value": "warsztaty dla sektora bankowego (ING)"
+        }
+      ]
+    },
+    {
+      "id": "b13",
+      "type": "finale",
+      "text": "Z absurdalnego pytania powstało pianino, książka i 200 godzin rozmów o technologii. Nauczyłeś się, czym różni się zwykły obiekt od Ars-electroniki: splątaniem wniosków, które widz przeżywa sam.",
+      "cta": {
+        "label": "Poznaj Arka na LinkedIn",
+        "url": "https://www.linkedin.com/in/arkadiusz-klej/"
+      }
+    }
+  ]
+}

@@ -166,3 +166,40 @@ Arek (po zagraniu w podgląd): „ogólnie jest zajebiście”, plus dwie zmiany
 
 - Nakładka DOM finału usunięta (`FinaleOverlay.ts`). Finał gra `RunnerScene.playFinale()`: sceneria ciemnieje, sześć fragmentów obrazu (klatki tekstury SVG) pojawia się rozrzuconych po panoramie, kolumnadzie i latarniach jak ukryte w tle, po czym w kolejności zebrania zlatują na siatkę pośrodku sceny (`Back.easeOut`), iskry, złoty rozbłysk, rama. Scena emituje `finale:assembled`; panel po lewej pokazuje wtedy podpis obrazu, tekst zamknięcia (maszyna do pisania) i CTA + „Wróć do hotelu”.
 - Do testów: `body[data-finale="assembled"]`.
+
+---
+
+## 2026-09-09 — Pozostałe historie: 8 nowych case'ów, obrazy, galeria w hubie
+
+Na prośbę Arka („przygotuj też wszystkie pozostałe historie, zrób do nich grafiki”) — poza pierwotnym zakresem PoC (backlog P1 „Kolejne case'y”), ale zamówione wprost.
+
+### Treść (`content/cases/*.json`)
+
+Przepisane z `content/cases_raw/` wg `content/cases/_SZABLON.md`: 6 fragmentów (3×2), 2–3 choice, 1–2 action, 1–2 interaction, max 3 narracje pod rząd, teksty ≤ 400 znaków, liczby wyłącznie z materiału źródłowego. Test `tests/unit/cases.test.ts` pilnuje tych reguł dla każdego pliku i przechodzi każdy case ScriptRunnerem.
+
+| id | świat | interakcje | uwagi / interpretacje do potwierdzenia przez Arka |
+|---|---|---|---|
+| kultura-futura | kultura | reveal („zamknij oczy”) + puzzle | Wybór patronów (A&B / Vogue / Wyborcza): źródło nie mówi, kogo wybrano — opcja trafna „wszystkie trzy” wzorowana na easter eggu z Kalejdoskopu. Literówka źródła „konfiltków” poprawiona. |
+| cyrograf-na-kwadrat | kultura | puzzle (wykres oszustw) + button „Otwórz gazetę” (licznik do 100 000 osób) | Linki do Facebooka/Issuu ze źródła pominięte (nie ma ich w cases_raw). |
+| ko-kreacja-mkidn | kultura | puzzle (Canvas Ko-kreacji) | Trzy zdania otwierające z tekstu źródłowego stały się dosłownie opcjami pierwszego wyboru. Brak liczbowych KPI w źródle — wyniki jakościowe. Skille skrócone do 3 słów-kluczy. |
+| kalejdoskop | kultura | puzzle | Easter egg z wersji roboczej („wybierasz jednego, potem wszystkich”) oddany jako wybór z opcją „wszyscy trzej”. Tekst źródłowy urywa się po pierwszym dniu — finał nie dopisuje kolejnych dni. Delty skilli z wersji roboczej (+10/+15/+11), „Lniane gacie… +4” jako KPI-żart. |
+| ewaluacja-festiwali | kultura | puzzle („mała postać otoczona klockami” — dosłownie motyw obrazu) | Wyniki z wersji roboczej (+8/+10/+7); pierwszy, urwany punkt „+10 do ,” przypisany do skilla Antropologia. |
+| up-arta | kultura | puzzle (ilustracja pianina) + button (licznik 20 000 widzów) | Cztery interakcje ze źródła scalone do dwóch; przyciski „TEDx / ING / dowiedz się więcej” bez linków w źródle → KPI „warsztaty dla sektora bankowego (ING)”. Czwarty skill (Filozofia cyfrowa) pominięty (limit 3). |
+| gra-teatralna-improvisio | kultura | puzzle | Wersja robocza (V1). Brak KPI liczbowych; „testy: licea, SWPS, UJ, UŚ” z notatki źródłowej. Tytuł skrócony do formy misji. |
+| scouting-pfr | **biznes** | button („Roześlij zapytania”, licznik 5 języków) | Wersja robocza. Jedyny case świata Biznes — obraz w stylu „planów konstrukcyjnych” (docs/04). Pytanie o The Mom Test oparte na metodzie, nie na cytacie ze źródła. CTA „Napisz do Arka” zgodnie z placeholderem autora. |
+| mundur | — | — | **Pominięty**: w źródle tylko nagłówek, bez treści (zasada „nie wymyślaj faktów”). |
+
+Nowe przeszkody: `dokumenty` (sterta kartek z pieczęcią), `kable` (plątanina przewodów).
+
+### Obrazy (`scripts/paintings.mjs`, `npm run paintings`)
+
+Generator SVG: wspólna rama maureskowa, marmur, promienie i sylwetki-kariatydy (jak w ręcznie napisanym obrazie „Teatru”), motyw środkowy per case (globus VR, tablica śledztwa z wykresem, Canvas, pałac w Gardzienicach z ogniskiem, przedzieranka z klockami, czterostronne pianino, trzy karty, kompas z dymkami w 5 językach). Świat Biznes: tło „blueprint” (siatka techniczna na ciemnym turkusie). Obrazy są „wygenerowane kodem” w rozumieniu docs/04 — pliki w `public/assets/paintings/` są artefaktem skryptu, nie edytować ręcznie (poza `teatr-jest-nasz.svg` i `_demo.svg`, pisanymi ręcznie wcześniej).
+
+### Silnik
+
+- `src/content/cases.ts`: rejestr wszystkich case'ów z kolejnością wieszania (wg rekomendacji `_INDEKS.md`, pilot pierwszy, `_demo` ukryty), `fetchGalleryCases()`.
+- `src/state/progress.ts`: ukończone historie — w pamięci (ADR-4).
+- `HubStubScene` = galeria: 9 obrazów w dwóch rzędach (`src/scenes/hubLayout.ts`, czysta funkcja używana też przez e2e do kliknięcia w obraz), każdy z ramą, tabliczką, stanem zniszczony/odrestaurowany, najazdem i nazwą pod kursorem. Panel po lewej: lista historii z przyciskami „Wejdź w obraz” (klawiatura/czytnik), podświetlana przy najechaniu na obraz (`hub:focus`).
+- Wejście: `hub:enter(id)` → scena emituje `hub:selected(id)` → `main.ts` przeładowuje ScriptRunner i panel na wybraną historię → najazd kamery → RunnerScene. Po finale obraz danego case'a wraca odrestaurowany (iskry), reszta bez zmian.
+- `?case=<id>` pomija hub i startuje historię od razu (także `_demo`). `BootScene` ładuje wszystkie SVG galerii na starcie (9 × 960×640).
+- Klucze tekstur: `painting.<id>` (wpis `painting.*` w manifeście).

@@ -4,11 +4,7 @@
   "title": "Zostań redaktorem naczelnym międzynarodowego Biennale Przyszłości Kultury",
   "lead": "Teatr w Krakowie potrzebuje Redaktora Naczelnego, który poprowadzi komunikację międzynarodowego Biennale i zainspiruje zespół do odważnego poszukiwania innowacji.",
   "role": "Redaktor Naczelny Biennale",
-  "skills": [
-    "Dziennikarstwo",
-    "Zarządzanie zespołem",
-    "Technologia"
-  ],
+  "skills": ["Dziennikarstwo", "Zarządzanie zespołem", "Technologia"],
   "painting": {
     "src": "assets/paintings/kultura-futura.svg",
     "cols": 3,

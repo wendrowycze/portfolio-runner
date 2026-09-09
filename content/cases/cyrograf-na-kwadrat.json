@@ -4,11 +4,7 @@
   "title": "Ujawnij model działania przestępców oszukujących studentów",
   "lead": "Parlament Studentów Rzeczypospolitej chce przeciwdziałać narastającej fali oszustw mieszkaniowych i powstrzymać grupy oszustów.",
   "role": "Redaktor prowadzący śledztwo dziennikarskie",
-  "skills": [
-    "Dziennikarstwo śledcze",
-    "Zarządzanie zespołem",
-    "Analiza danych"
-  ],
+  "skills": ["Dziennikarstwo śledcze", "Zarządzanie zespołem", "Analiza danych"],
   "painting": {
     "src": "assets/paintings/cyrograf-na-kwadrat.svg",
     "cols": 3,

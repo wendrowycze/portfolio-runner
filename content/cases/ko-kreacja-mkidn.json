@@ -4,11 +4,7 @@
   "title": "Pomóż Ministerstwu Kultury edukować o ko-kreacji oferty instytucji kulturalnych",
   "lead": "Ministerstwo Kultury chce zaangażować mieszkańców w tworzenie oferty instytucji kultury.",
   "role": "Ekspert programu „Bardzo Młoda Kultura”",
-  "skills": [
-    "Projektowanie usług",
-    "Polityki publiczne",
-    "Instytucje kultury"
-  ],
+  "skills": ["Projektowanie usług", "Polityki publiczne", "Instytucje kultury"],
   "painting": {
     "src": "assets/paintings/ko-kreacja-mkidn.svg",
     "cols": 3,

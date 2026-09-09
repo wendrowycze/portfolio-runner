@@ -213,6 +213,70 @@ const brama: Painter = (g, w, h) => {
   g.lineBetween(w / 2 + 7, 22, w / 2 - 7, 32);
 };
 
+/** Sterta dokumentów: kartki z liniami tekstu, jedna czerwona pieczęć. */
+const dokumenty: Painter = (g, w, h) => {
+  shadow(g, w, h);
+  const paper = col('text');
+  const ink = col('textMuted');
+  const sheets: [number, number, number][] = [
+    [6, 22, -6],
+    [12, 14, 4],
+    [8, 6, -3],
+  ];
+  for (const [x, y, tilt] of sheets) {
+    g.fillStyle(col('bgDeep'), 0.35);
+    g.fillRect(x + 3, y + 3, w - 18, 30);
+    g.fillStyle(paper, 1);
+    g.fillPoints(
+      [
+        { x, y: y + tilt * 0.2 },
+        { x: x + w - 18, y },
+        { x: x + w - 18, y: y + 30 },
+        { x, y: y + 30 + tilt * 0.2 },
+      ],
+      true,
+    );
+    g.fillStyle(ink, 1);
+    for (let line = 0; line < 4; line += 1) {
+      g.fillRect(x + 5, y + 6 + line * 6, w - 30 - (line % 2) * 8, 2);
+    }
+  }
+  g.fillStyle(col('warn'), 1);
+  g.fillCircle(w - 18, 18, 7);
+  g.lineStyle(2, paper, 1);
+  g.strokeCircle(w - 18, 18, 4);
+};
+
+/** Plątanina kabli: pętle przewodów i wtyczki, złote styki. */
+const kable: Painter = (g, w, h) => {
+  shadow(g, w, h);
+  const wire = col('textMuted');
+  const light = col('text');
+  g.lineStyle(4, wire, 1);
+  for (let i = 0; i < 4; i += 1) {
+    g.beginPath();
+    g.arc(14 + i * 20, h - 16, 11 + (i % 2) * 4, Math.PI, 0, false);
+    g.strokePath();
+  }
+  g.lineStyle(3, light, 1);
+  g.beginPath();
+  g.moveTo(4, h - 8);
+  for (let x = 4; x <= w - 4; x += 8) {
+    g.lineTo(x, h - 8 - (x % 16 === 0 ? 10 : 2));
+  }
+  g.strokePath();
+  // Wtyczki.
+  for (const x of [12, w - 24]) {
+    g.fillStyle(light, 1);
+    g.fillRoundedRect(x, 4, 14, 12, 3);
+    g.fillStyle(col('gold'), 1);
+    g.fillRect(x + 3, 16, 2, 6);
+    g.fillRect(x + 9, 16, 2, 6);
+  }
+  g.fillStyle(col('gold'), 1);
+  g.fillCircle(w / 2, 10, 3);
+};
+
 const PAINTERS: Record<keyof typeof OBSTACLES, Painter> = {
   barierka,
   skrzynia,
@@ -221,6 +285,8 @@ const PAINTERS: Record<keyof typeof OBSTACLES, Painter> = {
   boty,
   telefony,
   brama,
+  dokumenty,
+  kable,
 };
 
 export function generateObstacles(scene: Phaser.Scene): void {

@@ -26,6 +26,12 @@ export const TUNING = {
   REWIND_SPEED_MULT: 0.8,
   /** Jak szybko świat reaguje na wciśnięcie/puszczenie klawisza biegu (ms, stała czasowa). */
   MOVE_RESPONSE_MS: 160,
+  /**
+   * Górny limit czasu klatki (ms) używany przez scenę biegu. Bierzemy surowy czas klatki
+   * (Phaser przy braku fokusu okna przycina delta do 1/60 s, co spowalnia świat), ale po
+   * powrocie z innej karty nie „przewijamy” zegarów beatów o kilkadziesiąt sekund.
+   */
+  MAX_FRAME_MS: 100,
   /** Ile ms po spawnie przeszkoda wchodzi w strefę QTE (action). */
   ACTION_ZONE_START_MS: 1500,
   /** Domyślna szerokość strefy QTE (px) — używana, gdy beat nie definiuje okna. */

@@ -11,7 +11,8 @@
     "test": "vitest run",
     "e2e": "playwright test",
     "lint": "eslint . && prettier --check .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "paintings": "node scripts/paintings.mjs"
   },
   "dependencies": {
     "phaser": "^3.90.0",

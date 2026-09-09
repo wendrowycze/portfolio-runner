@@ -65,6 +65,20 @@ export const OBSTACLES = {
     bodyWidth: 70,
     bodyHeight: 78,
   },
+  dokumenty: {
+    texture: 'obstacle.dokumenty',
+    width: 64,
+    height: 56,
+    bodyWidth: 54,
+    bodyHeight: 50,
+  },
+  kable: {
+    texture: 'obstacle.kable',
+    width: 88,
+    height: 44,
+    bodyWidth: 76,
+    bodyHeight: 36,
+  },
 } as const satisfies Record<string, ObstacleDef>;
 
 export type ObstacleKey = keyof typeof OBSTACLES;

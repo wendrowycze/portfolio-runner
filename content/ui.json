@@ -43,5 +43,10 @@
   "hubLeadRestored": "Historia opowiedziana — obraz wrócił na ścianę w całości. Możesz przejść ją jeszcze raz.",
   "runHint": "Przytrzymaj D lub →, aby biec i czytać. A lub ← cofa bieg i tekst.",
   "runHintTouch": "Na telefonie: przytrzymaj prawą część biegu, aby biec; lewą, żeby się cofnąć.",
-  "finaleAssembling": "Fragmenty tła składają się w obraz…"
+  "finaleAssembling": "Fragmenty tła składają się w obraz…",
+  "hubProgress": "Odrestaurowane {done}/{total}",
+  "hubGalleryLead": "Na ścianie hotelu wisi dziewięć zniszczonych obrazów — każdy to jedna historia. Kliknij obraz albo wybierz historię z listy.",
+  "hubWorldKultura": "Kultura",
+  "hubWorldEdukacja": "Edukacja",
+  "hubWorldBiznes": "Biznes"
 }

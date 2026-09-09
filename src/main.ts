@@ -2,11 +2,13 @@ import Phaser from 'phaser';
 import { createGameConfig } from './config/gameConfig';
 import { resolveLayout, urlFlag } from './config/layout';
 import { TUNING } from './config/tuning';
-import { DEFAULT_CASE_ID, fetchCase, isKnownCase } from './content/cases';
+import { fetchCase, fetchGalleryCases, isKnownCase } from './content/cases';
 import { loadUiStrings, type UiStrings } from './content/uiStrings';
 import type { RunnerSceneData } from './scenes/RunnerScene';
 import { ScriptRunner } from './script/ScriptRunner';
+import type { Case } from './script/types';
 import { createGameState, resetGameState } from './state/GameState';
+import { createProgress } from './state/progress';
 import { bus } from './events/bus';
 import { DialoguePanel } from './ui/DialoguePanel';
 import { clear, el } from './ui/dom';
@@ -43,42 +45,59 @@ async function start(): Promise<void> {
     return;
   }
 
-  // Treść: case z ?case= (domyślnie pilot „Teatr jest nasz”), zwalidowany przez zod przy ładowaniu.
+  // Treść: wszystkie historie galerii (zod przy ładowaniu); ?case= startuje wybraną od razu.
+  const gallery = await fetchGalleryCases();
   const requestedCase = new URLSearchParams(search).get('case');
-  const caseId =
-    requestedCase !== null && isKnownCase(requestedCase) ? requestedCase : DEFAULT_CASE_ID;
-  const kejs = await fetchCase(caseId);
-  document.title = `${kejs.title} — Portfolio Runner`;
+  const startCase =
+    requestedCase !== null && isKnownCase(requestedCase)
+      ? (gallery.find((c) => c.id === requestedCase) ?? (await fetchCase(requestedCase)))
+      : undefined;
 
-  const state = createGameState(kejs.runner.baseSpeed);
+  const progress = createProgress();
+  const state = createGameState(TUNING.BASE_SPEED);
   const runner = new ScriptRunner(state);
-  runner.load(kejs);
-
   const panel = new DialoguePanel(panelContainer, runner, state, strings, {
     overlayParent: gameRoot,
     returnLabel: strings.finaleReturn,
   });
-  panel.showHub(kejs, false);
+  const runnerData: RunnerSceneData = { debug, startInRunner: startCase !== undefined };
 
-  // Wejście w obraz (klik na hubie / przycisk w panelu): świeży stan, panel gotowy na beaty.
-  bus.on('hub:enter', () => {
+  /** Przygotowuje silnik i panel na wybraną historię (świeży stan, przeładowany skrypt). */
+  const prepare = (kejs: Case): void => {
     resetGameState(state, kejs.runner.baseSpeed);
     runner.load(kejs);
     panel.mount(kejs);
+    runnerData.script = { runner, kejs, state };
+    document.title = `${kejs.title} — Portfolio Runner`;
+    document.body.dataset.caseId = kejs.id;
+    document.body.dataset.painting = progress.completed.has(kejs.id) ? 'restored' : 'damaged';
+  };
+
+  bus.on('hub:selected', (caseId) => {
+    const kejs = gallery.find((c) => c.id === caseId) ?? runnerData.script?.kejs;
+    if (kejs !== undefined) prepare(kejs);
   });
+
+  if (startCase !== undefined) prepare(startCase);
+  else panel.showHubGallery(gallery, progress.completed);
 
   // Czekamy na fonty, żeby tekst w canvasie nie renderował się fontem zastępczym.
   await document.fonts.ready;
 
   const game = new Phaser.Game(createGameConfig(runnerContainer));
-  const runnerData: RunnerSceneData = { debug, script: { runner, kejs, state } };
   game.registry.set('runnerData', runnerData);
   game.registry.set('uiStrings', strings);
+  game.registry.set('cases', gallery);
+  game.registry.set('progress', progress);
 
-  // Po finale: powrót do hubu z odrestaurowanym obrazem (docs/02_ARCHITEKTURA.md sekcja 2).
+  // Po finale: obraz odrestaurowany, powrót do galerii (docs/02_ARCHITEKTURA.md sekcja 2).
   runner.on('case:finished', () => {
-    panel.showHub(kejs, true);
-    game.scene.getScene('RunnerScene').scene.start('HubStubScene', { restored: true });
+    const finished = runnerData.script?.kejs.id;
+    if (finished !== undefined) progress.completed.add(finished);
+    document.body.dataset.painting = 'restored';
+    document.title = 'Portfolio Runner';
+    panel.showHubGallery(gallery, progress.completed);
+    game.scene.getScene('RunnerScene').scene.start('HubStubScene', { justFinished: finished });
   });
 
   watchResize(game);
@@ -89,11 +108,11 @@ async function start(): Promise<void> {
       game,
       runner,
       state,
+      progress,
     };
   }
 
   document.body.dataset.gameReady = 'true';
-  document.body.dataset.caseId = kejs.id;
 }
 
 /** Phaser nie zawsze wykrywa zmianę rozmiaru kontenera (CLAUDE.md, „Pułapki”) — debounce. */

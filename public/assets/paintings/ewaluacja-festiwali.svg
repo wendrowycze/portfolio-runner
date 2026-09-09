@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" width="960" height="640">
+  <!-- Wygenerowane przez scripts/paintings.mjs (npm run paintings). Nie edytować ręcznie. -->
+  
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="38%" r="60%">
+      <stop offset="0" stop-color="#3E2219"/>
+      <stop offset="1" stop-color="#261619"/>
+    </radialGradient>
+    <pattern id="mauresque" width="48" height="48" patternUnits="userSpaceOnUse">
+      <rect width="48" height="48" fill="#3E2219"/>
+      <path d="M24 3 L30 18 L45 24 L30 30 L24 45 L18 30 L3 24 L18 18 Z" fill="none" stroke="#DFB67C" stroke-width="2"/>
+      <circle cx="24" cy="24" r="4" fill="#DFB67C"/>
+      <path d="M0 0 L8 0 L0 8 Z M48 48 L40 48 L48 40 Z M48 0 L40 0 L48 8 Z M0 48 L8 48 L0 40 Z" fill="#895F47"/>
+    </pattern>
+    <pattern id="blueprint" width="40" height="40" patternUnits="userSpaceOnUse">
+      <rect width="40" height="40" fill="#0B2F2E"/>
+      <path d="M0 0 H40 M0 0 V40" fill="none" stroke="#DFB67C" stroke-opacity="0.35" stroke-width="1"/>
+      <path d="M20 0 V40 M0 20 H40" fill="none" stroke="#DFB67C" stroke-opacity="0.12" stroke-width="1"/>
+    </pattern>
+    <pattern id="marble" width="160" height="160" patternUnits="userSpaceOnUse">
+      <rect width="160" height="160" fill="#3E2219"/>
+      <path d="M-10 40 Q40 20 90 60 T170 50" fill="none" stroke="#895F47" stroke-opacity="0.35" stroke-width="2"/>
+      <path d="M-10 120 Q60 90 110 130 T170 110" fill="none" stroke="#DFB67C" stroke-opacity="0.12" stroke-width="1.5"/>
+    </pattern>
+    <linearGradient id="stone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#DFB67C"/>
+      <stop offset="1" stop-color="#895F47"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="640" fill="url(#mauresque)"/>
+  <rect x="36" y="36" width="888" height="568" fill="url(#marble)"/>
+  <rect x="36" y="36" width="888" height="568" fill="url(#glow)" opacity="0.75"/>
+  <rect x="36" y="36" width="888" height="568" fill="none" stroke="#DFB67C" stroke-width="6"/>
+  <rect x="48" y="48" width="864" height="544" fill="none" stroke="#895F47" stroke-width="2"/>
+  <g stroke="#DFB67C" stroke-opacity="0.09" stroke-width="10">
+    <path d="M480 120 L120 380"/><path d="M480 120 L220 60"/><path d="M480 120 L840 380"/><path d="M480 120 L740 60"/>
+    <path d="M480 120 L60 200"/><path d="M480 120 L900 200"/><path d="M480 120 L480 -20"/>
+  </g>
+  
+      <g transform="translate(200 120) rotate(-6)">
+        <path d="M0 0 H300 V210 H0 Z" fill="#E2E9E1" stroke="#DFB67C" stroke-width="4"/>
+        <rect x="24" y="26" width="170" height="6" fill="#895F47"/><path d="M300 20 l-14 8 l14 8" fill="#E2E9E1" stroke="#742224" stroke-width="2"/><rect x="24" y="60" width="130" height="6" fill="#895F47"/><path d="M300 54 l-14 8 l14 8" fill="#742224" stroke="#742224" stroke-width="2"/><rect x="24" y="94" width="170" height="6" fill="#895F47"/><path d="M300 88 l-14 8 l14 8" fill="#E2E9E1" stroke="#742224" stroke-width="2"/><rect x="24" y="128" width="130" height="6" fill="#895F47"/><path d="M300 122 l-14 8 l14 8" fill="#742224" stroke="#742224" stroke-width="2"/><rect x="24" y="162" width="170" height="6" fill="#895F47"/><path d="M300 156 l-14 8 l14 8" fill="#E2E9E1" stroke="#742224" stroke-width="2"/>
+        <text x="24" y="16" font-family="Georgia, serif" font-size="12" fill="#742224" letter-spacing="2">NADERWIJ TU</text>
+      </g>
+      <g transform="translate(560 330) scale(0.6)">
+    <circle cx="0" cy="-118" r="22" fill="#895F47" stroke="#DFB67C" stroke-width="3"/>
+    <path d="M-26 -92 L26 -92 L38 24 L-38 24 Z" fill="#895F47" stroke="#DFB67C" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M-14 -70 L14 -70 L18 -58 L-18 -58 Z" fill="#DFB67C"/>
+    <path d="M-20 -86 L-33.6 -118 L-56 -150" fill="none" stroke="#895F47" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+     <path d="M-20 -86 L-33.6 -118 L-56 -150" fill="none" stroke="#DFB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <path d="M20 -86 L33.6 -118 L56 -150" fill="none" stroke="#895F47" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+     <path d="M20 -86 L33.6 -118 L56 -150" fill="none" stroke="#DFB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <path d="M-24 24 L-20 96 M24 24 L20 96" fill="none" stroke="#895F47" stroke-width="16" stroke-linecap="round"/>
+    <path d="M-34 100 L-6 100 M6 100 L34 100" fill="none" stroke="#DFB67C" stroke-width="6" stroke-linecap="round"/>
+  </g>
+      <g transform="translate(470 140) rotate(0)"><rect x="-26" y="-26" width="52" height="52" fill="#895F47" stroke="#DFB67C" stroke-width="3"/><rect x="-26" y="-26" width="52" height="12" fill="#DFB67C"/></g><g transform="translate(640 150) rotate(12)"><rect x="-26" y="-26" width="52" height="52" fill="#895F47" stroke="#DFB67C" stroke-width="3"/><rect x="-26" y="-26" width="52" height="12" fill="#DFB67C"/></g><g transform="translate(450 230) rotate(-8)"><rect x="-26" y="-26" width="52" height="52" fill="#895F47" stroke="#DFB67C" stroke-width="3"/><rect x="-26" y="-26" width="52" height="12" fill="#DFB67C"/></g><g transform="translate(660 240) rotate(6)"><rect x="-26" y="-26" width="52" height="52" fill="#895F47" stroke="#DFB67C" stroke-width="3"/><rect x="-26" y="-26" width="52" height="12" fill="#DFB67C"/></g><g transform="translate(500 300) rotate(10)"><rect x="-26" y="-26" width="52" height="52" fill="#895F47" stroke="#DFB67C" stroke-width="3"/><rect x="-26" y="-26" width="52" height="12" fill="#DFB67C"/></g><g transform="translate(620 310) rotate(-12)"><rect x="-26" y="-26" width="52" height="52" fill="#895F47" stroke="#DFB67C" stroke-width="3"/><rect x="-26" y="-26" width="52" height="12" fill="#DFB67C"/></g><g transform="translate(560 100) rotate(-4)"><rect x="-26" y="-26" width="52" height="52" fill="#895F47" stroke="#DFB67C" stroke-width="3"/><rect x="-26" y="-26" width="52" height="12" fill="#DFB67C"/></g>
+      <rect x="160" y="420" width="640" height="16" fill="#895F47" stroke="#DFB67C" stroke-width="2"/>
+      <g transform="translate(262 480) scale(0.9)">
+    <circle cx="0" cy="-118" r="22" fill="#895F47" stroke="#DFB67C" stroke-width="3"/>
+    <path d="M-26 -92 L26 -92 L38 24 L-38 24 Z" fill="#895F47" stroke="#DFB67C" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M-14 -70 L14 -70 L18 -58 L-18 -58 Z" fill="#DFB67C"/>
+    <path d="M-20 -86 L-38.4 -118 L-64 -150" fill="none" stroke="#895F47" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+     <path d="M-20 -86 L-38.4 -118 L-64 -150" fill="none" stroke="#DFB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <path d="M20 -86 L33.6 -123 L56 -160" fill="none" stroke="#895F47" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+     <path d="M20 -86 L33.6 -123 L56 -160" fill="none" stroke="#DFB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <path d="M-24 24 L-20 96 M24 24 L20 96" fill="none" stroke="#895F47" stroke-width="16" stroke-linecap="round"/>
+    <path d="M-34 100 L-6 100 M6 100 L34 100" fill="none" stroke="#DFB67C" stroke-width="6" stroke-linecap="round"/>
+  </g>
+      <g transform="translate(698 480) scale(0.9)">
+    <circle cx="0" cy="-118" r="22" fill="#895F47" stroke="#DFB67C" stroke-width="3"/>
+    <path d="M-26 -92 L26 -92 L38 24 L-38 24 Z" fill="#895F47" stroke="#DFB67C" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M-14 -70 L14 -70 L18 -58 L-18 -58 Z" fill="#DFB67C"/>
+    <path d="M-20 -86 L-33.6 -123 L-56 -160" fill="none" stroke="#895F47" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+     <path d="M-20 -86 L-33.6 -123 L-56 -160" fill="none" stroke="#DFB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <path d="M20 -86 L38.4 -118 L64 -150" fill="none" stroke="#895F47" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+     <path d="M20 -86 L38.4 -118 L64 -150" fill="none" stroke="#DFB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <path d="M-24 24 L-20 96 M24 24 L20 96" fill="none" stroke="#895F47" stroke-width="16" stroke-linecap="round"/>
+    <path d="M-34 100 L-6 100 M6 100 L34 100" fill="none" stroke="#DFB67C" stroke-width="6" stroke-linecap="round"/>
+  </g>
+      <g transform="translate(150 500)"><circle cx="0" cy="0" r="34" fill="none" stroke="#E2E9E1" stroke-width="8"/><path d="M26 26 L64 64" stroke="#E2E9E1" stroke-width="11" stroke-linecap="round"/></g>
+  <rect x="60" y="576" width="840" height="4" fill="#DFB67C"/>
+  <text x="480" y="600" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" letter-spacing="6" fill="#DFB67C">PRZEDZIERANKA · EWALUACJA FESTIWALU · 100 STRON</text>
+</svg>

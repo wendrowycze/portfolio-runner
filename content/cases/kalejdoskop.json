@@ -4,11 +4,7 @@
   "title": "Pomóż organizatorom festiwalu odnieść sukces",
   "lead": "Międzynarodowy Festiwal Teatrów Młodzieżowych „Kalejdoskop” potrzebuje bohatera, który ugasi wszystkie pożary, pozyska sojuszników i zadba o atmosferę festiwalu.",
   "role": "Współorganizator festiwalu Kalejdoskop",
-  "skills": [
-    "Organizacja wydarzeń",
-    "Prowadzenie warsztatów",
-    "Pozyskiwanie partnerów"
-  ],
+  "skills": ["Organizacja wydarzeń", "Prowadzenie warsztatów", "Pozyskiwanie partnerów"],
   "painting": {
     "src": "assets/paintings/kalejdoskop.svg",
     "cols": 3,

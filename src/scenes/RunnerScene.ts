@@ -11,7 +11,7 @@ import { Player } from '../runner/Player';
 import { TimeDilation } from '../runner/TimeDilation';
 import type { BeatOutcome, ScriptRunner } from '../script/ScriptRunner';
 import { totalFragments, type Beat, type Case } from '../script/types';
-import { PAINTING_RASTER } from '../assets/manifest';
+import { PAINTING_RASTER, paintingTextureKey } from '../assets/manifest';
 import { createGameState, worldSpeed, type GameState } from '../state/GameState';
 
 export interface RunnerScriptData {
@@ -23,6 +23,8 @@ export interface RunnerScriptData {
 export interface RunnerSceneData {
   /** HUD debug widoczny od startu (?debug=1). */
   debug?: boolean;
+  /** Pomiń hub i zacznij bieg od razu (?case=…). */
+  startInRunner?: boolean;
   /** Tryb skryptowany (Etap 2+). Brak = wolny bieg z przeszkodami proceduralnymi (Etap 1). */
   script?: RunnerScriptData;
 }
@@ -286,7 +288,8 @@ export class RunnerScene extends Phaser.Scene {
     const gridH = tileSize * rows;
     const cx = GAME_WIDTH / 2;
     const cy = this.groundY / 2 + 10;
-    const texture = this.textures.get(textureKey('painting.current'));
+    const paintingKey = paintingTextureKey(kejs.id);
+    const texture = this.textures.get(paintingKey);
 
     // Przyciemnienie scenerii — obraz wyłania się z tła.
     const shade = this.add
@@ -322,7 +325,7 @@ export class RunnerScene extends Phaser.Scene {
       const spotX = spot?.[0] ?? 0.5;
       const spotY = spot?.[1] ?? 0.5;
       const tile = this.add
-        .image(spotX * GAME_WIDTH, spotY * this.groundY, textureKey('painting.current'), frameName)
+        .image(spotX * GAME_WIDTH, spotY * this.groundY, paintingKey, frameName)
         .setDepth(41)
         .setScale(scale * 0.45)
         .setAlpha(0)
@@ -469,7 +472,9 @@ export class RunnerScene extends Phaser.Scene {
       .setAlpha(0.18 + Math.sin(time / 180) * 0.06);
   }
 
-  override update(time: number, delta: number): void {
+  override update(time: number, frameDelta: number): void {
+    // Czas rzeczywisty klatki z limitem (patrz TUNING.MAX_FRAME_MS).
+    const delta = Math.min(this.game.loop.rawDelta || frameDelta, TUNING.MAX_FRAME_MS);
     if (this.script !== undefined && this.started) {
       const runner = this.script.runner;
       if (runner.phase === 'narration') {
