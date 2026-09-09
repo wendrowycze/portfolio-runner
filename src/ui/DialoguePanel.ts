@@ -27,10 +27,8 @@ import { createWidget, type Widget } from './widgets/createWidget';
  * Nie importuje niczego ze scen Phasera. Wejście gracza trafia do ScriptRunner.
  */
 export interface DialoguePanelOptions {
-  /** Etykieta drugiego przycisku finału („Wróć do hotelu” / „Zagraj jeszcze raz”). */
-  returnLabel: string;
-  /** Wołane po kliknięciu powrotu w finale (po ScriptRunner.advance()). */
-  onFinaleReturn?: (() => void) | undefined;
+  /** Rodzic pełnoekranowych nakładek widgetów (reveal) — zwykle kontener całej gry. */
+  overlayParent: HTMLElement;
 }
 
 export class DialoguePanel {
@@ -104,6 +102,30 @@ export class DialoguePanel {
     );
     this.refreshFragments();
     this.root.dataset.phase = 'idle';
+    delete this.root.dataset.beat;
+  }
+
+  /**
+   * Widok hubu (przed wejściem w obraz i po ukończeniu): lead case'a + przycisk wejścia.
+   * Wejście = zdarzenie `hub:enter` na magistrali (scena hubu robi przejście).
+   */
+  showHub(kejs: Case, restored: boolean): void {
+    this.mount(kejs);
+    this.root.dataset.phase = restored ? 'hub-restored' : 'hub';
+    const entry = this.appendEntry('entry-narration entry-lead');
+    entry.append(el('p', { className: 'narration-text', text: kejs.lead }));
+    if (restored) {
+      const done = this.appendEntry('entry-feedback is-right');
+      done.append(el('p', { text: this.strings.finaleRestored }));
+      const again = this.appendEntry('entry-narration');
+      again.append(el('p', { className: 'hint', text: this.strings.hubLeadRestored }));
+    } else {
+      entry.append(el('p', { className: 'hint', text: this.strings.hubHint }));
+    }
+    this.showContinue(restored ? this.strings.playAgain : this.strings.hubEnter, () => {
+      bus.emit('hub:enter');
+    });
+    this.footer.querySelector('button')?.setAttribute('data-testid', 'hub-enter');
   }
 
   // ----- publiczne API z docs/02_ARCHITEKTURA.md sekcja 3 -----
@@ -222,8 +244,11 @@ export class DialoguePanel {
     }
     const mount = el('div', { className: `widget widget-${beat.widget}` });
     entry.append(mount);
+    if (this.kejs === undefined) return;
     this.widget = createWidget(beat, mount, this.footer, this.strings, {
       reducedMotion: this.reducedMotion,
+      painting: this.kejs.painting,
+      overlayParent: this.options.overlayParent,
       onComplete: () => {
         this.runner.completeInteraction();
       },

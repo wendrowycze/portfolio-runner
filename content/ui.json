@@ -35,5 +35,10 @@
     "Spacja lub strzałka w górę — skok",
     "Na telefonie: dotknij obszar biegu",
     "F3 — dane techniczne (FPS, prędkość)"
-  ]
+  ],
+  "buttonThanks": "Dziękujemy! Zbiórka ruszyła.",
+  "buttonDonors": "wsparło już tysiące osób",
+  "revealTap": "Dotknij, aby otworzyć oczy",
+  "hubEnter": "Wejdź w obraz",
+  "hubLeadRestored": "Historia opowiedziana — obraz wrócił na ścianę w całości. Możesz przejść ją jeszcze raz."
 }

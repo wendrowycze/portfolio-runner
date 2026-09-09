@@ -1,9 +1,15 @@
 import type { UiStrings } from '../../content/uiStrings';
-import type { InteractionBeat } from '../../script/types';
-import { el } from '../dom';
+import type { InteractionBeat, Painting } from '../../script/types';
+import { createButtonWidget } from './ButtonWidget';
+import { createPuzzleWidget } from './PuzzleWidget';
+import { createRevealWidget } from './RevealWidget';
 
 export interface WidgetContext {
   reducedMotion: boolean;
+  /** Obraz case'a (dla puzzle). */
+  painting: Painting;
+  /** Rodzic pełnoekranowych nakładek (reveal). */
+  overlayParent: HTMLElement;
   /** Widget zakończony — ScriptRunner.completeInteraction(). */
   onComplete: () => void;
   /** Widget zmienił wysokość — panel przewija do końca. */
@@ -15,8 +21,8 @@ export interface Widget {
 }
 
 /**
- * Fabryka widgetów interakcji. Etap 2: szkielet — każdy widget pokazuje tekst i przycisk „Dalej”.
- * Pełne widgety button/puzzle/reveal wchodzą w Etapie 3 (src/ui/widgets/*Widget.ts).
+ * Fabryka widgetów interakcji (docs/01_GDD_RUNNER_POC.md sekcja d, „interaction”).
+ * Nowy rodzaj widgetu = schema JSON + script/types.ts + ten plik (CLAUDE.md, „trzy miejsca”).
  */
 export function createWidget(
   beat: InteractionBeat,
@@ -25,22 +31,12 @@ export function createWidget(
   strings: UiStrings,
   context: WidgetContext,
 ): Widget {
-  const button = el('button', {
-    className: 'button button-primary',
-    text: beat.label ?? strings.widgetContinue,
-    attrs: { type: 'button', 'data-testid': 'widget-continue' },
-  });
-  button.addEventListener('click', (event) => {
-    event.stopPropagation();
-    button.disabled = true;
-    context.onComplete();
-  });
-  actions.append(button);
-  mount.append(el('p', { className: 'hint', text: `[${beat.widget}]` }));
-  context.onLayout();
-  return {
-    destroy: () => {
-      button.remove();
-    },
-  };
+  switch (beat.widget) {
+    case 'button':
+      return createButtonWidget(beat, mount, actions, strings, context);
+    case 'puzzle':
+      return createPuzzleWidget(beat, context.painting, mount, strings, context);
+    case 'reveal':
+      return createRevealWidget(beat, context.overlayParent, strings, context);
+  }
 }

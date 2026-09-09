@@ -10,7 +10,7 @@
     "Aktywizacja społeczności"
   ],
   "painting": {
-    "src": "assets/paintings/teatr-jest-nasz.png",
+    "src": "assets/paintings/teatr-jest-nasz.svg",
     "cols": 3,
     "rows": 2,
     "caption": "Gmach Teatru im. J. Słowackiego wspierany przez aktora, widza i reżysera — obraz odrestaurowany dzięki solidarności tysięcy ludzi."
@@ -51,7 +51,9 @@
           "feedback": "Milczenie zostawia pole tylko fałszywym informacjom — trzeba było zareagować, choćby krótko."
         }
       ],
-      "reward": { "fragment": 1 }
+      "reward": {
+        "fragment": 1
+      }
     },
     {
       "id": "b03",
@@ -69,7 +71,7 @@
       "id": "b05",
       "type": "choice",
       "prompt": "Trzeba zacząć obdzwaniać media. Kogo dzwonisz najpierw: media zaprzyjaźnione czy ogólnopolskie?",
-      "obstacle": "sala-teatru",
+      "obstacle": "telefony",
       "timerMs": 7000,
       "options": [
         {
@@ -84,7 +86,9 @@
           "feedback": "Duże media chętniej podchwycą temat, który ma już pierwsze potwierdzone zainteresowanie — zaczynanie od nich bez przygotowania gruntu bywa ryzykowne."
         }
       ],
-      "reward": { "fragment": 2 }
+      "reward": {
+        "fragment": 2
+      }
     },
     {
       "id": "b06",
@@ -93,7 +97,9 @@
       "input": "jump",
       "obstacle": "kordon-kamer",
       "windowMs": 800,
-      "reward": { "fragment": 3 }
+      "reward": {
+        "fragment": 3
+      }
     },
     {
       "id": "b07",
@@ -108,7 +114,11 @@
       "widget": "button",
       "label": "WESPRZYJ TEATR",
       "style": "zrzutka",
-      "counter": { "from": 0, "to": 200000, "suffix": " zł" },
+      "counter": {
+        "from": 0,
+        "to": 200000,
+        "suffix": " zł"
+      },
       "text": "Uruchamiasz zbiórkę narodową. Kliknij, by zobaczyć, jak w pierwszych dniach rośnie wsparcie Polaków dla teatru."
     },
     {
@@ -124,7 +134,9 @@
       "input": "jump",
       "obstacle": "barierka",
       "windowMs": 800,
-      "reward": { "fragment": 4 }
+      "reward": {
+        "fragment": 4
+      }
     },
     {
       "id": "b11",
@@ -136,7 +148,7 @@
       "id": "b12",
       "type": "choice",
       "prompt": "Uczniowie w szkołach chcą organizować zbiórki na rzecz teatru, ale dyrekcja im tego zabrania. Co robisz?",
-      "obstacle": "opor-dyrekcji",
+      "obstacle": "brama",
       "timerMs": 7000,
       "options": [
         {
@@ -156,7 +168,9 @@
           "feedback": "Bez wsparcia dorosłego organizatora młodzi ludzie łatwo się zniechęcają — Twoja rola to właśnie pomoc w takich momentach."
         }
       ],
-      "reward": { "fragment": 5 }
+      "reward": {
+        "fragment": 5
+      }
     },
     {
       "id": "b13",
@@ -169,19 +183,36 @@
       "type": "interaction",
       "widget": "puzzle",
       "text": "Powstaje obraz-płaskorzeźba: gmach teatru wspierany na barkach aktora, widza i reżysera. Ułóż go, zamieniając miejscami sąsiadujące fragmenty.",
-      "reward": { "fragment": 6 }
+      "reward": {
+        "fragment": 6
+      }
     },
     {
       "id": "b15",
       "type": "results",
       "stats": [
-        { "skill": "Pozyskiwanie partnerów", "delta": 10 },
-        { "skill": "Organizacja zbiórek publicznych", "delta": 10 },
-        { "skill": "Aktywizacja społeczności", "delta": 10 }
+        {
+          "skill": "Pozyskiwanie partnerów",
+          "delta": 10
+        },
+        {
+          "skill": "Organizacja zbiórek publicznych",
+          "delta": 10
+        },
+        {
+          "skill": "Aktywizacja społeczności",
+          "delta": 10
+        }
       ],
       "kpis": [
-        { "label": "Zebrane w pierwsze dni", "value": "ponad 200 000 zł" },
-        { "label": "Zebrane łącznie", "value": "ponad 500 000 zł" },
+        {
+          "label": "Zebrane w pierwsze dni",
+          "value": "ponad 200 000 zł"
+        },
+        {
+          "label": "Zebrane łącznie",
+          "value": "ponad 500 000 zł"
+        },
         {
           "label": "Los dyrektora",
           "value": "zapobieżono politycznemu odwołaniu dyrektora Krzysztofa Głuchowskiego"

@@ -16,7 +16,13 @@ export interface FileAsset {
   license: string;
 }
 
-export type AssetEntry = GeneratedAsset | FileAsset;
+/** Asset, którego ścieżka pochodzi z treści case'a (JSON), nie z manifestu. */
+export interface CaseAsset {
+  source: 'case';
+  license: string;
+}
+
+export type AssetEntry = GeneratedAsset | FileAsset | CaseAsset;
 
 const generated: GeneratedAsset = { source: 'generated', license: 'wygenerowane kodem' };
 
@@ -44,6 +50,12 @@ export const ASSET_MANIFEST = {
   'obstacle.telefony': generated,
   'obstacle.brama': generated,
 
+  // --- obraz case'a: ścieżka pochodzi z JSON case'a (painting.src), klucz tekstury jest stały ---
+  'painting.current': {
+    source: 'case',
+    license: 'placeholder SVG generowany kodem (public/assets/paintings/*)',
+  },
+
   // --- efekty ---
   'fx.dust': generated,
   'fx.spark': generated,
@@ -63,6 +75,9 @@ export const PLAYER_RUN_FRAMES = 6;
 export function playerRunFrameKey(index: number): string {
   return `${textureKey('player.run')}.${String(index)}`;
 }
+
+/** Rozmiar, do jakiego rasteryzowany jest obraz case'a (SVG) w Phaserze — 3:2 jak siatka 3×2. */
+export const PAINTING_RASTER = { width: 960, height: 640 } as const;
 
 /** Pełna ścieżka pliku uwzględniająca base URL Vite (GitHub Pages). */
 export function assetUrl(path: string): string {

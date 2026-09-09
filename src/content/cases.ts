@@ -7,7 +7,7 @@ const CASE_LOADERS: Record<string, () => Promise<{ default: unknown }>> = {
   'teatr-jest-nasz': () => import('../../content/cases/teatr-jest-nasz.json'),
 };
 
-export const DEFAULT_CASE_ID = '_demo';
+export const DEFAULT_CASE_ID = 'teatr-jest-nasz';
 
 export function isKnownCase(id: string): boolean {
   return Object.hasOwn(CASE_LOADERS, id);

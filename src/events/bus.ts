@@ -15,6 +15,8 @@ export interface BusEvents extends Record<string, unknown[]> {
   'runner:tap': [];
   /** Zmiana mnożnika czasu świata (time dilation); UI synchronizuje maszynę do pisania. */
   'time:scale': [scale: number];
+  /** Prośba o wejście w obraz (klik w obraz na hubie albo przycisk w panelu). */
+  'hub:enter': [];
   /** Przełączenie widoczności HUD debug. */
   'debug:toggle': [visible: boolean];
 }

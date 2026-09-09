@@ -14,7 +14,9 @@ Emocja, jaką ma wywołać PoC:
 
 ## b. Układ ekranu
 
-### Desktop / landscape (domyślny layout: `stack`)
+> **Aktualizacja 2026-09-09 (decyzja Arka, Etap 0):** layoutem domyślnym jest `side` (opowieść po lewej, bieg po prawej); `stack` pozostaje dostępny pod `?layout=stack`. Poniższy opis wariantów jest nadal aktualny, zmienia się tylko wartość domyślna.
+
+### Desktop / landscape (layout `stack`, zapasowy)
 
 - Kontener gry: pełna wysokość viewportu, `width: 100%`, `max-width` nieograniczony (canvas Phasera skaluje się do kontenera przez `Phaser.Scale.FIT` lub `RESIZE` — patrz niżej).
 - **Runner** (górna połowa): `height: 50%` kontenera, `width: 100%`. Canvas Phasera renderuje tu paralaksę, ziemię, postać, przeszkody, HUD (licznik fragmentów, licznik potknięć).
@@ -77,7 +79,7 @@ Konwencja dla każdego typu: **Panel** (co widać w DOM), **Runner** (co dzieje 
 - Runner: na starcie beatu spawnuje się przeszkoda związana z `obstacle` (patrz sekcja e), time dilation aktywne (×0.35).
 - Wejście: klik/tap na opcję lub klawisz 1/2/3.
 - Sukces: wybór z `correct: true` → postać automatycznie przeskakuje/mija przeszkodę (animacja jump/pass 400 ms), zbiera fragment jeśli `reward.fragment` jest ustawiony, +1 do skilla z `option.skill`, prędkość wraca do normalnej.
-- Porażka: wybór z `correct: false`, LUB brak wyboru przed upływem `timerMs` (traktowane jak nietrafna opcja) → animacja potknięcia (600 ms, patrz sekcja e), krótki feedback tekstowy z `option.feedback` (dla braku wyboru — feedback generyczny „Nie zdążyłeś zareagować — spróbujmy jeszcze raz."), licznik potknięć +1, **beat NIE wraca do stanu początkowego jako pętla nieskończona** — po pokazaniu feedbacku (2 s) beat kończy się i historia idzie dalej (fragment nie zostaje przyznany, ale progres nie blokuje się — zgodnie z zasadą „nie da się przegrać historii").
+- Porażka: wybór z `correct: false`, LUB brak wyboru przed upływem `timerMs` (traktowane jak nietrafna opcja) → animacja potknięcia (600 ms, patrz sekcja e), krótki feedback tekstowy z `option.feedback` (dla braku wyboru — feedback generyczny „Nie zdążyłeś zareagować — spróbujmy jeszcze raz."), licznik potknięć +1. **Aktualizacja 2026-09-09 (decyzja Arka „zła decyzja zatrzymuje bieg”, wdrożona w Etapie 2):** świat zatrzymuje się na czas feedbacku (2 s), po czym **ten sam beat wraca** (przeszkoda spawnuje się ponownie, zegar startuje od nowa) — aż do trafnej reakcji. Fragment jest przyznawany dopiero przy trafieniu, więc finał zawsze ma komplet fragmentów. Zasada „nie da się przegrać historii” zostaje: nie ma game over, tylko brak postępu do czasu trafnej decyzji.
 - Timing: `timerMs` z JSON (typowo 6000–8000 ms). Feedback wyświetlany 2000 ms przed przejściem dalej.
 - Feedback wizualny/dźwiękowy: trafienie — błysk zielonkawej poświaty na przeszkodzie + SFX „success-chime" (placeholder); nietrafienie — czerwone potrząśnięcie ekranu (mikro, 150 ms, wyłączane w reduced-motion) + SFX „stumble" (placeholder).
 - Przejście: po rozwiązaniu (sukces natychmiast po animacji skoku, porażka po 2 s feedbacku) do kolejnego beatu.
@@ -88,10 +90,10 @@ Konwencja dla każdego typu: **Panel** (co widać w DOM), **Runner** (co dzieje 
 - Runner: przeszkoda `obstacle` spawnuje się tak, by wejść w strefę QTE dokładnie w oknie `windowMs` (patrz wzór w sekcji e).
 - Wejście: `input: "jump"` → spacja/↑/klik/tap w dowolnym momencie trwania beatu.
 - Sukces: wejście zarejestrowane w oknie `windowMs`, gdy przeszkoda jest w strefie QTE → skok, fragment (jeśli zdefiniowany), +1 do powiązanego skilla (jeśli podany).
-- Porażka: brak wejścia w oknie LUB wejście poza oknem → potknięcie (600 ms), bez fragmentu.
+- Porażka: brak wejścia w oknie LUB wejście poza oknem → potknięcie (600 ms), bez fragmentu. **Aktualizacja 2026-09-09:** jak w `choice` — świat staje na czas feedbacku, potem beat wraca (nowa przeszkoda, nowe okno), aż do trafionego skoku.
 - Timing: okno `windowMs` (typowo 800 ms) rozpoczyna się gdy przeszkoda wchodzi w strefę QTE (nie od startu beatu — patrz sekcja e).
 - Feedback: jak w `choice` (błysk/SFX sukcesu, potrząśnięcie/SFX potknięcia).
-- Przejście: natychmiast po rozstrzygnięciu (sukces) lub po 1200 ms animacji odzyskiwania tempa (porażka).
+- Przejście: natychmiast po rozstrzygnięciu (sukces); po porażce — powrót do tego samego beatu (patrz wyżej).
 
 ### interaction
 

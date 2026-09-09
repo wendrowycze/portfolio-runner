@@ -116,6 +116,7 @@ export class RunnerScene extends Phaser.Scene {
       this.unsubscribe.length = 0;
       this.timeDilation.destroy();
     });
+    document.body.dataset.scene = 'runner';
     bus.emit('runner:ready');
   }
 

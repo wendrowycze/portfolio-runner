@@ -39,6 +39,11 @@ const UiStringsSchema = z.strictObject({
   freeRunTitle: z.string(),
   freeRunLead: z.string(),
   freeRunHints: z.array(z.string()),
+  buttonThanks: z.string(),
+  buttonDonors: z.string(),
+  revealTap: z.string(),
+  hubEnter: z.string(),
+  hubLeadRestored: z.string(),
 });
 
 export type UiStrings = z.infer<typeof UiStringsSchema>;

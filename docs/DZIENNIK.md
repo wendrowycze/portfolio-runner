@@ -114,3 +114,35 @@ Zod dojdzie w Etapie 2 razem z ładowaniem treści (ADR-7).
 6. **Typy beatów w `script/types.ts` mają pola opcjonalne jako `T | undefined`** — wymusza to `exactOptionalPropertyTypes` w połączeniu z typem wyjściowym zod.
 7. Sukces beatu: przeszkoda nie „znika” po poprawnym wyborze, tylko w 420 ms podjeżdża pod skaczącą postać i płynie dalej — czytelniejsze niż nagłe zniknięcie i daje moment na lot fragmentu.
 8. `.finale[hidden] { display: none }` — atrybut `hidden` przegrywa z `display: grid` klasy; bez tej reguły niewidoczny overlay przechwytywał kliknięcia (wyłapane przez e2e).
+
+---
+
+## 2026-09-09 — Etap 3: Pilot „Teatr jest nasz”
+
+### Co powstało
+
+- `content/cases/teatr-jest-nasz.json` — treść z kitu przeniesiona 1:1 (16 beatów: 7 narracji, 3 choice, 2 action, 2 interaction, results, finale; 6 fragmentów). Zmiany wyłącznie techniczne: klucze przeszkód `sala-teatru` → `telefony` (obdzwanianie mediów) i `opor-dyrekcji` → `brama` (zamknięta brama szkoły z kłódką), `painting.src` → SVG. Wszystkie beaty mieszczą się w 400 znakach (test jednostkowy pilnuje rytmu: max 3 narracje pod rząd, 3 choice, 2 action, 2 interaction).
+- `public/assets/paintings/teatr-jest-nasz.svg` — obraz-płaskorzeźba wg `docs/04` (gmach z tympanonem i maskami, sześć kolumn, portal; aktor z maską, widz z biletem i uniesionymi dłońmi, reżyser z tubą i scenariuszem jako kariatydy; rama maureskowa, inskrypcja „TEATR JEST NASZ · KRAKÓW · MMXXII”). Napisany ręcznie z prostych kształtów w palecie — nie ilustracja, nie AI. 960×640, siatka 3×2.
+- Widgety (`src/ui/widgets/`): **ButtonWidget** — licznik 0 → 200 000 zł (Cubic.easeOut, 2 s), pasek, konfetti CSS, „Dalej” dopiero po animacji; **PuzzleWidget** — siatka 3×2 z obrazu case'a, klik-klik zamienia kafle, złota obwódka na dobrym miejscu, błysk i auto-„dalej” po 800 ms; **RevealWidget** — pełnoekranowe zaciemnienie z tekstem, tap skraca pauzę (zaimplementowany, pilot go nie używa — zgodnie z `docs/00`).
+- `src/scenes/HubStubScene.ts` — ściana hotelu (tapeta maureskowa, boazeria, kinkiety), złota rama, tabliczka z tytułem i rolą. Zniszczony: kafle przyciemnione + pęknięcia; odrestaurowany: pełny obraz, pulsująca złota poświata, iskry. Klik w obraz (albo przycisk „Wejdź w obraz” w panelu — klawiatura/czytnik ekranu) → najazd kamery + fade → RunnerScene. Po `case:finished` → hub w stanie odrestaurowanym, panel proponuje „Zagraj jeszcze raz”.
+- Obraz case'a ładowany w `BootScene.preload` jako SVG rasteryzowany do 960×640 (klucz `painting.current` w manifeście, ścieżka z JSON). Ten sam plik służy hubowi (Phaser), układance i finałowi (DOM) — jedno źródło prawdy.
+- Testy: Vitest — pilot przechodzi w całości z poprawnymi wyborami (6/6, 0 potknięć) i z błędem w każdym beacie (5 potknięć, 6/6); Playwright — pełne przejście przez klikanie od hubu do odrestaurowanego obrazu z zerem błędów w konsoli i zrzutami `docs/screens/etap3-*.png` (hub, narracja, wybór, QTE, zrzutka, układanka, wyniki, finał, hub odrestaurowany).
+
+### Decyzje
+
+1. **Układanka na klikanie** (nie przeciąganie) — prostsze na telefonie i dla klawiatury (kafle to przyciski). Tasowanie deterministyczne, bez kafla na właściwym miejscu na starcie; da się ułożyć w ≤ 5 zamianach.
+2. **Licznik zrzutki kończy na 200 000 zł**, a 500 000+ zł pojawia się w wynikach jako „Zebrane łącznie” — obie liczby z treści, każda w swoim momencie historii (rekomendacja z planu etapu). Do potwierdzenia przez Arka.
+3. **Nazwisko dyrektora w KPI** (`results.kpis`) zostawione tak, jak było w JSON z kitu, mimo że `cases_raw/teatr-jest-nasz.md` go nie wymienia — to fakt publiczny, a plik z kitu był dostarczony jako dane pilota. Jeśli Arek woli bez nazwiska, to zmiana jednej wartości w JSON.
+4. **W e2e skok w QTE wywoływany spacją**, nie klikiem w pierścień: klik Playwrighta ma ok. 0,5 s narzutu (sprawdzanie stabilności elementu), co w oknie 800 ms dawało losowe „za późno”. Sam pierścień jest klikalny i pulsuje poświatą (`box-shadow`), nie transformacją — dzięki temu nie „ucieka” automatom i czytnikom.
+5. **Workflow CI uruchamia lint/build/testy także dla pull requestów** (`pull_request`), a publikację Pages tylko z `main`. Powód: praca w sesji chmurowej idzie przez gałąź i PR — bez tego PR nie miałby żadnej weryfikacji.
+6. `docs/01_GDD_RUNNER_POC.md` zaktualizowany o decyzje Arka z Etapu 0 (layout `side` domyślny; nietrafiony choice/action = powrót do tego samego beatu) — zgodnie z zapisem z Etapu 0, że GDD ma być poprawione w Etapie 2.
+
+### Pomysły spoza zakresu (nie zaimplementowane)
+
+- Dźwięk (kroki, skok, potknięcie, fragment, konfetti) — Etap 4.
+- Lepszy obraz case'a (generatywny pipeline) — backlog P2, bank promptów w `docs/04`.
+- Pauza gry przy utracie fokusu karty: Phaser sam wstrzymuje pętlę (zegary beatów stają), ale maszyna do pisania i CSS-owe animacje idą dalej — do dopracowania w Etapie 4 razem z `prefers-reduced-motion`.
+
+### Stan na koniec sesji
+
+Etapy 1–3 gotowe na gałęzi `claude/sweet-cerf-g5z7oe` (trzy commity `etap-1`, `etap-2`, `etap-3`). Build/lint/Vitest/Playwright zielone lokalnie. Publikacja na GitHub Pages następuje po scaleniu do `main` — link produkcyjny pokaże nową wersję dopiero wtedy.

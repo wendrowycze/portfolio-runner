@@ -7,6 +7,7 @@ import { loadUiStrings, type UiStrings } from './content/uiStrings';
 import type { RunnerSceneData } from './scenes/RunnerScene';
 import { ScriptRunner } from './script/ScriptRunner';
 import { createGameState, resetGameState } from './state/GameState';
+import { bus } from './events/bus';
 import { DialoguePanel } from './ui/DialoguePanel';
 import { clear, el } from './ui/dom';
 import { FinaleOverlay } from './ui/FinaleOverlay';
@@ -43,7 +44,7 @@ async function start(): Promise<void> {
     return;
   }
 
-  // Treść: case z ?case= (domyślnie demo w Etapie 2), zwalidowany przez zod przy ładowaniu.
+  // Treść: case z ?case= (domyślnie pilot „Teatr jest nasz”), zwalidowany przez zod przy ładowaniu.
   const requestedCase = new URLSearchParams(search).get('case');
   const caseId =
     requestedCase !== null && isKnownCase(requestedCase) ? requestedCase : DEFAULT_CASE_ID;
@@ -56,18 +57,25 @@ async function start(): Promise<void> {
 
   const finale = new FinaleOverlay(gameRoot, strings);
   const panel = new DialoguePanel(panelContainer, runner, state, strings, {
-    returnLabel: strings.playAgain,
+    overlayParent: gameRoot,
   });
-  panel.mount(kejs);
+  panel.showHub(kejs, false);
 
   runner.on('beat:start', (beat) => {
     if (beat.type !== 'finale') return;
     finale.show(kejs, state, beat.text, beat.cta, {
-      returnLabel: strings.playAgain,
+      returnLabel: strings.finaleReturn,
       onReturn: () => {
         runner.advance();
       },
     });
+  });
+
+  // Wejście w obraz (klik na hubie / przycisk w panelu): świeży stan, panel gotowy na beaty.
+  bus.on('hub:enter', () => {
+    resetGameState(state, kejs.runner.baseSpeed);
+    runner.load(kejs);
+    panel.mount(kejs);
   });
 
   // Czekamy na fonty, żeby tekst w canvasie nie renderował się fontem zastępczym.
@@ -76,14 +84,13 @@ async function start(): Promise<void> {
   const game = new Phaser.Game(createGameConfig(runnerContainer));
   const runnerData: RunnerSceneData = { debug, script: { runner, kejs, state } };
   game.registry.set('runnerData', runnerData);
+  game.registry.set('uiStrings', strings);
 
-  // Po finale (Etap 2, bez hubu): historia zaczyna się od nowa ze świeżym stanem.
+  // Po finale: powrót do hubu z odrestaurowanym obrazem (docs/02_ARCHITEKTURA.md sekcja 2).
   runner.on('case:finished', () => {
     finale.hide();
-    resetGameState(state, kejs.runner.baseSpeed);
-    runner.load(kejs);
-    panel.mount(kejs);
-    game.scene.getScene('RunnerScene').scene.restart(runnerData);
+    panel.showHub(kejs, true);
+    game.scene.getScene('RunnerScene').scene.start('HubStubScene', { restored: true });
   });
 
   watchResize(game);

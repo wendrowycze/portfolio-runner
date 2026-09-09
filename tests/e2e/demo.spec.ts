@@ -13,6 +13,13 @@ async function waitForBeat(page: Page, id: string): Promise<void> {
   await expect(panel(page)).toHaveAttribute('data-beat', id, { timeout: 30_000 });
 }
 
+/** Z hubu (zniszczony obraz) do sceny biegu — przyciskiem w panelu. */
+async function enterFromHub(page: Page): Promise<void> {
+  await expect(page.locator('body')).toHaveAttribute('data-scene', 'hub', { timeout: 15_000 });
+  await page.locator('[data-testid="hub-enter"]').click();
+  await expect(page.locator('body')).toHaveAttribute('data-scene', 'runner', { timeout: 15_000 });
+}
+
 /** Klika poprawną opcję aktualnego beatu choice na podstawie treści JSON. */
 async function answerChoice(page: Page, beatId: string): Promise<void> {
   const beat = demo.beats.find((b) => b.id === beatId);
@@ -28,6 +35,7 @@ test('pełne przejście _demo.json w layoucie side: wybory, QTE, fragmenty, fina
   await page.goto('./?layout=side&case=_demo');
   await expect(page.locator('body')).toHaveAttribute('data-game-ready', 'true');
   await expect(page.locator('#game')).toHaveAttribute('data-layout', 'side');
+  await enterFromHub(page);
 
   // b01: narracja (tap) — klik w tekst dopisuje resztę, „Dalej” przechodzi.
   await waitForBeat(page, 'b01');
@@ -72,9 +80,11 @@ test('pełne przejście _demo.json w layoucie side: wybory, QTE, fragmenty, fina
   await page.screenshot({ path: 'docs/screens/etap2-finale.png', fullPage: true });
   await page.locator('[data-testid="finale-return"]').click();
 
-  // Po finale demo zaczyna się od nowa.
+  // Po finale: powrót do hubu z odrestaurowanym obrazem.
   await expect(page.locator('[data-testid="finale"]')).toBeHidden();
-  await waitForBeat(page, 'b01');
+  await expect(page.locator('body')).toHaveAttribute('data-painting', 'restored', {
+    timeout: 15_000,
+  });
   expect(errors).toEqual([]);
 });
 
@@ -85,6 +95,7 @@ test('layout stack: panel pod biegiem, zły wybór zatrzymuje bieg i wraca do te
   await page.goto('./?layout=stack&case=_demo');
   await expect(page.locator('body')).toHaveAttribute('data-game-ready', 'true');
   await expect(page.locator('#game')).toHaveAttribute('data-layout', 'stack');
+  await enterFromHub(page);
 
   const runnerBox = await page.locator('#runner').boundingBox();
   const panelBox = await page.locator('#panel').boundingBox();

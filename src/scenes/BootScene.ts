@@ -12,6 +12,7 @@ import { generateObstacles } from '../assets/generators/obstacles';
 import { generatePlayer } from '../assets/generators/player';
 import { GAME_HEIGHT, GAME_WIDTH } from '../config/gameConfig';
 import { PALETTE } from '../config/palette';
+import { assetUrl, PAINTING_RASTER, textureKey } from '../assets/manifest';
 import type { RunnerSceneData } from './RunnerScene';
 
 export const PROJECT_TITLE = 'PORTFOLIO RUNNER';
@@ -23,6 +24,18 @@ export const PROJECT_TITLE = 'PORTFOLIO RUNNER';
 export class BootScene extends Phaser.Scene {
   constructor() {
     super('BootScene');
+  }
+
+  /** Obraz case'a (SVG z ścieżki w JSON) — jedyny plik ładowany z dysku w PoC. */
+  preload(): void {
+    const runnerData = this.registry.get('runnerData') as RunnerSceneData | undefined;
+    const painting = runnerData?.script?.kejs.painting;
+    if (painting !== undefined) {
+      this.load.svg(textureKey('painting.current'), assetUrl(painting.src), {
+        width: PAINTING_RASTER.width,
+        height: PAINTING_RASTER.height,
+      });
+    }
   }
 
   create(): void {
@@ -46,6 +59,10 @@ export class BootScene extends Phaser.Scene {
 
     label.destroy();
     const runnerData = this.registry.get('runnerData') as RunnerSceneData | undefined;
-    this.scene.start('RunnerScene', runnerData ?? {});
+    if (runnerData?.script !== undefined) {
+      this.scene.start('HubStubScene', { restored: false });
+    } else {
+      this.scene.start('RunnerScene', runnerData ?? {});
+    }
   }
 }
