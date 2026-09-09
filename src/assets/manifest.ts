@@ -81,5 +81,7 @@ export const PAINTING_RASTER = { width: 960, height: 640 } as const;
 
 /** Pełna ścieżka pliku uwzględniająca base URL Vite (GitHub Pages). */
 export function assetUrl(path: string): string {
+  // Adresy absolutne i data-URI (np. obraz osadzony w pojedynczym pliku podglądu) bez zmian.
+  if (/^(?:data:|https?:\/\/)/.test(path)) return path;
   return `${import.meta.env.BASE_URL}${path.replace(/^\//, '')}`;
 }
