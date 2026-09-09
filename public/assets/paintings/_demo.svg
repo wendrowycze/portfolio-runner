@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" width="960" height="640">
+  <!-- Placeholder obrazu demo (Etap 2): ornament maureskowy w palecie Kultury. Wygenerowany kodem, nie ilustracja. -->
+  <defs>
+    <pattern id="tiles" width="80" height="80" patternUnits="userSpaceOnUse">
+      <rect width="80" height="80" fill="#3E2219"/>
+      <path d="M40 4 L76 40 L40 76 L4 40 Z" fill="none" stroke="#DFB67C" stroke-width="3"/>
+      <circle cx="40" cy="40" r="10" fill="#742224" stroke="#DFB67C" stroke-width="2"/>
+      <path d="M0 0 L16 0 L0 16 Z M80 80 L64 80 L80 64 Z" fill="#11485D"/>
+    </pattern>
+  </defs>
+  <rect width="960" height="640" fill="#261619"/>
+  <rect x="40" y="40" width="880" height="560" fill="url(#tiles)"/>
+  <rect x="40" y="40" width="880" height="560" fill="none" stroke="#DFB67C" stroke-width="12"/>
+  <rect x="64" y="64" width="832" height="512" fill="none" stroke="#895F47" stroke-width="4"/>
+  <circle cx="480" cy="320" r="150" fill="#261619" stroke="#DFB67C" stroke-width="10"/>
+  <text x="480" y="336" text-anchor="middle" font-family="Georgia, serif" font-size="56" fill="#E2E9E1">DEMO</text>
+</svg>

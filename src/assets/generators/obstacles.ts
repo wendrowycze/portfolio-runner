@@ -5,54 +5,69 @@ import { bake, col, makeGraphics } from './draw';
 
 type Painter = (g: Phaser.GameObjects.Graphics, w: number, h: number) => void;
 
+/**
+ * Przeszkody muszą odcinać się od ciemnych warstw tła: jasne korpusy (#E2E9E1/#ACCBC6),
+ * złote akcenty, czerwień tylko jako sygnał „uwaga”. Każda ma cień na ziemi.
+ */
+function shadow(g: Phaser.GameObjects.Graphics, w: number, h: number): void {
+  g.fillStyle(col('bgDeep'), 0.5);
+  g.fillEllipse(w / 2, h - 2, w * 0.95, 6);
+}
+
 const barierka: Painter = (g, w, h) => {
-  const wood = col('ground');
-  const dark = col('panelBg');
-  g.fillStyle(dark, 1);
-  g.fillRect(6, h - 6, 16, 6);
-  g.fillRect(w - 22, h - 6, 16, 6);
-  g.fillStyle(wood, 1);
-  g.fillRect(10, 8, 8, h - 8);
-  g.fillRect(w - 18, 8, 8, h - 8);
+  shadow(g, w, h);
+  const light = col('text');
+  const post = col('textMuted');
+  // Stopy i słupki.
+  g.fillStyle(post, 1);
+  g.fillRect(6, h - 8, 18, 5);
+  g.fillRect(w - 24, h - 8, 18, 5);
+  g.fillRect(11, 6, 8, h - 10);
+  g.fillRect(w - 19, 6, 8, h - 10);
   // Górna listwa w pasy — jak barierka policyjna.
-  for (let x = 4; x < w - 4; x += 12) {
-    g.fillStyle((x / 12) % 2 === 0 ? col('text') : col('warn'), 1);
-    g.fillRect(x, 10, Math.min(12, w - 4 - x), 8);
+  const stripe = 12;
+  for (let i = 0; i * stripe < w - 8; i += 1) {
+    const x = 4 + i * stripe;
+    g.fillStyle(i % 2 === 0 ? light : col('warn'), 1);
+    g.fillRect(x, 10, Math.min(stripe, w - 4 - x), 9);
   }
-  g.fillStyle(wood, 1);
+  g.lineStyle(1, col('gold'), 1);
+  g.strokeRect(4.5, 10.5, w - 9, 9);
+  // Dolna listwa.
+  g.fillStyle(light, 1);
   g.fillRect(4, 30, w - 8, 6);
-  g.fillStyle(col('gold'), 1);
-  g.fillRect(4, 9, w - 8, 1);
 };
 
 const skrzynia: Painter = (g, w, h) => {
+  shadow(g, w, h);
   const wood = col('ground');
-  const dark = col('panelBg');
+  const edge = col('gold');
   g.fillStyle(wood, 1);
-  g.fillRect(2, 4, w - 4, h - 4);
-  g.lineStyle(3, dark, 1);
-  g.strokeRect(3.5, 5.5, w - 7, h - 7);
-  g.lineBetween(4, 6, w - 4, h - 2);
-  g.lineBetween(w - 4, 6, 4, h - 2);
-  g.fillStyle(col('gold'), 1);
+  g.fillRect(3, 4, w - 6, h - 8);
+  g.lineStyle(3, edge, 1);
+  g.strokeRect(4.5, 5.5, w - 9, h - 11);
+  g.lineBetween(5, 6, w - 5, h - 6);
+  g.lineBetween(w - 5, 6, 5, h - 6);
+  g.fillStyle(col('text'), 1);
   for (const [x, y] of [
-    [8, 10],
-    [w - 10, 10],
-    [8, h - 8],
-    [w - 10, h - 8],
+    [9, 10],
+    [w - 11, 10],
+    [9, h - 12],
+    [w - 11, h - 12],
   ] as const) {
-    g.fillRect(x, y, 2, 2);
+    g.fillRect(x, y, 3, 3);
   }
 };
 
 const kolumna: Painter = (g, w, h) => {
+  shadow(g, w, h);
   const marble = col('text');
   const shade = col('textMuted');
   g.fillStyle(shade, 1);
-  g.fillRect(2, h - 10, w - 4, 10);
+  g.fillRect(2, h - 12, w - 4, 8);
   g.fillStyle(marble, 1);
-  g.fillRect(4, h - 14, w - 8, 4);
-  g.fillRect(10, 18, w - 20, h - 32);
+  g.fillRect(4, h - 16, w - 8, 4);
+  g.fillRect(10, 18, w - 20, h - 34);
   // Złamany szczyt.
   g.fillPoints(
     [
@@ -66,36 +81,39 @@ const kolumna: Painter = (g, w, h) => {
     true,
   );
   g.lineStyle(1, shade, 1);
-  g.lineBetween(16, 22, 16, h - 16);
-  g.lineBetween(w / 2, 22, w / 2, h - 16);
-  g.lineBetween(w - 16, 22, w - 16, h - 16);
-  g.lineStyle(2, col('panelBg'), 0.7);
+  g.lineBetween(16, 22, 16, h - 18);
+  g.lineBetween(w / 2, 22, w / 2, h - 18);
+  g.lineBetween(w - 16, 22, w - 16, h - 18);
+  g.lineStyle(2, col('ground'), 0.8);
   g.lineBetween(14, 30, 22, 40);
   g.lineBetween(22, 40, 18, 52);
 };
 
 const kordonKamer: Painter = (g, w, h) => {
-  const dark = col('bgDeep');
-  const body = col('cool');
+  shadow(g, w, h);
+  const light = col('text');
+  const body = col('textMuted');
   const lens = col('parallaxFar');
   const camera = (x: number, top: number): void => {
     // Statyw.
-    g.lineStyle(3, dark, 1);
-    g.lineBetween(x, top + 16, x - 12, h);
-    g.lineBetween(x, top + 16, x + 12, h);
-    g.lineBetween(x, top + 16, x, h);
+    g.lineStyle(3, light, 1);
+    g.lineBetween(x, top + 16, x - 12, h - 3);
+    g.lineBetween(x, top + 16, x + 12, h - 3);
+    g.lineBetween(x, top + 16, x, h - 3);
     // Korpus.
     g.fillStyle(body, 1);
     g.fillRect(x - 12, top, 24, 16);
     g.fillRect(x + 12, top + 3, 8, 10);
+    g.lineStyle(1, light, 1);
+    g.strokeRect(x - 12.5, top + 0.5, 24, 16);
     g.fillStyle(lens, 1);
     g.fillCircle(x + 18, top + 8, 4);
     g.fillStyle(col('gold'), 1);
     g.fillCircle(x + 17, top + 7, 1.5);
     g.fillStyle(col('warn'), 1);
-    g.fillCircle(x - 8, top + 4, 2);
+    g.fillCircle(x - 7, top + 4, 2.5);
     // Mikrofon na górze.
-    g.fillStyle(dark, 1);
+    g.fillStyle(light, 1);
     g.fillRect(x - 4, top - 6, 8, 6);
   };
   camera(20, 14);
@@ -104,7 +122,8 @@ const kordonKamer: Painter = (g, w, h) => {
 };
 
 const boty: Painter = (g, w, h) => {
-  const bubble = col('textMuted');
+  shadow(g, w, h);
+  const bubble = col('text');
   const dark = col('bgDeep');
   const draw = (x: number, y: number, s: number): void => {
     g.fillStyle(bubble, 1);
@@ -129,28 +148,29 @@ const boty: Painter = (g, w, h) => {
 };
 
 const telefony: Painter = (g, w, h) => {
-  const dark = col('bgDeep');
-  const light = col('textMuted');
+  shadow(g, w, h);
+  const body = col('text');
+  const detail = col('bgDeep');
   const handset = (x: number, y: number, angle: number): void => {
     const len = 30;
     const dx = Math.cos(angle) * len;
     const dy = Math.sin(angle) * len;
-    g.lineStyle(5, dark, 1);
+    g.lineStyle(5, body, 1);
     g.lineBetween(x, y, x + dx, y + dy);
-    g.fillStyle(dark, 1);
+    g.fillStyle(body, 1);
     g.fillCircle(x, y, 6);
     g.fillCircle(x + dx, y + dy, 6);
-    g.fillStyle(light, 1);
+    g.fillStyle(detail, 1);
     g.fillCircle(x, y, 2);
     g.fillCircle(x + dx, y + dy, 2);
   };
   // Podstawa telefonu.
-  g.fillStyle(dark, 1);
-  g.fillRoundedRect(10, h - 26, w - 20, 22, 4);
-  g.fillStyle(light, 1);
+  g.fillStyle(body, 1);
+  g.fillRoundedRect(10, h - 28, w - 20, 22, 4);
+  g.fillStyle(detail, 1);
   for (let i = 0; i < 3; i += 1) {
     for (let j = 0; j < 3; j += 1) {
-      g.fillRect(20 + i * 8, h - 20 + j * 5, 4, 3);
+      g.fillRect(20 + i * 8, h - 22 + j * 5, 4, 3);
     }
   }
   handset(18, 22, -0.25);
@@ -165,17 +185,16 @@ const telefony: Painter = (g, w, h) => {
 };
 
 const brama: Painter = (g, w, h) => {
-  const iron = col('panelBg');
-  const dark = col('bgDeep');
-  g.fillStyle(dark, 1);
-  g.fillRect(0, h - 6, w, 6);
+  shadow(g, w, h);
+  const iron = col('textMuted');
+  const light = col('text');
   g.fillStyle(iron, 1);
-  g.fillRect(4, 4, 8, h - 4);
-  g.fillRect(w - 12, 4, 8, h - 4);
+  g.fillRect(4, 4, 8, h - 6);
+  g.fillRect(w - 12, 4, 8, h - 6);
   g.fillRect(4, 4, w - 8, 6);
   g.fillRect(4, h / 2, w - 8, 5);
   for (let x = 20; x < w - 12; x += 12) {
-    g.fillRect(x, 8, 4, h - 8);
+    g.fillRect(x, 8, 4, h - 10);
     g.fillTriangle(x - 2, 8, x + 6, 8, x + 2, 0);
   }
   // Kłódka i tabliczka.
@@ -187,7 +206,9 @@ const brama: Painter = (g, w, h) => {
   g.strokePath();
   g.fillStyle(col('warn'), 1);
   g.fillRect(w / 2 - 20, 18, 40, 18);
-  g.lineStyle(3, col('text'), 1);
+  g.lineStyle(1, light, 1);
+  g.strokeRect(w / 2 - 20.5, 18.5, 40, 18);
+  g.lineStyle(3, light, 1);
   g.lineBetween(w / 2 - 7, 22, w / 2 + 7, 32);
   g.lineBetween(w / 2 + 7, 22, w / 2 - 7, 32);
 };

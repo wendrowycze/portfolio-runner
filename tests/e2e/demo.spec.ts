@@ -1,0 +1,115 @@
+import { readFileSync } from 'node:fs';
+import { expect, test, type Page } from '@playwright/test';
+import { loadCase } from '../../src/content/loader';
+import { collectErrors } from './helpers';
+
+const demo = loadCase(
+  JSON.parse(readFileSync(new URL('../../content/cases/_demo.json', import.meta.url), 'utf8')),
+);
+
+const panel = (page: Page) => page.locator('#panel');
+
+async function waitForBeat(page: Page, id: string): Promise<void> {
+  await expect(panel(page)).toHaveAttribute('data-beat', id, { timeout: 30_000 });
+}
+
+/** Klika poprawną opcję aktualnego beatu choice na podstawie treści JSON. */
+async function answerChoice(page: Page, beatId: string): Promise<void> {
+  const beat = demo.beats.find((b) => b.id === beatId);
+  if (beat?.type !== 'choice') throw new Error(`${beatId} nie jest choice`);
+  const index = beat.options.findIndex((o) => o.correct);
+  await page.locator('[data-testid="option"]').nth(index).click();
+}
+
+test('pełne przejście _demo.json w layoucie side: wybory, QTE, fragmenty, finał', async ({
+  page,
+}) => {
+  const errors = collectErrors(page);
+  await page.goto('./?layout=side&case=_demo');
+  await expect(page.locator('body')).toHaveAttribute('data-game-ready', 'true');
+  await expect(page.locator('#game')).toHaveAttribute('data-layout', 'side');
+
+  // b01: narracja (tap) — klik w tekst dopisuje resztę, „Dalej” przechodzi.
+  await waitForBeat(page, 'b01');
+  await page.locator('[data-testid="story"]').click();
+  await page.locator('[data-testid="continue"]').click();
+
+  // b02: narracja auto — przechodzi sama.
+  await waitForBeat(page, 'b02');
+  await page.locator('[data-testid="story"]').click();
+  await waitForBeat(page, 'b03');
+
+  // b03: wybór — czas zwolniony, opcje widoczne, pasek czasu.
+  await expect(page.locator('[data-testid="option"]')).toHaveCount(3);
+  await page.waitForTimeout(1200);
+  await page.screenshot({ path: 'docs/screens/etap2-side.png', fullPage: true });
+  await answerChoice(page, 'b03');
+  await expect(page.locator('.fragment-slot[data-collected="true"]')).toHaveCount(1);
+
+  // b04: QTE — czekamy aż pierścień otworzy okno, wtedy spacja.
+  await waitForBeat(page, 'b04');
+  await expect(page.locator('[data-testid="qte"]')).toHaveAttribute('data-open', 'true', {
+    timeout: 10_000,
+  });
+  await page.keyboard.press('Space');
+  await expect(page.locator('.fragment-slot[data-collected="true"]')).toHaveCount(2);
+
+  // b05: wyniki.
+  await waitForBeat(page, 'b05');
+  await expect(page.locator('[data-testid="results"]')).toBeVisible();
+  await page.waitForTimeout(1200);
+  await page.screenshot({ path: 'docs/screens/etap2-results.png', fullPage: true });
+  await page.locator('[data-testid="continue"]').click();
+
+  // b06: finał — kafle wlatują, CTA i powrót.
+  await waitForBeat(page, 'b06');
+  await expect(page.locator('[data-testid="finale"]')).toBeVisible();
+  await expect(page.locator('.finale-tile[data-landed="true"]')).toHaveCount(2, {
+    timeout: 10_000,
+  });
+  await expect(page.locator('[data-testid="finale-return"]')).toBeVisible({ timeout: 20_000 });
+  await page.waitForTimeout(600);
+  await page.screenshot({ path: 'docs/screens/etap2-finale.png', fullPage: true });
+  await page.locator('[data-testid="finale-return"]').click();
+
+  // Po finale demo zaczyna się od nowa.
+  await expect(page.locator('[data-testid="finale"]')).toBeHidden();
+  await waitForBeat(page, 'b01');
+  expect(errors).toEqual([]);
+});
+
+test('layout stack: panel pod biegiem, zły wybór zatrzymuje bieg i wraca do tego samego beatu', async ({
+  page,
+}) => {
+  const errors = collectErrors(page);
+  await page.goto('./?layout=stack&case=_demo');
+  await expect(page.locator('body')).toHaveAttribute('data-game-ready', 'true');
+  await expect(page.locator('#game')).toHaveAttribute('data-layout', 'stack');
+
+  const runnerBox = await page.locator('#runner').boundingBox();
+  const panelBox = await page.locator('#panel').boundingBox();
+  expect(runnerBox).not.toBeNull();
+  expect(panelBox).not.toBeNull();
+  if (runnerBox !== null && panelBox !== null) expect(panelBox.y).toBeGreaterThan(runnerBox.y);
+
+  await waitForBeat(page, 'b01');
+  await page.keyboard.press('Space'); // dopisz
+  await page.keyboard.press('Space'); // dalej
+  await waitForBeat(page, 'b02');
+  await page.locator('[data-testid="story"]').click();
+  await waitForBeat(page, 'b03');
+  await page.waitForTimeout(1200);
+  await page.screenshot({ path: 'docs/screens/etap2-stack.png', fullPage: true });
+
+  // Zły wybór klawiszem: feedback, potem ten sam beat wraca.
+  const beat = demo.beats.find((b) => b.id === 'b03');
+  const wrongIndex = beat?.type === 'choice' ? beat.options.findIndex((o) => !o.correct) : 0;
+  await page.keyboard.press(`Digit${String(wrongIndex + 1)}`);
+  await expect(panel(page)).toHaveAttribute('data-phase', 'feedback');
+  await expect(page.locator('.entry-feedback.is-wrong')).toBeVisible();
+  await expect(panel(page)).toHaveAttribute('data-phase', 'choice', { timeout: 10_000 });
+  await expect(page.locator('.fragment-slot[data-collected="true"]')).toHaveCount(0);
+  await answerChoice(page, 'b03');
+  await expect(page.locator('.fragment-slot[data-collected="true"]')).toHaveCount(1);
+  expect(errors).toEqual([]);
+});

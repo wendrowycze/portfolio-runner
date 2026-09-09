@@ -3,7 +3,7 @@ import { collectErrors } from './helpers';
 
 test('bieg działa: skok klawiaturą, HUD debug pokazuje FPS i prędkość', async ({ page }) => {
   const errors = collectErrors(page);
-  await page.goto('./?debug=1');
+  await page.goto('./?free=1&debug=1');
   await expect(page.locator('body')).toHaveAttribute('data-game-ready', 'true');
   await expect(page.locator('#runner canvas')).toBeVisible();
 
@@ -28,7 +28,7 @@ test('mobile: tap w obszar biegu = skok, layout składa się góra/dół', async
   });
   const page = await context.newPage();
   const errors = collectErrors(page);
-  await page.goto('./');
+  await page.goto('./?free=1');
   await expect(page.locator('body')).toHaveAttribute('data-game-ready', 'true');
 
   const runner = page.locator('#runner');

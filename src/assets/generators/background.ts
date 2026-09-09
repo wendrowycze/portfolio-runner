@@ -224,13 +224,6 @@ export function generateProps(scene: Phaser.Scene): void {
     g.fillStyle(col('warn'), 0.7);
     g.fillRect(x - 9, 136, 18, 16);
   };
-  const bench = (x: number): void => {
-    g.fillStyle(dark, 1);
-    g.fillRect(x, height - 26, 44, 5);
-    g.fillRect(x + 4, height - 21, 4, 21);
-    g.fillRect(x + 36, height - 21, 4, 21);
-    g.fillRect(x + 2, height - 40, 40, 4);
-  };
 
   drawWrapped(width, 90, lamp);
   drawWrapped(width, 410, lamp);
@@ -242,7 +235,6 @@ export function generateProps(scene: Phaser.Scene): void {
     cypress(x, 110);
   });
   drawWrapped(width, 560, posterColumn);
-  drawWrapped(width, 640, bench);
   drawWrapped(width, 880, (x) => {
     cypress(x, 130);
   });

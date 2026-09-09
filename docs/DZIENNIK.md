@@ -87,3 +87,30 @@ Zod dojdzie w Etapie 2 razem z ładowaniem treści (ADR-7).
 - **Błędy ładowania Google Fonts w testach e2e są ignorowane** (`tests/e2e/helpers.ts`) — w środowisku bez sieci fonty mają fallback, a to nie jest błąd gry. Wszystkie inne błędy konsoli nadal oblewają test.
 - Favicon jako inline SVG (złota rama na ciemnym tle) — usuwa 404 `favicon.ico` z konsoli.
 - FPS w headless Chromium (software rendering) to ok. 20–25 — nie jest miarodajny; w zwykłej przeglądarce scena to kilkanaście obiektów i celuje w 60 fps.
+
+---
+
+## 2026-09-09 — Etap 2: Skrypt i panel dialogowy
+
+### Co powstało
+
+- **zod 4** (`npm i zod`) — jedyna nowa zależność, uzasadniona ADR-7. `src/content/loader.ts`: schema zod typowana jako `z.ZodType<Case>` względem ręcznych typów w `src/script/types.ts` — rozjazd między nimi to błąd kompilacji, rozjazd z `content/schema/case.schema.json` wyłapują testy Vitest na `_demo.json`. Loader sprawdza też reguły spoza JSON Schema: unikalne id beatów, liczba fragmentów = cols×rows, każdy fragment przyznany raz, skille z opcji/results istnieją w `case.skills`, ostatni beat = finale.
+- `src/script/ScriptRunner.ts` — maszyna stanów bez Phasera i DOM; czas dostaje przez `tick(deltaMs)` (scena woła co klatkę, testy ręcznie). Zdarzenia: `beat:start`, `beat:resolved`, `beat:retry`, `fragment:collected`, `skill:gained`, `timer:progress`, `action:window`, `phase`, `case:finished`.
+- `src/ui/DialoguePanel.ts` + `typewriter.ts` — panel jako przewijana opowieść: wpisy dopisują się na dole, starsze bledną i uciekają w górę. Nagłówek z rolą, tytułem i 6 slotami fragmentów; stopka z akcjami (Dalej / opcje + pasek czasu / pierścień QTE / przycisk widgetu).
+- `src/ui/FinaleOverlay.ts` — pełnoekranowy finał: kafle wlatują w kolejności zebrania (naprzemiennie z lewej/prawej, `Back.easeOut`), złoty rozbłysk, podpis, tekst zamknięcia, CTA + powrót. W Etapie 2 powrót = „Zagraj jeszcze raz” (hub dopiero w Etapie 3).
+- `content/ui.json` + `src/content/uiStrings.ts` — teksty interfejsu (przyciski, podpowiedzi, feedback generyczny) poza kodem TS, walidowane zodem.
+- `content/cases/_demo.json` + `public/assets/paintings/_demo.svg` — 6 beatów syntetycznych, obraz 2×1.
+- Integracja w `RunnerScene`: choice/action → time dilation z `runner.choiceSlowdown` + `spawnForBeat`; sukces → auto-skok, przeszkoda „podjeżdża” pod postać, iskry, lot miniatury fragmentu do HUD; porażka → potknięcie, świat staje (0×), przeszkoda znika, po 2 s beat wraca. Złoty snop światła na ziemi pod przeszkodą aktywnego beatu.
+- `?layout=stack|side` (runtime) — oba layouty przetestowane e2e ze zrzutami `etap2-side.png`, `etap2-stack.png`; do tego `etap2-results.png`, `etap2-finale.png`.
+- `?free=1` — tryb wolnego biegu z Etapu 1 nadal dostępny (ocena tempa bez historii). `?case=_demo` wybiera case; `?debug=1` dodatkowo wystawia uchwyt `window.__portfolioRunner` do diagnostyki.
+
+### Decyzje
+
+1. **Decyzja Arka „zła decyzja zatrzymuje bieg” wdrożona dla choice ORAZ action.** Nietrafiony wybór, brak wyboru w czasie, skok za wcześnie/za późno = potknięcie + feedback (2 s, świat stoi) + powrót do tego samego beatu (`attempt` +1, przeszkoda spawnuje się ponownie). Konsekwencja: finał zawsze ma komplet fragmentów. GDD sekcja d („beat nie wraca jako pętla”) jest tym samym nadpisana — zgodnie z zapisem z Etapu 0.
+2. **Tempo maszyny do pisania sprzężone ze światem tylko dla narracji** (`rate = max(0.25, timeScale)`): przy ×1.15 tekst płynie szybciej, przy potknięciu prawie staje. Prompt wyboru i QTE piszą się szybko (×2.2), żeby nie zjadać czasu z paska; feedback i wyniki normalnie. Uzasadnienie: gracz musi zdążyć przeczytać opcje w 7 s.
+3. **Przeszkody beatu poruszają się „po zegarze”, nie po fizyce** — pozycja = interpolacja od punktu spawnu do postaci wg postępu `timerMs`. Moment dotarcia zawsze pokrywa się z upływem czasu, niezależnie od easingu time dilation (300 ms) i FPS. Dystans spawnu liczony jak w GDD sekcja e (`baseSpeed × slowdown × czas`).
+4. **Wizualna szerokość strefy QTE wynika z `windowMs`** (`baseSpeed × slowdown × windowMs`), a nie ze stałej `QTE_ZONE_WIDTH_PX` (zostaje jako fallback). Dzięki temu pasek na ziemi mówi prawdę o oknie z JSON — GDD dopuszczało rozjazd z ostrzeżeniem, tu go po prostu nie ma.
+5. **Klawiatura obsługiwana w jednym miejscu (panel DOM)**, nie w Phaserze: spacja/↑ = skok w action albo „dalej” w narracji, Enter = dalej, 1/2/3 = opcja. Phaser obsługuje tylko klik/tap w canvas (i klawisze w trybie `?free=1`). Unika podwójnych zdarzeń.
+6. **Typy beatów w `script/types.ts` mają pola opcjonalne jako `T | undefined`** — wymusza to `exactOptionalPropertyTypes` w połączeniu z typem wyjściowym zod.
+7. Sukces beatu: przeszkoda nie „znika” po poprawnym wyborze, tylko w 420 ms podjeżdża pod skaczącą postać i płynie dalej — czytelniejsze niż nagłe zniknięcie i daje moment na lot fragmentu.
+8. `.finale[hidden] { display: none }` — atrybut `hidden` przegrywa z `display: grid` klasy; bez tej reguły niewidoczny overlay przechwytywał kliknięcia (wyłapane przez e2e).

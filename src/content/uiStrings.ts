@@ -1,0 +1,53 @@
+import { z } from 'zod';
+import uiJson from '../../content/ui.json';
+
+/**
+ * Teksty interfejsu (przyciski, podpowiedzi, feedback generyczny) — w content/ui.json,
+ * nie w kodzie TS (CLAUDE.md: treść wyłącznie w content/).
+ */
+const UiStringsSchema = z.strictObject({
+  continue: z.string(),
+  start: z.string(),
+  jumpPrompt: z.string(),
+  jumpHint: z.string(),
+  choiceHint: z.string(),
+  actionWait: z.string(),
+  actionNow: z.string(),
+  feedbackTimeout: z.string(),
+  feedbackEarly: z.string(),
+  feedbackLate: z.string(),
+  feedbackRight: z.string(),
+  retryIn: z.string(),
+  fragmentCollected: z.string(),
+  fragmentsLabel: z.string(),
+  resultsTitle: z.string(),
+  resultsSkills: z.string(),
+  resultsKpis: z.string(),
+  resultsStumbles: z.string(),
+  resultsTime: z.string(),
+  resultsSee: z.string(),
+  finaleReturn: z.string(),
+  finaleRestored: z.string(),
+  playAgain: z.string(),
+  hubHint: z.string(),
+  hubDamaged: z.string(),
+  hubRestored: z.string(),
+  widgetContinue: z.string(),
+  puzzleHint: z.string(),
+  puzzleDone: z.string(),
+  revealHint: z.string(),
+  freeRunTitle: z.string(),
+  freeRunLead: z.string(),
+  freeRunHints: z.array(z.string()),
+});
+
+export type UiStrings = z.infer<typeof UiStringsSchema>;
+
+export function loadUiStrings(json: unknown = uiJson): UiStrings {
+  return UiStringsSchema.parse(json);
+}
+
+/** Podstawianie {n}, {total} itd. */
+export function format(template: string, values: Record<string, string | number>): string {
+  return template.replace(/\{(\w+)\}/g, (_m, key: string) => String(values[key] ?? ''));
+}
