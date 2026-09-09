@@ -1,0 +1,205 @@
+{
+  "id": "teatr-jest-nasz",
+  "world": "kultura",
+  "title": "Pokaż urzędnikom, że #teatrjestnasz",
+  "lead": "Widzowie Teatru w Krakowie chcą chronić go przed cenzurą polityczną. Poszukują kogoś, kto zorganizuje zbiórkę narodową, aby wesprzeć teatr.",
+  "role": "Organizator zbiórki narodowej",
+  "skills": [
+    "Pozyskiwanie partnerów",
+    "Organizacja zbiórek publicznych",
+    "Aktywizacja społeczności"
+  ],
+  "painting": {
+    "src": "assets/paintings/teatr-jest-nasz.png",
+    "cols": 3,
+    "rows": 2,
+    "caption": "Gmach Teatru im. J. Słowackiego wspierany przez aktora, widza i reżysera — obraz odrestaurowany dzięki solidarności tysięcy ludzi."
+  },
+  "runner": {
+    "theme": "kultura",
+    "baseSpeed": 220,
+    "choiceSlowdown": 0.35
+  },
+  "beats": [
+    {
+      "id": "b01",
+      "type": "narration",
+      "text": "Jest rok 2022. Cała Polska, niczym mityczna Galia, rozdarta jest wewnętrznymi konfliktami. Napięcia polityczne zdają się dominować na każdej scenie teatralnej. Ale czy na pewno? Jeden teatr w Krakowie nie poddaje się dyktatowi, zaciekle broniąc wolności artystycznej wypowiedzi, nawet gdy na platformie X boty rozpowszechniają na jego temat fałszywe informacje.",
+      "advance": "tap"
+    },
+    {
+      "id": "b02",
+      "type": "choice",
+      "prompt": "Boty na platformie X zaczynają rozpowszechniać fałszywe informacje o teatrze. Jak reagujesz?",
+      "obstacle": "boty",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Publikujesz sprawdzone fakty i prosisz obserwujących o udostępnianie prawdziwych informacji.",
+          "correct": true,
+          "skill": "Aktywizacja społeczności",
+          "feedback": "Trafiona reakcja — w starciu z dezinformacją liczy się szybkie dotarcie z prawdą, nie polemika."
+        },
+        {
+          "text": "Wdajesz się w długą wymianę zdań z botami w komentarzach.",
+          "correct": false,
+          "feedback": "Kłótnia z botami nie zmienia niczyjego zdania i zabiera czas, którego potrzebujesz na realną akcję."
+        },
+        {
+          "text": "Ignorujesz sprawę i nie odpowiadasz w ogóle.",
+          "correct": false,
+          "feedback": "Milczenie zostawia pole tylko fałszywym informacjom — trzeba było zareagować, choćby krótko."
+        }
+      ],
+      "reward": { "fragment": 1 }
+    },
+    {
+      "id": "b03",
+      "type": "narration",
+      "text": "Trwa pandemia, a w budżecie teatru brakuje kilku milionów złotych. Mieszkańcy Krakowa postanawiają działać, a Ty jesteś jednym z nich. Podejmujesz decyzję: czas ogłosić narodową zbiórkę.",
+      "advance": "tap"
+    },
+    {
+      "id": "b04",
+      "type": "narration",
+      "text": "Przygotowujesz angażujące opisy i materiały prasowe. Nagrywasz wywiady dla radia i osobiście obdzwaniasz wszystkie zaprzyjaźnione media. Rozumiesz, że w crowdfundingu liczy się każdy, nawet najmniejszy gest — również ten wyrażony przez proste udostępnienie informacji.",
+      "advance": "tap"
+    },
+    {
+      "id": "b05",
+      "type": "choice",
+      "prompt": "Trzeba zacząć obdzwaniać media. Kogo dzwonisz najpierw: media zaprzyjaźnione czy ogólnopolskie?",
+      "obstacle": "sala-teatru",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Najpierw zaprzyjaźnione redakcje — łatwiej zdobyć pierwsze poparcie i dopracować przekaz.",
+          "correct": true,
+          "skill": "Pozyskiwanie partnerów",
+          "feedback": "Dobry ruch — sprawdzony, przyjazny kanał daje pierwszy impuls, który potem łatwiej skalować."
+        },
+        {
+          "text": "Od razu największe ogólnopolskie stacje, żeby zrobić najgłośniej jak się da.",
+          "correct": false,
+          "feedback": "Duże media chętniej podchwycą temat, który ma już pierwsze potwierdzone zainteresowanie — zaczynanie od nich bez przygotowania gruntu bywa ryzykowne."
+        }
+      ],
+      "reward": { "fragment": 2 }
+    },
+    {
+      "id": "b06",
+      "type": "action",
+      "prompt": "Kilka minut przed ogłoszeniem zbiórki nerwowo spoglądasz na salę teatru — rząd kamer i dziennikarzy otoczył scenę grubym kordonem. Skocz nad kordonem kamer, by zdążyć na scenę!",
+      "input": "jump",
+      "obstacle": "kordon-kamer",
+      "windowMs": 800,
+      "reward": { "fragment": 3 }
+    },
+    {
+      "id": "b07",
+      "type": "narration",
+      "text": "Gdy rozpoczynasz swoją stanowczą przemowę, wiesz już, że do akcji przyłączają się największe ogólnopolskie media. W ciągu zaledwie kilku pierwszych dni udaje się zebrać ponad 200 000 złotych.",
+      "advance": "auto",
+      "durationMs": 5000
+    },
+    {
+      "id": "b08",
+      "type": "interaction",
+      "widget": "button",
+      "label": "WESPRZYJ TEATR",
+      "style": "zrzutka",
+      "counter": { "from": 0, "to": 200000, "suffix": " zł" },
+      "text": "Uruchamiasz zbiórkę narodową. Kliknij, by zobaczyć, jak w pierwszych dniach rośnie wsparcie Polaków dla teatru."
+    },
+    {
+      "id": "b09",
+      "type": "narration",
+      "text": "Inicjatywa nabiera rozpędu. Wspierasz organizację protestów i pikiet poparcia. Teatry z całej Polski solidarnie stają za Teatrem Słowackiego. Artyści nagrywają filmy w geście wsparcia — sam Robert Makłowicz nie tylko pikietuje razem z Tobą pod teatrem, ale także publikuje płomienne nagrania.",
+      "advance": "tap"
+    },
+    {
+      "id": "b10",
+      "type": "action",
+      "prompt": "Wspierasz protesty i pikiety poparcia pod teatrem. Na Twojej drodze staje barierka oddzielająca pikietujących od wejścia. Przeskocz barierkę i dołącz do pierwszej linii!",
+      "input": "jump",
+      "obstacle": "barierka",
+      "windowMs": 800,
+      "reward": { "fragment": 4 }
+    },
+    {
+      "id": "b11",
+      "type": "narration",
+      "text": "Do akcji dołączają firmy, a mecenasi sztuki (Attaché) ofiarowują cenne dzieła na licytacje. Uczniowie chcą organizować zbiórki na rzecz teatru, lecz napotykają na opór ze strony dyrekcji szkół.",
+      "advance": "tap"
+    },
+    {
+      "id": "b12",
+      "type": "choice",
+      "prompt": "Uczniowie w szkołach chcą organizować zbiórki na rzecz teatru, ale dyrekcja im tego zabrania. Co robisz?",
+      "obstacle": "opor-dyrekcji",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Rozmawiasz z dyrekcją, pokazujesz że zbiórka to legalna forma wsparcia kultury i oferujesz pomoc w formalnościach.",
+          "correct": true,
+          "skill": "Organizacja zbiórek publicznych",
+          "feedback": "Rozmowa i konkretna pomoc organizacyjna rozbraja opór skuteczniej niż nacisk."
+        },
+        {
+          "text": "Publicznie krytykujesz dyrekcję szkół w mediach społecznościowych.",
+          "correct": false,
+          "feedback": "Eskalacja konfliktu zamiast go rozładować mogła zniechęcić kolejne szkoły do współpracy."
+        },
+        {
+          "text": "Zostawiasz sprawę uczniom samym sobie.",
+          "correct": false,
+          "feedback": "Bez wsparcia dorosłego organizatora młodzi ludzie łatwo się zniechęcają — Twoja rola to właśnie pomoc w takich momentach."
+        }
+      ],
+      "reward": { "fragment": 5 }
+    },
+    {
+      "id": "b13",
+      "type": "narration",
+      "text": "Mimo to, dzięki wspólnemu wysiłkowi, udaje się zebrać ponad pół miliona złotych i skutecznie zapobiec politycznemu odwołaniu dyrektora. To doświadczenie uświadamia Ci, że ludzie są prawdziwymi sprzymierzeńcami kultury. Kluczowe jest stworzenie platformy, która pozwoli im zobaczyć, jak wielu ich jest.",
+      "advance": "tap"
+    },
+    {
+      "id": "b14",
+      "type": "interaction",
+      "widget": "puzzle",
+      "text": "Powstaje obraz-płaskorzeźba: gmach teatru wspierany na barkach aktora, widza i reżysera. Ułóż go, zamieniając miejscami sąsiadujące fragmenty.",
+      "reward": { "fragment": 6 }
+    },
+    {
+      "id": "b15",
+      "type": "results",
+      "stats": [
+        { "skill": "Pozyskiwanie partnerów", "delta": 10 },
+        { "skill": "Organizacja zbiórek publicznych", "delta": 10 },
+        { "skill": "Aktywizacja społeczności", "delta": 10 }
+      ],
+      "kpis": [
+        { "label": "Zebrane w pierwsze dni", "value": "ponad 200 000 zł" },
+        { "label": "Zebrane łącznie", "value": "ponad 500 000 zł" },
+        {
+          "label": "Los dyrektora",
+          "value": "zapobieżono politycznemu odwołaniu dyrektora Krzysztofa Głuchowskiego"
+        },
+        {
+          "label": "Solidarność",
+          "value": "teatry z całej Polski i Robert Makłowicz wsparli akcję"
+        }
+      ]
+    },
+    {
+      "id": "b16",
+      "type": "finale",
+      "text": "Dzięki swojej postawie pokazałeś tysiącom osób, że nawet mały gest może mieć ogromne znaczenie. Pomogłeś jednej z najważniejszych instytucji kultury w kraju przetrwać polityczną burzę. Nauczyłeś się, że najważniejsze nie jest przekonywanie ludzi do czynienia dobra, ale skuteczne pokazywanie im, jak mogą to robić.",
+      "cta": {
+        "label": "Poznaj Arka na LinkedIn",
+        "url": "https://www.linkedin.com/in/arkadiusz-klej/"
+      }
+    }
+  ]
+}

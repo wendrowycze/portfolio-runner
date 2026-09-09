@@ -1,0 +1,97 @@
+/* Paleta z docs/04_STYL_I_ASSETY.md — te same wartości co w src/config/palette.ts */
+:root {
+  --c-bg-deep: #261619;
+  --c-panel-bg: #3e2219;
+  --c-warn: #742224;
+  --c-ground: #895f47;
+  --c-gold: #dfb67c;
+  --c-text: #e2e9e1;
+  --c-text-muted: #accbc6;
+  --c-cool: #3d5e67;
+  --c-parallax-mid: #11485d;
+  --c-parallax-far: #0b2f2e;
+  --font-hud: 'Press Start 2P', monospace;
+  --font-text: 'Spectral', Georgia, serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--c-bg-deep);
+  color: var(--c-text);
+  font-family: var(--font-text);
+}
+
+/* Kontener gry: CSS Grid. Układ domyślny "side" = opowieść po lewej, bieg po prawej
+   (decyzja Arka z 2026-09-09, patrz docs/DZIENNIK.md). Wariant "stack" zostaje pod ręką. */
+#game {
+  height: 100vh;
+  height: 100dvh;
+  display: grid;
+}
+
+#game[data-layout='side'] {
+  grid-template-columns: 40% 60%;
+  grid-template-areas: 'panel runner';
+}
+
+#game[data-layout='stack'] {
+  grid-template-rows: 50% 50%;
+  grid-template-areas: 'runner' 'panel';
+}
+
+#panel {
+  grid-area: panel;
+  background: var(--c-panel-bg);
+  padding: 24px;
+  overflow: hidden;
+  border-right: 2px solid var(--c-gold);
+}
+
+#game[data-layout='stack'] #panel {
+  border-right: 0;
+  border-top: 2px solid var(--c-gold);
+}
+
+#panel-title {
+  font-family: var(--font-hud);
+  font-size: 16px;
+  color: var(--c-gold);
+  margin: 0 0 16px;
+  line-height: 1.6;
+}
+
+#panel-lead {
+  font-size: 16px;
+  color: var(--c-text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+#runner {
+  grid-area: runner;
+  position: relative;
+  overflow: hidden;
+  background: var(--c-bg-deep);
+}
+
+#runner canvas {
+  display: block;
+}
+
+@media (max-width: 767px) {
+  #game[data-layout='side'] {
+    grid-template-columns: 100%;
+    grid-template-rows: 50% 50%;
+    grid-template-areas: 'runner' 'panel';
+  }
+  #game[data-layout='side'] #panel {
+    border-right: 0;
+    border-top: 2px solid var(--c-gold);
+  }
+}

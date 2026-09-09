@@ -1,0 +1,383 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://portfolio-arka.dev/schema/case.schema.json",
+  "title": "Case (scenariusz runnera)",
+  "description": "Schemat pojedynczego case'a (projektu/historii) do silnika endless runnera portfolio Arka. Format wiążący dla content/cases/*.json — patrz też docs/01_GDD_RUNNER_POC.md (sekcja d, specyfikacja typów beatów).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "world", "title", "lead", "role", "skills", "painting", "runner", "beats"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unikalny identyfikator case'a, kebab-case, używany m.in. jako nazwa pliku.",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "world": {
+      "type": "string",
+      "description": "Świat/tożsamość, do którego należy case.",
+      "enum": ["kultura", "edukacja", "biznes"]
+    },
+    "title": {
+      "type": "string",
+      "description": "Tytuł misji/case'a wyświetlany w hubie i na starcie runnera.",
+      "minLength": 1
+    },
+    "lead": {
+      "type": "string",
+      "description": "Krótki lead/zajawka wyjaśniająca zadanie gracza.",
+      "minLength": 1
+    },
+    "role": {
+      "type": "string",
+      "description": "Rola Arka w tym case'ie (np. „Organizator zbiórki narodowej”).",
+      "minLength": 1
+    },
+    "skills": {
+      "type": "array",
+      "description": "Maksymalnie 3 skille/statystyki RPG tego case'a, wyświetlane w results.",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1,
+      "maxItems": 3,
+      "uniqueItems": true
+    },
+    "painting": {
+      "type": "object",
+      "description": "Obraz do ułożenia w finale (siatka fragmentów).",
+      "additionalProperties": false,
+      "required": ["src", "cols", "rows", "caption"],
+      "properties": {
+        "src": {
+          "type": "string",
+          "description": "Ścieżka do assetu obrazu (docelowego, złożonego).",
+          "minLength": 1
+        },
+        "cols": {
+          "type": "integer",
+          "description": "Liczba kolumn siatki fragmentów.",
+          "minimum": 1
+        },
+        "rows": {
+          "type": "integer",
+          "description": "Liczba wierszy siatki fragmentów.",
+          "minimum": 1
+        },
+        "caption": {
+          "type": "string",
+          "description": "Podpis wyświetlany pod złożonym obrazem w finale.",
+          "minLength": 1
+        }
+      }
+    },
+    "runner": {
+      "type": "object",
+      "description": "Parametry sceny runnera specyficzne dla tego case'a.",
+      "additionalProperties": false,
+      "required": ["theme", "baseSpeed", "choiceSlowdown"],
+      "properties": {
+        "theme": {
+          "type": "string",
+          "description": "Motyw wizualny runnera (paleta/ornamenty), zwykle zgodny ze światem.",
+          "enum": ["kultura", "edukacja", "biznes"]
+        },
+        "baseSpeed": {
+          "type": "number",
+          "description": "Bazowa prędkość biegu postaci w px/s.",
+          "exclusiveMinimum": 0
+        },
+        "choiceSlowdown": {
+          "type": "number",
+          "description": "Mnożnik spowolnienia świata (time dilation) podczas choice/action, np. 0.35.",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "beats": {
+      "type": "array",
+      "description": "Sekwencja beatów tworzących historię case'a, wykonywanych po kolei.",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/beat" }
+    }
+  },
+  "definitions": {
+    "beat": {
+      "description": "Pojedynczy beat historii; kształt zależy od pola `type`.",
+      "oneOf": [
+        { "$ref": "#/definitions/beatNarration" },
+        { "$ref": "#/definitions/beatChoice" },
+        { "$ref": "#/definitions/beatAction" },
+        { "$ref": "#/definitions/beatInteraction" },
+        { "$ref": "#/definitions/beatResults" },
+        { "$ref": "#/definitions/beatFinale" }
+      ]
+    },
+    "beatId": {
+      "type": "string",
+      "description": "Unikalny identyfikator beatu w obrębie case'a (np. „b01”).",
+      "pattern": "^b[0-9]{2,}$"
+    },
+    "reward": {
+      "type": "object",
+      "description": "Nagroda przyznawana po pomyślnym rozwiązaniu beatu.",
+      "additionalProperties": false,
+      "required": ["fragment"],
+      "properties": {
+        "fragment": {
+          "type": "integer",
+          "description": "Numer fragmentu obrazu przyznawany przy sukcesie (1..cols*rows), w kolejności zbierania.",
+          "minimum": 1
+        }
+      }
+    },
+    "beatNarration": {
+      "type": "object",
+      "description": "Beat narracyjny: tekst w panelu, bez interakcji poza przejściem dalej.",
+      "additionalProperties": false,
+      "required": ["id", "type", "text", "advance"],
+      "properties": {
+        "id": { "$ref": "#/definitions/beatId" },
+        "type": { "const": "narration", "description": "Typ beatu: narracja." },
+        "text": {
+          "type": "string",
+          "description": "Tekst narracji (maszyna do pisania), max ok. 400 znaków na beat.",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "advance": {
+          "type": "string",
+          "description": "Sposób przejścia do kolejnego beatu: tap = czeka na wejście gracza, auto = przechodzi automatycznie po durationMs.",
+          "enum": ["tap", "auto"]
+        },
+        "durationMs": {
+          "type": "integer",
+          "description": "Czas w ms do automatycznego przejścia, wymagane gdy advance = auto.",
+          "minimum": 0
+        }
+      },
+      "if": { "properties": { "advance": { "const": "auto" } } },
+      "then": { "required": ["durationMs"] }
+    },
+    "beatChoice": {
+      "type": "object",
+      "description": "Beat wyboru: zbliżająca się przeszkoda, spowolnienie czasu, 2-3 opcje dialogowe.",
+      "additionalProperties": false,
+      "required": ["id", "type", "prompt", "obstacle", "timerMs", "options"],
+      "properties": {
+        "id": { "$ref": "#/definitions/beatId" },
+        "type": { "const": "choice", "description": "Typ beatu: wybór." },
+        "prompt": {
+          "type": "string",
+          "description": "Pytanie/polecenie wyświetlane nad opcjami.",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "obstacle": {
+          "type": "string",
+          "description": "Klucz przeszkody ze słownika obstacles.ts (np. „kordon-kamer”).",
+          "minLength": 1
+        },
+        "timerMs": {
+          "type": "integer",
+          "description": "Czas w ms na dokonanie wyboru, zanim brak wyboru liczy się jako nietrafiony.",
+          "exclusiveMinimum": 0
+        },
+        "options": {
+          "type": "array",
+          "description": "Lista 2-3 opcji dialogowych.",
+          "minItems": 2,
+          "maxItems": 3,
+          "items": { "$ref": "#/definitions/choiceOption" }
+        },
+        "reward": { "$ref": "#/definitions/reward" }
+      }
+    },
+    "choiceOption": {
+      "type": "object",
+      "description": "Pojedyncza opcja wyboru w beacie typu choice.",
+      "additionalProperties": false,
+      "required": ["text", "correct", "feedback"],
+      "properties": {
+        "text": { "type": "string", "description": "Treść opcji dialogowej.", "minLength": 1 },
+        "correct": {
+          "type": "boolean",
+          "description": "Czy opcja jest trafna (prowadzi do sukcesu i nagrody)."
+        },
+        "skill": {
+          "type": "string",
+          "description": "Nazwa skilla, do którego dodawany jest punkt przy wyborze tej opcji (zwykle tylko dla correct=true)."
+        },
+        "feedback": {
+          "type": "string",
+          "description": "Krótki, uczący feedback wyświetlany po wybraniu tej opcji.",
+          "minLength": 1
+        }
+      }
+    },
+    "beatAction": {
+      "type": "object",
+      "description": "Beat akcji: QTE typu „skocz” w oknie czasowym.",
+      "additionalProperties": false,
+      "required": ["id", "type", "prompt", "input", "obstacle", "windowMs"],
+      "properties": {
+        "id": { "$ref": "#/definitions/beatId" },
+        "type": { "const": "action", "description": "Typ beatu: akcja/QTE." },
+        "prompt": {
+          "type": "string",
+          "description": "Polecenie wyświetlane graczowi (np. „Skocz nad barierką!”).",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "input": {
+          "type": "string",
+          "description": "Rodzaj wymaganego wejścia gracza.",
+          "enum": ["jump"]
+        },
+        "obstacle": {
+          "type": "string",
+          "description": "Klucz przeszkody ze słownika obstacles.ts.",
+          "minLength": 1
+        },
+        "windowMs": {
+          "type": "integer",
+          "description": "Okno czasowe w ms, w którym wejście gracza liczy się jako trafienie.",
+          "exclusiveMinimum": 0
+        },
+        "reward": { "$ref": "#/definitions/reward" }
+      }
+    },
+    "beatInteraction": {
+      "type": "object",
+      "description": "Beat interakcji: widget DOM (button/reveal/puzzle) w panelu.",
+      "additionalProperties": false,
+      "required": ["id", "type", "widget"],
+      "properties": {
+        "id": { "$ref": "#/definitions/beatId" },
+        "type": { "const": "interaction", "description": "Typ beatu: interakcja z widgetem." },
+        "widget": {
+          "type": "string",
+          "description": "Rodzaj widgetu interakcji.",
+          "enum": ["button", "reveal", "puzzle"]
+        },
+        "label": { "type": "string", "description": "Etykieta przycisku (widget=button)." },
+        "style": {
+          "type": "string",
+          "description": "Wariant stylu wizualnego widgetu (np. „zrzutka”)."
+        },
+        "counter": {
+          "type": "object",
+          "description": "Parametry animowanego licznika (widget=button).",
+          "additionalProperties": false,
+          "required": ["from", "to"],
+          "properties": {
+            "from": { "type": "number", "description": "Wartość startowa licznika." },
+            "to": { "type": "number", "description": "Wartość docelowa licznika." },
+            "suffix": { "type": "string", "description": "Sufiks doklejany do liczby (np. „ zł”)." }
+          }
+        },
+        "text": {
+          "type": "string",
+          "description": "Tekst towarzyszący widgetowi (np. treść narracyjna reveal/puzzle).",
+          "maxLength": 400
+        },
+        "reward": { "$ref": "#/definitions/reward" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "widget": { "const": "button" } } },
+          "then": { "required": ["label", "counter", "text"] }
+        },
+        {
+          "if": { "properties": { "widget": { "const": "reveal" } } },
+          "then": { "required": ["text"] }
+        },
+        {
+          "if": { "properties": { "widget": { "const": "puzzle" } } },
+          "then": { "required": ["text"] }
+        }
+      ]
+    },
+    "beatResults": {
+      "type": "object",
+      "description": "Beat wyników: karta z przyrostami skilli i KPI case'a.",
+      "additionalProperties": false,
+      "required": ["id", "type", "stats", "kpis"],
+      "properties": {
+        "id": { "$ref": "#/definitions/beatId" },
+        "type": { "const": "results", "description": "Typ beatu: wyniki." },
+        "stats": {
+          "type": "array",
+          "description": "Przyrosty skilli do wyświetlenia.",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["skill", "delta"],
+            "properties": {
+              "skill": {
+                "type": "string",
+                "description": "Nazwa skilla (musi występować w case.skills).",
+                "minLength": 1
+              },
+              "delta": {
+                "type": "number",
+                "description": "Wartość przyrostu wyświetlana jako „+X”."
+              }
+            }
+          }
+        },
+        "kpis": {
+          "type": "array",
+          "description": "Lista KPI case'a do wyświetlenia (statyczny tekst z treści case'a).",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "value"],
+            "properties": {
+              "label": {
+                "type": "string",
+                "description": "Opis KPI (np. „Zebrane w pierwsze dni”).",
+                "minLength": 1
+              },
+              "value": {
+                "type": "string",
+                "description": "Wartość KPI jako tekst (np. „200 000 zł”).",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "beatFinale": {
+      "type": "object",
+      "description": "Beat finałowy: układanie obrazu z zebranych fragmentów, tekst zamknięcia, CTA.",
+      "additionalProperties": false,
+      "required": ["id", "type", "text", "cta"],
+      "properties": {
+        "id": { "$ref": "#/definitions/beatId" },
+        "type": { "const": "finale", "description": "Typ beatu: finał." },
+        "text": {
+          "type": "string",
+          "description": "Tekst zamknięcia historii.",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "cta": {
+          "type": "object",
+          "description": "Wezwanie do działania po finale.",
+          "additionalProperties": false,
+          "required": ["label", "url"],
+          "properties": {
+            "label": { "type": "string", "description": "Etykieta przycisku CTA.", "minLength": 1 },
+            "url": {
+              "type": "string",
+              "description": "Docelowy URL (np. profil LinkedIn).",
+              "format": "uri"
+            }
+          }
+        }
+      }
+    }
+  }
+}

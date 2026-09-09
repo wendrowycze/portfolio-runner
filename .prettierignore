@@ -1,0 +1,13 @@
+node_modules
+dist
+test-results
+playwright-report
+package-lock.json
+content/cases_raw
+docs
+content/cases/_SZABLON.md
+content/inwentarz_tresci.md
+prompts
+README.md
+CLAUDE.md
+ASSETS_ATTRIBUTION.md
