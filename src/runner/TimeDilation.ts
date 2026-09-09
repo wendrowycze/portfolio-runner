@@ -48,6 +48,25 @@ export class TimeDilation {
     });
   }
 
+  /**
+   * Śledzenie celu klatka po klatce (wykładnicze zbliżanie) — dla biegu sterowanego trzymanym
+   * klawiszem w narracji. Przerywa aktywny tween. Dopuszcza wartości ujemne (cofanie).
+   */
+  track(target: number, deltaMs: number, responseMs: number): void {
+    if (this.tween !== undefined) {
+      this.tween.stop();
+      this.tween = undefined;
+    }
+    const current = this.state.timeScale;
+    const diff = target - current;
+    if (Math.abs(diff) < 0.004) {
+      this.apply(target);
+      return;
+    }
+    const k = 1 - Math.exp(-deltaMs / Math.max(1, responseMs));
+    this.apply(current + diff * k);
+  }
+
   /** Time dilation na czas wyboru/QTE. */
   enter(factor: number = TUNING.TIME_DILATION_FACTOR): void {
     this.setTarget(factor);
@@ -64,10 +83,9 @@ export class TimeDilation {
   }
 
   private apply(value: number): void {
-    const clamped = Math.max(0, value);
-    if (clamped === this.state.timeScale) return;
-    this.state.timeScale = clamped;
-    bus.emit('time:scale', clamped);
+    if (value === this.state.timeScale) return;
+    this.state.timeScale = value;
+    bus.emit('time:scale', value);
   }
 
   destroy(): void {

@@ -11,10 +11,12 @@ export interface BusEvents extends Record<string, unknown[]> {
   'runner:stumble': [];
   /** Skok gracza (klawiatura/tap) — informacyjnie, np. dla dźwięku w Etapie 4. */
   'runner:jump': [];
-  /** Tap/klik w scenę biegu podczas narracji — panel traktuje jak „dalej”. */
-  'runner:tap': [];
   /** Zmiana mnożnika czasu świata (time dilation); UI synchronizuje maszynę do pisania. */
   'time:scale': [scale: number];
+  /** Kierunek biegu z klawiatury (D/→ = 1, A/← = -1, nic = 0) — trzymany, nie klikany. */
+  'move:direction': [direction: -1 | 0 | 1];
+  /** Finał: fragmenty tła złożyły się w obraz — panel może pokazać tekst zamknięcia i CTA. */
+  'finale:assembled': [];
   /** Prośba o wejście w obraz (klik w obraz na hubie albo przycisk w panelu). */
   'hub:enter': [];
   /** Przełączenie widoczności HUD debug. */

@@ -11,6 +11,7 @@ import { Player } from '../runner/Player';
 import { TimeDilation } from '../runner/TimeDilation';
 import type { BeatOutcome, ScriptRunner } from '../script/ScriptRunner';
 import { totalFragments, type Beat, type Case } from '../script/types';
+import { PAINTING_RASTER } from '../assets/manifest';
 import { createGameState, worldSpeed, type GameState } from '../state/GameState';
 
 export interface RunnerScriptData {
@@ -42,6 +43,10 @@ export class RunnerScene extends Phaser.Scene {
   private zoneMarker!: Phaser.GameObjects.Rectangle;
   private spotlight!: Phaser.GameObjects.Ellipse;
   private script: RunnerScriptData | undefined;
+  /** Kierunek biegu w narracji: klawiatura (przez magistralę) i dotyk/klik w scenę. */
+  private keyDirection: -1 | 0 | 1 = 0;
+  private pointerDirection: -1 | 0 | 1 = 0;
+  private finaleStarted = false;
   private lastInputAt = 0;
   private lastStumbleAt = -Infinity;
   private started = false;
@@ -59,6 +64,10 @@ export class RunnerScene extends Phaser.Scene {
   create(data: RunnerSceneData): void {
     this.script = data.script;
     this.started = false;
+    this.finaleStarted = false;
+    this.keyDirection = 0;
+    this.pointerDirection = 0;
+    delete document.body.dataset.finale;
     this.state = this.script?.state ?? createGameState(TUNING.BASE_SPEED);
     this.state.timeScale = 1;
     this.physics.world.setBounds(0, -400, GAME_WIDTH, this.groundY + 400);
@@ -132,9 +141,29 @@ export class RunnerScene extends Phaser.Scene {
         this.handleJumpInput();
       });
     }
-    this.input.on(Phaser.Input.Events.POINTER_DOWN, () => {
+    this.input.on(Phaser.Input.Events.POINTER_DOWN, (pointer: Phaser.Input.Pointer) => {
+      if (this.script?.runner.phase === 'narration') {
+        // Przytrzymanie prawej połowy sceny = bieg, lewej = cofanie (dotyk/mysz).
+        this.pointerDirection = pointer.x >= GAME_WIDTH / 2 ? 1 : -1;
+        return;
+      }
       this.handleJumpInput();
     });
+    const release = (): void => {
+      this.pointerDirection = 0;
+    };
+    this.input.on(Phaser.Input.Events.POINTER_UP, release);
+    this.input.on(Phaser.Input.Events.POINTER_UP_OUTSIDE, release);
+    this.input.on(Phaser.Input.Events.GAME_OUT, release);
+    this.unsubscribe.push(
+      bus.on('move:direction', (direction) => {
+        this.keyDirection = direction;
+      }),
+    );
+  }
+
+  private get moveDirection(): -1 | 0 | 1 {
+    return this.keyDirection !== 0 ? this.keyDirection : this.pointerDirection;
   }
 
   /** Skok/tap z debouncem (GDD sekcja i). W trybie skryptowanym trafia do ScriptRunnera. */
@@ -148,7 +177,6 @@ export class RunnerScene extends Phaser.Scene {
     }
     const runner = this.script.runner;
     if (runner.phase === 'action') runner.triggerAction();
-    else if (runner.phase === 'narration') bus.emit('runner:tap');
   }
 
   private onObstacleHit(obstacle: Phaser.Physics.Arcade.Image): void {
@@ -194,7 +222,8 @@ export class RunnerScene extends Phaser.Scene {
     this.player.run();
     switch (beat.type) {
       case 'narration':
-        this.timeDilation.setTarget(TUNING.NARRATION_SPEED_MULT);
+        // Świat staje od razu; dalej tempo śledzi trzymany klawisz (update → track), nie tween.
+        this.timeDilation.setTarget(0, 0);
         break;
       case 'choice':
         this.timeDilation.enter(slowdown);
@@ -217,7 +246,7 @@ export class RunnerScene extends Phaser.Scene {
         break;
       }
       case 'interaction':
-        this.timeDilation.setTarget(1);
+        this.timeDilation.setTarget(0, 500, 'Quad.easeOut');
         break;
       case 'results':
         this.timeDilation.setTarget(0, 900, 'Quad.easeOut');
@@ -226,8 +255,140 @@ export class RunnerScene extends Phaser.Scene {
         });
         break;
       case 'finale':
+        this.playFinale();
         break;
     }
+  }
+
+  /**
+   * Finał w scenie (decyzja Arka): świat ciemnieje, fragmenty obrazu „ukryte” w scenerii
+   * rozjaśniają się i zlatują w kolejności zebrania na siatkę pośrodku sceny, potem złoty
+   * rozbłysk i rama. Panel dostaje `finale:assembled` i pokazuje tekst zamknięcia + CTA.
+   */
+  private playFinale(): void {
+    const kejs = this.script?.kejs;
+    if (kejs === undefined || this.finaleStarted) return;
+    this.finaleStarted = true;
+    this.hud.setVisible(false);
+    this.spotlight.setVisible(false);
+    this.timeDilation.setTarget(0, 700, 'Quad.easeOut');
+    this.time.delayedCall(700, () => {
+      this.player.idle();
+    });
+
+    const { cols, rows } = kejs.painting;
+    const total = totalFragments(kejs);
+    const srcW = PAINTING_RASTER.width / cols;
+    const srcH = PAINTING_RASTER.height / rows;
+    const tileSize = Math.min(150, Math.floor((GAME_WIDTH * 0.55) / cols), Math.floor(300 / rows));
+    const scale = tileSize / srcW;
+    const gridW = tileSize * cols;
+    const gridH = tileSize * rows;
+    const cx = GAME_WIDTH / 2;
+    const cy = this.groundY / 2 + 10;
+    const texture = this.textures.get(textureKey('painting.current'));
+
+    // Przyciemnienie scenerii — obraz wyłania się z tła.
+    const shade = this.add
+      .rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, col('bgDeep'), 1)
+      .setOrigin(0, 0)
+      .setDepth(40)
+      .setAlpha(0);
+    this.tweens.add({ targets: shade, alpha: 0.62, duration: 1400, ease: 'Sine.easeInOut' });
+
+    // Kolejność wlatywania = kolejność zebrania (brakujące — teoretycznie — na końcu).
+    const order = [...this.state.fragments];
+    for (let f = 1; f <= total; f += 1) if (!order.includes(f)) order.push(f);
+
+    // Pozycje startowe rozrzucone po scenerii (panorama, kolumnada, latarnie).
+    const scatter = [
+      [0.12, 0.3],
+      [0.88, 0.22],
+      [0.3, 0.62],
+      [0.72, 0.66],
+      [0.5, 0.18],
+      [0.06, 0.74],
+      [0.94, 0.5],
+      [0.4, 0.4],
+      [0.62, 0.85],
+    ];
+    const tiles: Phaser.GameObjects.Image[] = [];
+    for (let f = 1; f <= total; f += 1) {
+      const c = (f - 1) % cols;
+      const r = Math.floor((f - 1) / cols);
+      const frameName = `tile-${String(cols)}x${String(rows)}-${String(f)}`;
+      if (!texture.has(frameName)) texture.add(frameName, 0, c * srcW, r * srcH, srcW, srcH);
+      const spot = scatter[(f - 1) % scatter.length];
+      const spotX = spot?.[0] ?? 0.5;
+      const spotY = spot?.[1] ?? 0.5;
+      const tile = this.add
+        .image(spotX * GAME_WIDTH, spotY * this.groundY, textureKey('painting.current'), frameName)
+        .setDepth(41)
+        .setScale(scale * 0.45)
+        .setAlpha(0)
+        .setAngle((f % 2 === 0 ? 1 : -1) * (8 + f * 3))
+        .setTint(0xdfb67c);
+      tile.setData('target', {
+        x: cx - gridW / 2 + c * tileSize + tileSize / 2,
+        y: cy - gridH / 2 + r * tileSize + tileSize / 2,
+      });
+      tiles.push(tile);
+      this.tweens.add({ targets: tile, alpha: 0.55, duration: 900, delay: 300 + f * 90 });
+    }
+
+    const stagger = TUNING.FINALE_TILE_STAGGER_MS + TUNING.FINALE_TILE_FLY_MS * 0.5;
+    order.forEach((fragment, i) => {
+      const tile = tiles[fragment - 1];
+      if (tile === undefined) return;
+      const target = tile.getData('target') as { x: number; y: number };
+      this.time.delayedCall(1500 + i * stagger, () => {
+        tile.clearTint();
+        this.tweens.add({
+          targets: tile,
+          x: target.x,
+          y: target.y,
+          angle: 0,
+          alpha: 1,
+          scale,
+          duration: TUNING.FINALE_TILE_FLY_MS,
+          ease: 'Back.easeOut',
+          onComplete: () => {
+            this.sparks.explode(6, target.x, target.y);
+          },
+        });
+      });
+    });
+
+    const landedAt = 1500 + (order.length - 1) * stagger + TUNING.FINALE_TILE_FLY_MS;
+    this.time.delayedCall(landedAt + 300, () => {
+      // Złoty rozbłysk i rama, która zostaje.
+      const flash = this.add
+        .rectangle(cx, cy, gridW + 80, gridH + 80, col('gold'), 1)
+        .setDepth(42)
+        .setAlpha(0);
+      this.tweens.add({
+        targets: flash,
+        alpha: { from: 0.85, to: 0 },
+        scaleX: 1.6,
+        scaleY: 1.6,
+        duration: TUNING.FINALE_FLASH_MS,
+        ease: 'Quad.easeOut',
+        onComplete: () => {
+          flash.destroy();
+        },
+      });
+      const frame = this.add.graphics().setDepth(43).setAlpha(0);
+      frame.lineStyle(10, col('ground'), 1);
+      frame.strokeRect(cx - gridW / 2 - 14, cy - gridH / 2 - 14, gridW + 28, gridH + 28);
+      frame.lineStyle(4, col('gold'), 1);
+      frame.strokeRect(cx - gridW / 2 - 16, cy - gridH / 2 - 16, gridW + 32, gridH + 32);
+      frame.strokeRect(cx - gridW / 2 - 4, cy - gridH / 2 - 4, gridW + 8, gridH + 8);
+      this.tweens.add({ targets: frame, alpha: 1, duration: 500 });
+      this.sparks.explode(40, cx, cy - gridH / 2);
+      this.sparks.explode(40, cx, cy + gridH / 2);
+      document.body.dataset.finale = 'assembled';
+      bus.emit('finale:assembled');
+    });
   }
 
   private onBeatResolved(beat: Beat, outcome: BeatOutcome): void {
@@ -309,9 +470,23 @@ export class RunnerScene extends Phaser.Scene {
   }
 
   override update(time: number, delta: number): void {
+    if (this.script !== undefined && this.started) {
+      const runner = this.script.runner;
+      if (runner.phase === 'narration') {
+        const direction = this.moveDirection;
+        const target =
+          direction > 0
+            ? TUNING.NARRATION_SPEED_MULT
+            : direction < 0
+              ? -TUNING.REWIND_SPEED_MULT
+              : 0;
+        this.timeDilation.track(target, delta, TUNING.MOVE_RESPONSE_MS);
+        runner.moveBy((worldSpeed(this.state) * delta) / 1000);
+      }
+      runner.tick(delta);
+    }
     const speed = worldSpeed(this.state);
     this.state.elapsedMs += delta;
-    if (this.script !== undefined && this.started) this.script.runner.tick(delta);
     this.parallax.update(delta, speed);
     this.spawner.update(time, delta, speed, this.freeRun);
     this.player.setTimeScale(this.state.timeScale);

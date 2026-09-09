@@ -146,3 +146,23 @@ Zod dojdzie w Etapie 2 razem z ładowaniem treści (ADR-7).
 ### Stan na koniec sesji
 
 Etapy 1–3 gotowe na gałęzi `claude/sweet-cerf-g5z7oe` (trzy commity `etap-1`, `etap-2`, `etap-3`). Build/lint/Vitest/Playwright zielone lokalnie. Publikacja na GitHub Pages następuje po scaleniu do `main` — link produkcyjny pokaże nową wersję dopiero wtedy.
+
+---
+
+## 2026-09-09 — Poprawki Arka po obejrzeniu Etapów 1–3
+
+Arek (po zagraniu w podgląd): „ogólnie jest zajebiście”, plus dwie zmiany mechaniki.
+
+### 1. Bieg i tekst sterowane trzymanym klawiszem, cofanie
+
+- **Narracja jest „odcinkiem drogi”** (`ScriptRunner.moveBy(±px)`): kolejne beaty narracji tworzą jeden ciąg; tekst odsłania się proporcjonalnie do przebiegniętych pikseli (`NARRATION_PX_PER_CHAR = 5`, oddech `NARRATION_BEAT_GAP_PX = 140` między beatami). Trzymanie **D / →** = bieg do przodu, **A / ←** = cofanie (świat i animacja postaci odtwarzane wstecz, tekst się chowa). Puszczenie klawisza = świat staje. Na dotyku: przytrzymanie prawej połowy sceny = bieg, lewej = cofanie.
+- Cofać można do początku bieżącego odcinka narracji (nie za rozstrzygnięty wybór/skok — to „kotwice” historii).
+- Przejście do kolejnego beatu (wybór, skok, widget) następuje samo, gdy gracz przebiegnie cały tekst. Nie ma już przycisku „Dalej” ani narracji „auto” — pola `advance`/`durationMs` zostają w schemacie i JSON-ach dla zgodności, silnik ich nie używa (odnotowane w `script/types.ts`).
+- Stan klawiszy obsługuje panel (DOM, `keydown`/`keyup`, reset przy `blur`) i wysyła `move:direction` magistralą; scena śledzi cel prędkości wykładniczo (`TimeDilation.track`, stała `MOVE_RESPONSE_MS = 160`). `GameState.timeScale` może być ujemny.
+- Wybory i QTE bez zmian (zegar rzeczywisty, przeszkoda po zegarze). Widgety i wyniki: świat stoi.
+- Pełne przejście „Teatru” trwa teraz ok. 2 minuty realnego biegu — limit testu e2e podniesiony do 5 minut.
+
+### 2. Tło składa się w obraz (finał w scenie biegu)
+
+- Nakładka DOM finału usunięta (`FinaleOverlay.ts`). Finał gra `RunnerScene.playFinale()`: sceneria ciemnieje, sześć fragmentów obrazu (klatki tekstury SVG) pojawia się rozrzuconych po panoramie, kolumnadzie i latarniach jak ukryte w tle, po czym w kolejności zebrania zlatują na siatkę pośrodku sceny (`Back.easeOut`), iskry, złoty rozbłysk, rama. Scena emituje `finale:assembled`; panel po lewej pokazuje wtedy podpis obrazu, tekst zamknięcia (maszyna do pisania) i CTA + „Wróć do hotelu”.
+- Do testów: `body[data-finale="assembled"]`.

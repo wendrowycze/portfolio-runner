@@ -23,6 +23,10 @@ export interface NarrationBeat {
   id: string;
   type: 'narration';
   text: string;
+  /**
+   * Pola ze schematu; od decyzji Arka z 2026-09-09 narracja odsłania się biegiem (trzymany klawisz),
+   * więc silnik ich nie używa — zostają dla zgodności treści z content/schema/case.schema.json.
+   */
   advance: 'tap' | 'auto';
   durationMs?: number | undefined;
 }

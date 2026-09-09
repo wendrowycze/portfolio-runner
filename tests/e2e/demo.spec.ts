@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 import { loadCase } from '../../src/content/loader';
-import { collectErrors } from './helpers';
+import { collectErrors, runThroughNarration } from './helpers';
 
 const demo = loadCase(
   JSON.parse(readFileSync(new URL('../../content/cases/_demo.json', import.meta.url), 'utf8')),
@@ -37,15 +37,25 @@ test('pełne przejście _demo.json w layoucie side: wybory, QTE, fragmenty, fina
   await expect(page.locator('#game')).toHaveAttribute('data-layout', 'side');
   await enterFromHub(page);
 
-  // b01: narracja (tap) — klik w tekst dopisuje resztę, „Dalej” przechodzi.
+  // b01: narracja odsłania się, gdy trzymasz D; A cofa bieg i tekst.
   await waitForBeat(page, 'b01');
-  await page.locator('[data-testid="story"]').click();
-  await page.locator('[data-testid="continue"]').click();
+  const paragraph = page.locator('[data-narration="b01"]');
+  await expect(paragraph).toHaveText('');
+  await page.keyboard.down('KeyD');
+  await page.waitForTimeout(1500);
+  await page.keyboard.up('KeyD');
+  const afterRun = (await paragraph.textContent())?.length ?? 0;
+  expect(afterRun).toBeGreaterThan(20);
+  await page.keyboard.down('KeyA');
+  await page.waitForTimeout(900);
+  await page.keyboard.up('KeyA');
+  const afterRewind = (await paragraph.textContent())?.length ?? 0;
+  expect(afterRewind).toBeLessThan(afterRun);
+  await runThroughNarration(page, 'b01');
 
-  // b02: narracja auto — przechodzi sama.
+  // b02: druga narracja tego samego odcinka — dalej trzymamy D.
   await waitForBeat(page, 'b02');
-  await page.locator('[data-testid="story"]').click();
-  await waitForBeat(page, 'b03');
+  await runThroughNarration(page, 'b02');
 
   // b03: wybór — czas zwolniony, opcje widoczne, pasek czasu.
   await expect(page.locator('[data-testid="option"]')).toHaveCount(3);
@@ -69,11 +79,10 @@ test('pełne przejście _demo.json w layoucie side: wybory, QTE, fragmenty, fina
   await page.screenshot({ path: 'docs/screens/etap2-results.png', fullPage: true });
   await page.locator('[data-testid="continue"]').click();
 
-  // b06: finał — kafle wlatują, CTA i powrót.
+  // b06: finał — tło składa się w obraz w scenie, potem CTA i powrót w panelu.
   await waitForBeat(page, 'b06');
-  await expect(page.locator('[data-testid="finale"]')).toBeVisible();
-  await expect(page.locator('.finale-tile[data-landed="true"]')).toHaveCount(2, {
-    timeout: 10_000,
+  await expect(page.locator('body')).toHaveAttribute('data-finale', 'assembled', {
+    timeout: 20_000,
   });
   await expect(page.locator('[data-testid="finale-return"]')).toBeVisible({ timeout: 20_000 });
   await page.waitForTimeout(600);
@@ -81,7 +90,6 @@ test('pełne przejście _demo.json w layoucie side: wybory, QTE, fragmenty, fina
   await page.locator('[data-testid="finale-return"]').click();
 
   // Po finale: powrót do hubu z odrestaurowanym obrazem.
-  await expect(page.locator('[data-testid="finale"]')).toBeHidden();
   await expect(page.locator('body')).toHaveAttribute('data-painting', 'restored', {
     timeout: 15_000,
   });
@@ -104,11 +112,11 @@ test('layout stack: panel pod biegiem, zły wybór zatrzymuje bieg i wraca do te
   if (runnerBox !== null && panelBox !== null) expect(panelBox.y).toBeGreaterThan(runnerBox.y);
 
   await waitForBeat(page, 'b01');
-  await page.keyboard.press('Space'); // dopisz
-  await page.keyboard.press('Space'); // dalej
+  await runThroughNarration(page, 'b01'); // strzałka w prawo też działa
   await waitForBeat(page, 'b02');
-  await page.locator('[data-testid="story"]').click();
-  await waitForBeat(page, 'b03');
+  await page.keyboard.down('ArrowRight');
+  await expect(panel(page)).toHaveAttribute('data-beat', 'b03', { timeout: 60_000 });
+  await page.keyboard.up('ArrowRight');
   await page.waitForTimeout(1200);
   await page.screenshot({ path: 'docs/screens/etap2-stack.png', fullPage: true });
 

@@ -2,7 +2,7 @@ import { TUNING } from '../config/tuning';
 import { bus } from '../events/bus';
 import type { UiStrings } from '../content/uiStrings';
 import { format } from '../content/uiStrings';
-import type { BeatOutcome, ScriptRunner } from '../script/ScriptRunner';
+import type { BeatOutcome, NarrationProgress, ScriptRunner } from '../script/ScriptRunner';
 import type {
   Beat,
   Case,
@@ -29,6 +29,8 @@ import { createWidget, type Widget } from './widgets/createWidget';
 export interface DialoguePanelOptions {
   /** Rodzic pełnoekranowych nakładek widgetów (reveal) — zwykle kontener całej gry. */
   overlayParent: HTMLElement;
+  /** Etykieta przycisku powrotu w finale („Wróć do hotelu”). */
+  returnLabel: string;
 }
 
 export class DialoguePanel {
@@ -44,9 +46,21 @@ export class DialoguePanel {
   private qteRing: SVGCircleElement | undefined;
   private widget: Widget | undefined;
   private kejs: Case | undefined;
+  /** Akapity narracji bieżącego odcinka drogi (id beatu → element). */
+  private readonly narrationParagraphs = new Map<string, HTMLElement>();
+  private runProgress: HTMLElement | undefined;
+  private readonly heldKeys = new Set<string>();
   private readonly reducedMotion = prefersReducedMotion();
   private readonly onKeyDown = (event: KeyboardEvent): void => {
     this.handleKey(event);
+  };
+  private readonly onKeyUp = (event: KeyboardEvent): void => {
+    if (this.heldKeys.delete(event.code)) this.emitDirection();
+  };
+  private readonly onBlur = (): void => {
+    if (this.heldKeys.size === 0) return;
+    this.heldKeys.clear();
+    this.emitDirection();
   };
 
   constructor(
@@ -66,13 +80,12 @@ export class DialoguePanel {
     root.append(this.header, this.story, this.footer);
     root.dataset.phase = 'idle';
 
-    this.story.addEventListener('click', () => {
-      this.handleStoryTap();
-    });
     document.addEventListener('keydown', this.onKeyDown);
+    document.addEventListener('keyup', this.onKeyUp);
+    window.addEventListener('blur', this.onBlur);
     this.unsubscribe.push(
-      bus.on('runner:tap', () => {
-        this.handleStoryTap();
+      bus.on('finale:assembled', () => {
+        this.revealFinale();
       }),
     );
     this.bind();
@@ -130,22 +143,51 @@ export class DialoguePanel {
 
   // ----- publiczne API z docs/02_ARCHITEKTURA.md sekcja 3 -----
 
-  showNarration(text: string, mode: 'tap' | 'auto', durationMs?: number): void {
-    this.resetFooter();
+  /**
+   * Beat narracji: pusty akapit, który wypełnia się w miarę biegu (setNarrationProgress).
+   * Kolejne narracje tego samego odcinka dopisują się pod spodem; cofanie chowa tekst.
+   */
+  showNarration(beatId: string): void {
+    if (this.runProgress === undefined) {
+      this.resetFooter();
+      this.narrationParagraphs.clear();
+      this.footer.append(
+        el('p', { className: 'hint', text: this.strings.runHint }),
+        el('p', { className: 'hint hint-touch', text: this.strings.runHintTouch }),
+      );
+      const bar = el('div', { className: 'run-progress', attrs: { 'aria-hidden': 'true' } });
+      this.runProgress = el('div', { className: 'run-progress-fill' });
+      bar.append(this.runProgress);
+      this.footer.append(bar);
+    }
     const entry = this.appendEntry('entry-narration');
-    const paragraph = el('p', { className: 'narration-text' });
-    entry.append(paragraph);
-    void this.type(paragraph, text, () => Math.max(0.25, this.state.timeScale)).then(() => {
-      if (this.runner.current?.type !== 'narration') return;
-      this.runner.textRevealed();
-      if (mode === 'auto') {
-        this.showAutoProgress(durationMs ?? 0);
-      } else {
-        this.showContinue(this.strings.continue, () => {
-          this.runner.advance();
-        });
-      }
+    const paragraph = el('p', {
+      className: 'narration-text',
+      attrs: { 'data-narration': beatId },
     });
+    entry.append(paragraph);
+    this.narrationParagraphs.set(beatId, paragraph);
+  }
+
+  /** Postęp odcinka drogi: tekst = tyle znaków, ile „przebiegnięto”. */
+  setNarrationProgress(progress: NarrationProgress[], fraction: number): void {
+    const kejs = this.kejs;
+    if (kejs === undefined) return;
+    let caretOwner: HTMLElement | undefined;
+    for (const item of progress) {
+      const paragraph = this.narrationParagraphs.get(item.beatId);
+      const beat = kejs.beats.find((b) => b.id === item.beatId);
+      if (paragraph === undefined || beat?.type !== 'narration') continue;
+      const next = beat.text.slice(0, item.revealed);
+      if (paragraph.textContent !== next) paragraph.textContent = next;
+      paragraph.classList.remove('is-typing');
+      if (item.revealed < item.length) caretOwner ??= paragraph;
+    }
+    caretOwner?.classList.add('is-typing');
+    if (this.runProgress !== undefined) {
+      this.runProgress.style.width = `${String(fraction * 100)}%`;
+    }
+    this.scrollToEnd(false);
   }
 
   showChoice(prompt: string, options: ChoiceOption[], timerMs: number): void {
@@ -320,18 +362,55 @@ export class DialoguePanel {
     this.scrollToEnd(true);
   }
 
+  private pendingFinale: { text: string; cta: Cta } | undefined;
+
+  /** Finał: scena składa fragmenty tła w obraz; panel czeka na `finale:assembled`. */
   showFinale(text: string, cta: Cta): void {
-    // Finał renderuje FinaleOverlay (pełny ekran); panel pokazuje tylko podsumowanie w opowieści.
     this.resetFooter();
+    this.pendingFinale = { text, cta };
     const entry = this.appendEntry('entry-finale');
-    entry.append(el('p', { className: 'narration-text', text: text }));
-    const link = el('a', {
-      className: 'button button-primary',
-      text: cta.label,
-      attrs: { href: cta.url, target: '_blank', rel: 'noopener noreferrer' },
-    });
-    this.footer.append(link);
+    entry.append(el('p', { className: 'hint', text: this.strings.finaleAssembling }));
     this.scrollToEnd(true);
+  }
+
+  private revealFinale(): void {
+    const pending = this.pendingFinale;
+    const kejs = this.kejs;
+    if (pending === undefined || kejs === undefined) return;
+    this.pendingFinale = undefined;
+    const entry = this.appendEntry('entry-finale');
+    entry.append(
+      el('p', { className: 'finale-badge', text: this.strings.finaleRestored }),
+      el('p', { className: 'finale-caption', text: kejs.painting.caption }),
+    );
+    const textNode = el('p', { className: 'narration-text' });
+    entry.append(textNode);
+    this.scrollToEnd(true);
+    void this.type(textNode, pending.text, () => 1).then(() => {
+      const link = el('a', {
+        className: 'button button-primary',
+        text: pending.cta.label,
+        attrs: {
+          href: pending.cta.url,
+          target: '_blank',
+          rel: 'noopener noreferrer',
+          'data-testid': 'finale-cta',
+        },
+      });
+      const back = el('button', {
+        className: 'button',
+        text: this.options.returnLabel,
+        attrs: { type: 'button', 'data-testid': 'finale-return' },
+      });
+      back.addEventListener('click', (event) => {
+        event.stopPropagation();
+        this.runner.advance();
+      });
+      clear(this.footer);
+      this.footer.append(link, back);
+      back.focus({ preventScroll: true });
+      this.scrollToEnd(true);
+    });
   }
 
   /** Feedback po rozstrzygnięciu beatu (trafnym i nietrafnym). */
@@ -409,6 +488,8 @@ export class DialoguePanel {
 
   destroy(): void {
     document.removeEventListener('keydown', this.onKeyDown);
+    document.removeEventListener('keyup', this.onKeyUp);
+    window.removeEventListener('blur', this.onBlur);
     for (const off of this.unsubscribe) off();
     this.typewriter?.cancel();
     this.widget?.destroy();
@@ -426,6 +507,9 @@ export class DialoguePanel {
       this.runner.on('beat:resolved', (beat, outcome) => {
         this.root.dataset.phase = outcome.correct ? 'success' : 'feedback';
         this.showFeedback(beat, outcome);
+      }),
+      this.runner.on('narration:progress', (progress, fraction) => {
+        this.setNarrationProgress(progress, fraction);
       }),
       this.runner.on('timer:progress', (fraction) => {
         this.setTimerProgress(fraction);
@@ -445,7 +529,7 @@ export class DialoguePanel {
   private renderBeat(beat: Beat): void {
     switch (beat.type) {
       case 'narration':
-        this.showNarration(beat.text, beat.advance, beat.durationMs);
+        this.showNarration(beat.id);
         break;
       case 'choice':
         this.showChoice(beat.prompt, beat.options, beat.timerMs);
@@ -491,6 +575,7 @@ export class DialoguePanel {
 
   private resetFooter(): void {
     clear(this.footer);
+    this.runProgress = undefined;
     this.optionButtons = [];
     this.timerFill = undefined;
     this.qte = undefined;
@@ -512,18 +597,6 @@ export class DialoguePanel {
     });
     this.footer.append(button);
     button.focus({ preventScroll: true });
-  }
-
-  private showAutoProgress(durationMs: number): void {
-    clear(this.footer);
-    const bar = el('div', { className: 'auto-progress', attrs: { 'aria-hidden': 'true' } });
-    const fill = el('div', { className: 'auto-progress-fill' });
-    bar.append(fill);
-    this.footer.append(bar);
-    requestAnimationFrame(() => {
-      fill.style.transitionDuration = `${String(durationMs)}ms`;
-      fill.style.width = '0%';
-    });
   }
 
   private countUp(target: HTMLElement, value: number, durationMs: number): void {
@@ -551,37 +624,34 @@ export class DialoguePanel {
     }
   }
 
-  /** Tap w opowieść: w narracji — dopisz resztę albo idź dalej. */
-  private handleStoryTap(): void {
-    if (this.runner.phase !== 'narration') return;
-    if (this.typewriter !== undefined && !this.typewriter.isDone) {
-      this.typewriter.skip();
-      return;
-    }
-    const beat = this.runner.current;
-    if (beat?.type === 'narration' && beat.advance === 'tap') this.runner.advance();
+  private emitDirection(): void {
+    const forward = this.heldKeys.has('KeyD') || this.heldKeys.has('ArrowRight');
+    const backward = this.heldKeys.has('KeyA') || this.heldKeys.has('ArrowLeft');
+    bus.emit('move:direction', forward && !backward ? 1 : backward && !forward ? -1 : 0);
   }
 
   private handleKey(event: KeyboardEvent): void {
-    if (event.repeat) return;
     const target = event.target as HTMLElement | null;
     const inInput = target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA';
     if (inInput) return;
     switch (event.code) {
+      case 'KeyD':
+      case 'ArrowRight':
+      case 'KeyA':
+      case 'ArrowLeft':
+        // Bieg trzymanym klawiszem (D/→ do przodu, A/← cofanie) — stan, nie kliknięcie.
+        event.preventDefault();
+        if (!this.heldKeys.has(event.code)) {
+          this.heldKeys.add(event.code);
+          this.emitDirection();
+        }
+        break;
       case 'Space':
       case 'ArrowUp':
+        if (event.repeat) return;
         if (this.runner.phase === 'action') {
           event.preventDefault();
           this.runner.triggerAction();
-        } else if (this.runner.phase === 'narration') {
-          event.preventDefault();
-          this.handleStoryTap();
-        }
-        break;
-      case 'Enter':
-        if (this.runner.phase === 'narration' && target?.tagName !== 'BUTTON') {
-          event.preventDefault();
-          this.handleStoryTap();
         }
         break;
       case 'Digit1':
@@ -590,6 +660,7 @@ export class DialoguePanel {
       case 'Numpad1':
       case 'Numpad2':
       case 'Numpad3': {
+        if (event.repeat) return;
         const index = Number(event.code.slice(-1)) - 1;
         if (this.runner.phase === 'choice') this.runner.resolveChoice(index);
         break;

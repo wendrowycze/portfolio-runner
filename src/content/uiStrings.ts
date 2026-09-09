@@ -44,6 +44,9 @@ const UiStringsSchema = z.strictObject({
   revealTap: z.string(),
   hubEnter: z.string(),
   hubLeadRestored: z.string(),
+  runHint: z.string(),
+  runHintTouch: z.string(),
+  finaleAssembling: z.string(),
 });
 
 export type UiStrings = z.infer<typeof UiStringsSchema>;

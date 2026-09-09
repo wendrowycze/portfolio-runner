@@ -1,0 +1,213 @@
+{
+  "id": "cyrograf-na-kwadrat",
+  "world": "kultura",
+  "title": "Ujawnij model działania przestępców oszukujących studentów",
+  "lead": "Parlament Studentów Rzeczypospolitej chce przeciwdziałać narastającej fali oszustw mieszkaniowych i powstrzymać grupy oszustów.",
+  "role": "Redaktor prowadzący śledztwo dziennikarskie",
+  "skills": [
+    "Dziennikarstwo śledcze",
+    "Zarządzanie zespołem",
+    "Analiza danych"
+  ],
+  "painting": {
+    "src": "assets/paintings/cyrograf-na-kwadrat.svg",
+    "cols": 3,
+    "rows": 2,
+    "caption": "Tablica śledztwa: nazwiska, numery NIP i wykres, który rośnie po 2020 roku. Obraz odrestaurowany."
+  },
+  "runner": {
+    "theme": "kultura",
+    "baseSpeed": 220,
+    "choiceSlowdown": 0.35
+  },
+  "beats": [
+    {
+      "id": "b01",
+      "type": "narration",
+      "text": "Stoisz przed tablicą, na której przypięte są dziesiątki kartek z nazwiskami, numerami NIP firm oraz datami. Próbujesz zrozumieć, jak to możliwe, że kilka zorganizowanych grup działa od kilkunastu lat praktycznie bezkarnie, co roku oszukując kilka tysięcy osób szukających mieszkania. Analizujesz sieć spółek w Polsce, Wielkiej Brytanii, Czechach i na Słowacji.",
+      "advance": "tap"
+    },
+    {
+      "id": "b02",
+      "type": "narration",
+      "text": "Schemat jest zawsze ten sam. W okolicach wyników matur pojawiają się dziesiątki atrakcyjnych ofert. OLX, Gumtree i Allegro odsyłają do stron, gdzie za kontakt do właściciela trzeba zapłacić kilkaset złotych z góry. Potem spotkanie zostaje odwołane albo kontakt się urywa. Agencja umywa ręce: regulamin nie obiecywał, że dane są prawdziwe. Policja jest bezradna.",
+      "advance": "tap"
+    },
+    {
+      "id": "b03",
+      "type": "choice",
+      "prompt": "Pierwszy dziennikarz opisał sprawę w 2013 roku, jest 2021 i jesteś co najmniej czwartym, który próbuje. Skąd wziąć twarde dane o skali oszustw?",
+      "obstacle": "dokumenty",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Od Rzecznika Komendy Głównej Policji — zna sprawę i deklaruje pomoc.",
+          "correct": true,
+          "feedback": "To dzięki niemu zdobywasz dane o dynamice oszustw i widzisz, jak po 2020 roku liczba oszustw online drastycznie wzrosła.",
+          "skill": "Analiza danych"
+        },
+        {
+          "text": "Z komentarzy pod ogłoszeniami.",
+          "correct": false,
+          "feedback": "Komentarze to pojedyncze historie, nie skala zjawiska. Do artykułu okładkowego potrzebujesz danych, nie anegdot."
+        },
+        {
+          "text": "Oszacować samemu na podstawie kilku znajomych.",
+          "correct": false,
+          "feedback": "Kilka przypadków nie pokazuje trendu. Bez danych z policji nie zobaczyłbyś skoku po 2020 roku."
+        }
+      ],
+      "reward": {
+        "fragment": 1
+      }
+    },
+    {
+      "id": "b04",
+      "type": "narration",
+      "text": "Rzecznik zna sprawę i deklaruje chęć pomocy. Dzięki niemu zdobywasz dane o dynamice oszustw mieszkaniowych i widzisz, jak po roku 2020 liczba oszustw online drastycznie wzrosła. Wykres, który powstaje na tablicy, mówi więcej niż dziesiątki kartek.",
+      "advance": "tap"
+    },
+    {
+      "id": "b05",
+      "type": "interaction",
+      "widget": "puzzle",
+      "text": "Z danych policji powstaje wykres dynamiki oszustw. Ułóż go, zamieniając miejscami fragmenty tablicy śledztwa.",
+      "reward": {
+        "fragment": 2
+      }
+    },
+    {
+      "id": "b06",
+      "type": "narration",
+      "text": "Prowadzisz sześcioosobową grupę w redakcji, która chce coś zrobić z tą sprawą. Przeprowadzacie w sumie 15 rozmów z ofiarami oszustw. Rozmawiacie z osobami decyzyjnymi w portalach. Organizujecie dwie sesje zdjęciowe, aby odpowiednio zwizualizować tekst.",
+      "advance": "tap"
+    },
+    {
+      "id": "b07",
+      "type": "action",
+      "prompt": "Z ponad 30 stron materiału źródłowego ma powstać 5 stron artykułu okładkowego. Przeskocz stos dokumentów, zanim minie deadline!",
+      "input": "jump",
+      "obstacle": "dokumenty",
+      "windowMs": 800,
+      "reward": {
+        "fragment": 3
+      }
+    },
+    {
+      "id": "b08",
+      "type": "narration",
+      "text": "Premiera artykułu połączona jest z kampanią edukacyjną na Facebooku oraz relacją na żywo z Przewodniczącym Parlamentu Studentów RP. Artykuł i kampania docierają do ponad 100 000 młodych osób w Warszawie.",
+      "advance": "tap"
+    },
+    {
+      "id": "b09",
+      "type": "action",
+      "prompt": "Relacja na żywo z Przewodniczącym Parlamentu Studentów RP zaczyna się za chwilę. Przeskocz kordon kamer, by zdążyć do studia!",
+      "input": "jump",
+      "obstacle": "kordon-kamer",
+      "windowMs": 800,
+      "reward": {
+        "fragment": 4
+      }
+    },
+    {
+      "id": "b10",
+      "type": "interaction",
+      "widget": "button",
+      "label": "OTWÓRZ GAZETĘ",
+      "style": "zrzutka",
+      "counter": {
+        "from": 0,
+        "to": 100000,
+        "suffix": " osób"
+      },
+      "text": "Artykuł okładkowy i kampania edukacyjna ruszają. Kliknij, by zobaczyć, do ilu młodych osób w Warszawie dotarły.",
+      "reward": {
+        "fragment": 5
+      }
+    },
+    {
+      "id": "b11",
+      "type": "choice",
+      "prompt": "Zespół śledczy chce zablokować fałszywe ogłoszenia. Jak?",
+      "obstacle": "boty",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Masowe zgłaszanie ofert do znających Cię już pracowników portali.",
+          "correct": true,
+          "feedback": "W ciągu kilku dni zablokowanych zostaje kilkaset ogłoszeń. Nie wszystkie — ale kilkaset oszustw mniej.",
+          "skill": "Zarządzanie zespołem"
+        },
+        {
+          "text": "Publicznie oskarżyć portale o współpracę z oszustami.",
+          "correct": false,
+          "feedback": "Portale były rozmówcami, nie wrogami. Kontakt zbudowany w trakcie śledztwa zadziałał lepiej niż konflikt."
+        },
+        {
+          "text": "Zgłosić jedno ogłoszenie i czekać na reakcję.",
+          "correct": false,
+          "feedback": "Jedno zgłoszenie ginie w systemie. Tu zadziałała skala: cały zespół i setki zgłoszeń naraz."
+        }
+      ],
+      "reward": {
+        "fragment": 6
+      }
+    },
+    {
+      "id": "b12",
+      "type": "narration",
+      "text": "Wysyłasz maile do pracowników portali z ogłoszeniami. W ciągu kilku dni zostaje zablokowanych kilkaset ogłoszeń. Nie wszystkie. Ale po ośmiu latach od pierwszego artykułu ktoś wreszcie zrobił coś więcej niż opis.",
+      "advance": "tap"
+    },
+    {
+      "id": "b13",
+      "type": "results",
+      "stats": [
+        {
+          "skill": "Dziennikarstwo śledcze",
+          "delta": 10
+        },
+        {
+          "skill": "Zarządzanie zespołem",
+          "delta": 10
+        },
+        {
+          "skill": "Analiza danych",
+          "delta": 10
+        }
+      ],
+      "kpis": [
+        {
+          "label": "Zasięg",
+          "value": "ponad 100 000 młodych osób"
+        },
+        {
+          "label": "Udaremnione oszustwa",
+          "value": "kilkaset zablokowanych ogłoszeń"
+        },
+        {
+          "label": "Rozmowy z ofiarami",
+          "value": "15"
+        },
+        {
+          "label": "Materiał",
+          "value": "ponad 30 stron źródeł → 5 stron artykułu okładkowego"
+        },
+        {
+          "label": "Bonus",
+          "value": "+1 do poczucia, że trzeba coś zmienić w tym świecie"
+        }
+      ]
+    },
+    {
+      "id": "b14",
+      "type": "finale",
+      "text": "Śledztwo nie zamknęło sprawy — ale pokazało model działania oszustów, dotarło do 100 000 młodych ludzi i zablokowało kilkaset ogłoszeń. Nauczyłeś się, że dane z jednej rozmowy z właściwą osobą znaczą więcej niż lata domysłów.",
+      "cta": {
+        "label": "Poznaj Arka na LinkedIn",
+        "url": "https://www.linkedin.com/in/arkadiusz-klej/"
+      }
+    }
+  ]
+}

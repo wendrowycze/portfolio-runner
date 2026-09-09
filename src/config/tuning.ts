@@ -13,8 +13,19 @@ export const TUNING = {
   TIME_DILATION_EASE_MS: 300,
   /** Mnożnik tempa animacji biegu postaci podczas time dilation (postać nie „zamarza”). */
   PLAYER_ANIM_DILATION_MULT: 0.7,
-  /** Prędkość maszyny do pisania (znaków/s) przy normalnym tempie świata. */
+  /** Prędkość maszyny do pisania (znaków/s) — prompty, feedback, finał. */
   TYPEWRITER_CPS: 45,
+  /**
+   * Narracja jest „odcinkiem drogi”: każdy znak tekstu to tyle px biegu (trzymając D/→ odsłaniasz
+   * tekst, A/← cofa bieg i tekst). 5 px/znak przy 220 px/s ≈ 44 znaki/s.
+   */
+  NARRATION_PX_PER_CHAR: 5,
+  /** Oddech (px biegu) po każdym beacie narracji, zanim zacznie się kolejny. */
+  NARRATION_BEAT_GAP_PX: 140,
+  /** Prędkość cofania (mnożnik prędkości bazowej). */
+  REWIND_SPEED_MULT: 0.8,
+  /** Jak szybko świat reaguje na wciśnięcie/puszczenie klawisza biegu (ms, stała czasowa). */
+  MOVE_RESPONSE_MS: 160,
   /** Ile ms po spawnie przeszkoda wchodzi w strefę QTE (action). */
   ACTION_ZONE_START_MS: 1500,
   /** Domyślna szerokość strefy QTE (px) — używana, gdy beat nie definiuje okna. */

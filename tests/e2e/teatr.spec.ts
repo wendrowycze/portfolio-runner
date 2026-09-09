@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 import { loadCase } from '../../src/content/loader';
-import { collectErrors } from './helpers';
+import { collectErrors, runThroughNarration } from './helpers';
 
 /**
  * Pełne przejście pilota „Teatr jest nasz” przez FAKTYCZNE klikanie (nie API):
@@ -64,14 +64,14 @@ test('hub → pełny case „Teatr jest nasz” → odrestaurowany obraz, zero b
     await waitForBeat(page, beat.id);
     switch (beat.type) {
       case 'narration': {
-        await page.locator('[data-testid="story"]').click(); // dopisz resztę tekstu
-        if (beat.advance === 'tap') {
-          if (!screenshots.has('narration')) {
-            screenshots.add('narration');
-            await shot(page, 'etap3-narration');
-          }
-          await page.locator('[data-testid="continue"]').click();
+        if (!screenshots.has('narration')) {
+          screenshots.add('narration');
+          await page.keyboard.down('KeyD');
+          await page.waitForTimeout(2200);
+          await page.keyboard.up('KeyD');
+          await shot(page, 'etap3-narration');
         }
+        await runThroughNarration(page, beat.id);
         break;
       }
       case 'choice': {
@@ -128,9 +128,8 @@ test('hub → pełny case „Teatr jest nasz” → odrestaurowany obraz, zero b
         break;
       }
       case 'finale': {
-        await expect(page.locator('[data-testid="finale"]')).toBeVisible();
-        await expect(page.locator('.finale-tile[data-landed="true"]')).toHaveCount(6, {
-          timeout: 15_000,
+        await expect(page.locator('body')).toHaveAttribute('data-finale', 'assembled', {
+          timeout: 30_000,
         });
         await expect(page.locator('[data-testid="finale-return"]')).toBeVisible({
           timeout: 30_000,
@@ -147,7 +146,6 @@ test('hub → pełny case „Teatr jest nasz” → odrestaurowany obraz, zero b
   }
 
   // Powrót do hubu: obraz odrestaurowany, panel proponuje ponowną grę.
-  await expect(page.locator('[data-testid="finale"]')).toBeHidden();
   await expect(page.locator('body')).toHaveAttribute('data-painting', 'restored', {
     timeout: 15_000,
   });

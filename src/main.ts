@@ -10,7 +10,6 @@ import { createGameState, resetGameState } from './state/GameState';
 import { bus } from './events/bus';
 import { DialoguePanel } from './ui/DialoguePanel';
 import { clear, el } from './ui/dom';
-import { FinaleOverlay } from './ui/FinaleOverlay';
 
 function requireElement(id: string): HTMLElement {
   const element = document.getElementById(id);
@@ -55,21 +54,11 @@ async function start(): Promise<void> {
   const runner = new ScriptRunner(state);
   runner.load(kejs);
 
-  const finale = new FinaleOverlay(gameRoot, strings);
   const panel = new DialoguePanel(panelContainer, runner, state, strings, {
     overlayParent: gameRoot,
+    returnLabel: strings.finaleReturn,
   });
   panel.showHub(kejs, false);
-
-  runner.on('beat:start', (beat) => {
-    if (beat.type !== 'finale') return;
-    finale.show(kejs, state, beat.text, beat.cta, {
-      returnLabel: strings.finaleReturn,
-      onReturn: () => {
-        runner.advance();
-      },
-    });
-  });
 
   // Wejście w obraz (klik na hubie / przycisk w panelu): świeży stan, panel gotowy na beaty.
   bus.on('hub:enter', () => {
@@ -88,7 +77,6 @@ async function start(): Promise<void> {
 
   // Po finale: powrót do hubu z odrestaurowanym obrazem (docs/02_ARCHITEKTURA.md sekcja 2).
   runner.on('case:finished', () => {
-    finale.hide();
     panel.showHub(kejs, true);
     game.scene.getScene('RunnerScene').scene.start('HubStubScene', { restored: true });
   });

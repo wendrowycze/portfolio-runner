@@ -46,12 +46,22 @@ describe('ScriptRunner — _demo.json, wszystkie wybory poprawne', () => {
     expect(runner.current?.id).toBe('b01');
     expect(runner.phase).toBe('narration');
 
-    runner.advance(); // b01 tap
+    // Narracja odsłania się biegiem: b01 i b02 to jeden odcinek drogi.
+    const b01Length = (runner.current as { text: string }).text.length;
+    runner.moveBy(TUNING.NARRATION_PX_PER_CHAR * 10);
+    expect(runner.narrationProgress()).toEqual([
+      { beatId: 'b01', revealed: 10, length: b01Length },
+    ]);
+    runner.moveBy(-TUNING.NARRATION_PX_PER_CHAR * 4); // cofanie chowa tekst
+    expect(runner.narrationProgress()[0]?.revealed).toBe(6);
+    runner.moveBy(-10_000); // nie da się cofnąć przed początek odcinka
+    expect(runner.narrationProgress()[0]?.revealed).toBe(0);
+    expect(runner.current?.id).toBe('b01');
+    runner.moveBy(b01Length * TUNING.NARRATION_PX_PER_CHAR + TUNING.NARRATION_BEAT_GAP_PX + 1);
     expect(runner.current?.id).toBe('b02');
-    runner.textRevealed();
-    elapse(runner, 2400);
-    expect(runner.current?.id).toBe('b02'); // durationMs 2500 jeszcze nie minęło
-    elapse(runner, 200);
+    expect(runner.phase).toBe('narration');
+    expect(runner.narrationProgress().map((p) => p.beatId)).toEqual(['b01', 'b02']);
+    runner.moveBy(runner.narrationRemainingPx);
     expect(runner.current?.id).toBe('b03');
     expect(runner.phase).toBe('choice');
 
@@ -102,8 +112,13 @@ describe('ScriptRunner — _demo.json, wszystkie wybory poprawne', () => {
     runner.resolveChoice(0);
     runner.triggerAction();
     runner.completeInteraction();
+    runner.advance();
     expect(runner.phase).toBe('narration');
     expect(state.stumbles).toBe(0);
+    runner.moveBy(10_000);
+    expect(runner.phase).toBe('choice');
+    runner.moveBy(10_000); // bieg nie działa w fazie wyboru
+    expect(runner.phase).toBe('choice');
   });
 });
 
@@ -111,9 +126,7 @@ describe('ScriptRunner — błędne wybory: potknięcie i powrót do tego samego
   it('zły wybór → feedback → ten sam beat (attempt 2) → poprawny wybór → dalej', () => {
     const { runner, state, log } = setup();
     runner.start();
-    runner.advance();
-    runner.textRevealed();
-    elapse(runner, 2500);
+    runner.moveBy(10_000);
     expect(runner.current?.id).toBe('b03');
     const beat = runner.current;
     if (beat === undefined) throw new Error('brak beatu');
@@ -139,9 +152,7 @@ describe('ScriptRunner — błędne wybory: potknięcie i powrót do tego samego
   it('brak wyboru w czasie = timeout, potem powrót', () => {
     const { runner, state, log } = setup();
     runner.start();
-    runner.advance();
-    runner.textRevealed();
-    elapse(runner, 2500);
+    runner.moveBy(10_000);
     elapse(runner, 7000);
     expect(log).toContain('fail:b03:timeout');
     expect(state.stumbles).toBe(1);
@@ -153,9 +164,7 @@ describe('ScriptRunner — błędne wybory: potknięcie i powrót do tego samego
   it('QTE: za wcześnie i za późno = potknięcia, trafienie w oknie = fragment; case i tak się kończy', () => {
     const { runner, state, log } = setup();
     runner.start();
-    runner.advance();
-    runner.textRevealed();
-    elapse(runner, 2500);
+    runner.moveBy(10_000);
     const choice = runner.current;
     if (choice === undefined) throw new Error('brak beatu');
     runner.resolveChoice(correctIndex(choice));

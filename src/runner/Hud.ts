@@ -62,6 +62,12 @@ export class Hud {
     this.refreshCounters();
   }
 
+  setVisible(visible: boolean): void {
+    this.fragmentsText.setVisible(visible);
+    this.stumblesText.setVisible(visible);
+    this.debugText.setVisible(visible && this.debugVisible);
+  }
+
   setTotalFragments(total: number): void {
     this.totalFragments = total;
     this.refreshCounters();

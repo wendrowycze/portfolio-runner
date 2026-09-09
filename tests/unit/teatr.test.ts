@@ -21,9 +21,7 @@ function elapse(runner: ScriptRunner, ms: number): void {
 function play(runner: ScriptRunner, beat: Beat, mistakes: boolean): void {
   switch (beat.type) {
     case 'narration':
-      runner.textRevealed();
-      if (beat.advance === 'auto') elapse(runner, (beat.durationMs ?? 0) + 50);
-      else runner.advance();
+      runner.moveBy(runner.narrationRemainingPx); // przebiegnij cały odcinek narracji
       break;
     case 'choice': {
       if (mistakes) {

@@ -1,0 +1,219 @@
+{
+  "id": "kalejdoskop",
+  "world": "kultura",
+  "title": "Pomóż organizatorom festiwalu odnieść sukces",
+  "lead": "Międzynarodowy Festiwal Teatrów Młodzieżowych „Kalejdoskop” potrzebuje bohatera, który ugasi wszystkie pożary, pozyska sojuszników i zadba o atmosferę festiwalu.",
+  "role": "Współorganizator festiwalu Kalejdoskop",
+  "skills": [
+    "Organizacja wydarzeń",
+    "Prowadzenie warsztatów",
+    "Pozyskiwanie partnerów"
+  ],
+  "painting": {
+    "src": "assets/paintings/kalejdoskop.svg",
+    "cols": 3,
+    "rows": 2,
+    "caption": "Pałac w Gardzienicach, 120 aktorów z 4 krajów i korowód do „Belgijki” w dolnych ogrodach. Obraz odrestaurowany."
+  },
+  "runner": {
+    "theme": "kultura",
+    "baseSpeed": 220,
+    "choiceSlowdown": 0.35
+  },
+  "beats": [
+    {
+      "id": "b01",
+      "type": "narration",
+      "text": "Otrzymujesz maila: data festiwalu została oficjalnie potwierdzona. Rozpoczyna się odliczanie. Przed Tobą i zespołem kilkanaście tygodni intensywnych przygotowań. Stajesz przed kluczową decyzją: kto powinien zostać głównym partnerem medialnym wydarzenia?",
+      "advance": "tap"
+    },
+    {
+      "id": "b02",
+      "type": "choice",
+      "prompt": "Partner medialny: TVP Lublin, Miesięcznik Teatralny czy e-teatr.pl?",
+      "obstacle": "telefony",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "TVP Lublin — jeden duży patron wystarczy.",
+          "correct": false,
+          "feedback": "Początkowo też tak myślisz. Ale dla maksymalnego rozgłosu potrzebujesz ich wszystkich — spróbuj jeszcze raz."
+        },
+        {
+          "text": "Wszyscy trzej — sześć pakietów medialnych i maraton negocjacji.",
+          "correct": true,
+          "feedback": "Po wielu godzinach negocjacji, dziesiątkach maili i sześciu pakietach medialnych pozyskujesz wszystkich trzech patronów.",
+          "skill": "Pozyskiwanie partnerów"
+        },
+        {
+          "text": "e-teatr.pl — najbliżej środowiska, reszta niepotrzebna.",
+          "correct": false,
+          "feedback": "Środowisko to jedna publiczność. Festiwal międzynarodowy potrzebuje telewizji, miesięcznika i portalu naraz."
+        }
+      ],
+      "reward": {
+        "fragment": 1
+      }
+    },
+    {
+      "id": "b03",
+      "type": "narration",
+      "text": "Nadchodzi dzień festiwalu. Ponad 120 aktorów z 4 krajów zjeżdża do malowniczego kompleksu pałacowego w Gardzienicach, aby zaprezentować efekty wielomiesięcznej pracy. Wpadasz na ulubionych reżyserów, którzy w pośpiechu proszą o pomoc w transporcie scenografii, a z każdej strony podbiegają uczestnicy z pytaniami o warsztaty szermierki i choreografii.",
+      "advance": "tap"
+    },
+    {
+      "id": "b04",
+      "type": "action",
+      "prompt": "Reżyser prosi o pomoc w transporcie scenografii, a za pięć minut zaczynasz odpowiadać na pytania o warsztaty. Przeskocz skrzynie z rekwizytami!",
+      "input": "jump",
+      "obstacle": "skrzynia",
+      "windowMs": 800,
+      "reward": {
+        "fragment": 2
+      }
+    },
+    {
+      "id": "b05",
+      "type": "narration",
+      "text": "Na miejsce dotarły już wszystkie zaproszone media. Twoim zadaniem jest zorganizowanie wywiadów z organizatorką, jurorami i artystami. Logistyka jest kluczowa: wywiady trzeba zacząć od osób, które mają najmniej czasu.",
+      "advance": "tap"
+    },
+    {
+      "id": "b06",
+      "type": "choice",
+      "prompt": "Układasz harmonogram wywiadów. Od kogo zaczynasz?",
+      "obstacle": "kordon-kamer",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Od jurorów — za chwilę wracają na salę oceniać spektakle.",
+          "correct": true,
+          "feedback": "Najpierw najbardziej zajęci. Organizatorka i artyści zostają na miejscu dłużej — harmonogram się domyka.",
+          "skill": "Organizacja wydarzeń"
+        },
+        {
+          "text": "Od organizatorki — jest przecież cały czas na miejscu.",
+          "correct": false,
+          "feedback": "Właśnie dlatego może poczekać. Jurorzy i artyści między spektaklami mają okna liczone w minutach."
+        },
+        {
+          "text": "Od artystów, którzy akurat stoją najbliżej.",
+          "correct": false,
+          "feedback": "Wygodne, ale nie logistyczne. Zaczyna się od tych, którzy zaraz znikną, nie od tych pod ręką."
+        }
+      ],
+      "reward": {
+        "fragment": 3
+      }
+    },
+    {
+      "id": "b07",
+      "type": "narration",
+      "text": "Gdy wywiady dobiegają końca, nadchodzi czas na warsztaty z choreografii walki w Commedii dell’arte. Zbierasz uczestników na placu przed jedną z czterech scen festiwalu. Po kilku godzinach ćwiczeń, przerywanych spektaklami, wieczór kończy się wspólnym śpiewem i tańcem przy ognisku.",
+      "advance": "tap"
+    },
+    {
+      "id": "b08",
+      "type": "choice",
+      "prompt": "Zadanie niemal niewykonalne: jak przekonać 120 rozentuzjazmowanych aktorów, by poszli spać, skoro czekają ich jeszcze trzy dni festiwalu?",
+      "obstacle": "brama",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Rozsiać plotkę, że w dolnych ogrodach nic się nie wydarzy — i czekać tam z głośnikiem.",
+          "correct": true,
+          "feedback": "Genialny w swojej prostocie plan. Oczywiście to właśnie tam czekasz już z głośnikiem, by zainicjować wielki korowód do „Belgijki”.",
+          "skill": "Prowadzenie warsztatów"
+        },
+        {
+          "text": "Ogłosić ciszę nocną przez megafon.",
+          "correct": false,
+          "feedback": "120 aktorów po ognisku nie słucha megafonu. Energię trzeba spożytkować, nie zakazać."
+        },
+        {
+          "text": "Zamknąć ogrody na klucz.",
+          "correct": false,
+          "feedback": "Zamknięte ogrody to bunt, nie sen. Dusza towarzystwa działa plotką, nie kłódką."
+        }
+      ],
+      "reward": {
+        "fragment": 4
+      }
+    },
+    {
+      "id": "b09",
+      "type": "action",
+      "prompt": "Korowód do „Belgijki” rusza przez dolne ogrody. Przeskocz barierkę i prowadź tańce, aż wszyscy opadną z sił!",
+      "input": "jump",
+      "obstacle": "barierka",
+      "windowMs": 800,
+      "reward": {
+        "fragment": 5
+      }
+    },
+    {
+      "id": "b10",
+      "type": "narration",
+      "text": "Po godzinie szalonych tańców i śpiewów energia wszystkich zostaje spożytkowana i grupa grzecznie rozchodzi się do łóżek. Dla Ciebie to nie koniec dnia. Siadasz do laptopa i do późnej nocy wysyłasz materiały prasowe z pierwszego dnia, aby rankiem ukazały się na portalach pozyskanych przez Ciebie patronów.",
+      "advance": "tap"
+    },
+    {
+      "id": "b11",
+      "type": "interaction",
+      "widget": "puzzle",
+      "text": "Powstaje obraz festiwalu: pałac w Gardzienicach, cztery sceny i korowód w dolnych ogrodach. Ułóż go, zamieniając miejscami fragmenty.",
+      "reward": {
+        "fragment": 6
+      }
+    },
+    {
+      "id": "b12",
+      "type": "results",
+      "stats": [
+        {
+          "skill": "Organizacja wydarzeń",
+          "delta": 10
+        },
+        {
+          "skill": "Prowadzenie warsztatów",
+          "delta": 15
+        },
+        {
+          "skill": "Pozyskiwanie partnerów",
+          "delta": 11
+        }
+      ],
+      "kpis": [
+        {
+          "label": "Patroni medialni",
+          "value": "3 (TVP Lublin, Miesięcznik Teatralny, e-teatr.pl)"
+        },
+        {
+          "label": "Pakiety medialne",
+          "value": "6"
+        },
+        {
+          "label": "Uczestnicy",
+          "value": "ponad 120 aktorów z 4 krajów"
+        },
+        {
+          "label": "Sceny festiwalu",
+          "value": "4"
+        },
+        {
+          "label": "Nagroda od organizatorów",
+          "value": "Lniane gacie marmurowej mocy antyku +4"
+        }
+      ]
+    },
+    {
+      "id": "b13",
+      "type": "finale",
+      "text": "Pierwszy dzień festiwalu zamykasz nad ranem, wysyłając materiały prasowe. Nauczyłeś się, że atmosfera festiwalu to logistyka, partnerzy i jedna dobrze rozsiana plotka — a przed Tobą jeszcze trzy takie dni.",
+      "cta": {
+        "label": "Poznaj Arka na LinkedIn",
+        "url": "https://www.linkedin.com/in/arkadiusz-klej/"
+      }
+    }
+  ]
+}

@@ -1,0 +1,225 @@
+{
+  "id": "kultura-futura",
+  "world": "kultura",
+  "title": "Zostań redaktorem naczelnym międzynarodowego Biennale Przyszłości Kultury",
+  "lead": "Teatr w Krakowie potrzebuje Redaktora Naczelnego, który poprowadzi komunikację międzynarodowego Biennale i zainspiruje zespół do odważnego poszukiwania innowacji.",
+  "role": "Redaktor Naczelny Biennale",
+  "skills": [
+    "Dziennikarstwo",
+    "Zarządzanie zespołem",
+    "Technologia"
+  ],
+  "painting": {
+    "src": "assets/paintings/kultura-futura.svg",
+    "cols": 3,
+    "rows": 2,
+    "caption": "Biennale Przyszłości Kultury — redakcja, artyści z 8 krajów i wystawa VR, której można dotknąć. Obraz odrestaurowany."
+  },
+  "runner": {
+    "theme": "kultura",
+    "baseSpeed": 220,
+    "choiceSlowdown": 0.35
+  },
+  "beats": [
+    {
+      "id": "b01",
+      "type": "narration",
+      "text": "Jest piękny letni dzień. Siedzisz przy stoliku w kawiarni, w ogrodzie Teatru im. J. Słowackiego w Krakowie. Obok Ciebie zasiada dyrektor i wybitny artysta. Przy stole raz za razem padają kolejne pomysły na Biennale, które ma dotyczyć przyszłości technologii w kulturze. Po kilku godzinach rozmów Tobie przypada zadanie poprowadzenia zespołu redakcyjnego całego projektu.",
+      "advance": "tap"
+    },
+    {
+      "id": "b02",
+      "type": "narration",
+      "text": "Twoim celem jest stworzenie międzynarodowej komunikacji, przeprowadzenie wywiadów z niezwykłymi artystami, zorganizowanie konkursów oraz kilku wydarzeń towarzyszących. Tworzysz strategię opartą na miesiącach tematycznych, które prowadzą do głównego wydarzenia. Z zespołem mapujesz najbardziej innowacyjne obszary w kulturze: spektakle VR i AR, filozofię technologii.",
+      "advance": "tap"
+    },
+    {
+      "id": "b03",
+      "type": "choice",
+      "prompt": "Trzy redakcje rozważają patronat nad Biennale: A&B, Vogue i Wyborcza. Jak podchodzisz do patronów?",
+      "obstacle": "telefony",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Zapraszam wszystkie trzy — każda dociera do innej publiczności, a Biennale ma być międzynarodowe.",
+          "correct": true,
+          "feedback": "Trafnie — różne redakcje to różne publiczności, a komunikacja Biennale ma sięgać daleko poza jedno środowisko.",
+          "skill": "Dziennikarstwo"
+        },
+        {
+          "text": "Wybieram tylko największy zasięg i zamykam temat.",
+          "correct": false,
+          "feedback": "Jeden patron to jedna publiczność. Biennale o przyszłości kultury potrzebuje kilku głosów naraz."
+        },
+        {
+          "text": "Rezygnuję z patronów — redakcja sama zrobi zasięgi.",
+          "correct": false,
+          "feedback": "Własna redakcja to za mało na wydarzenie międzynarodowe. Patroni mnożą dotarcie, nie zastępują pracy zespołu."
+        }
+      ],
+      "reward": {
+        "fragment": 1
+      }
+    },
+    {
+      "id": "b04",
+      "type": "narration",
+      "text": "Nie zapominasz o płaszczyźnie społecznej. Redakcja pisze o dostępności kultury, sytuacji teatru awangardowego oraz edukacji seksualnej w teatrze. Nadzorujesz pracę zespołu, który tworzy teksty, posty i grafiki. Prowadzisz wywiady z pionierami biomimikry, koordynacji intymności i dostępności kultury. Pokazujesz czytelnikom, jak wiele współczesnych konfliktów to konsekwencja wojny klimatycznej.",
+      "advance": "tap"
+    },
+    {
+      "id": "b05",
+      "type": "action",
+      "prompt": "Jeden z reportaży realizujesz przez kilka tygodni. Dzięki niemu trzy studentki z Ukrainy, które uciekły z Uniwersytetu Kotlarewskiego w Charkowie, dostają stypendium we wrocławskiej AST. Przeskocz stertę dokumentów, by zdążyć przed nowym semestrem!",
+      "input": "jump",
+      "obstacle": "dokumenty",
+      "windowMs": 800,
+      "reward": {
+        "fragment": 2
+      }
+    },
+    {
+      "id": "b06",
+      "type": "narration",
+      "text": "Po wielu miesiącach przygotowań rozpoczyna się intensywny okres Biennale. Oprowadzasz po wystawach, pilnując, aby wszystkie wydarzenia zostały szczegółowo zrelacjonowane. W trakcie Biennale organizujecie również eksperymenty związane z dostępnością. Jesteś projektantem i wiesz, że z odpowiednim zespołem nie ma rzeczy niemożliwych.",
+      "advance": "tap"
+    },
+    {
+      "id": "b07",
+      "type": "choice",
+      "prompt": "Chcecie zorganizować jedną z pierwszych w Europie wystaw VR dla osób niewidomych. Jak to zrobić?",
+      "obstacle": "kable",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Specjalne stanowiska: audiodeskrypcje, feedback haptyczny i instrukcje dla przewodników.",
+          "correct": true,
+          "feedback": "Dokładnie tak powstał raport z wystawy — VR dla osób z ograniczonym zmysłem wzroku to dźwięk, dotyk i przewodnik, nie sam obraz.",
+          "skill": "Technologia"
+        },
+        {
+          "text": "Wydrukować opis wystawy w brajlu i zostawić przy wejściu.",
+          "correct": false,
+          "feedback": "Opis to nie doświadczenie. Chodziło o to, by osoba niewidoma przeżyła wirtualną przestrzeń na równi z innymi."
+        },
+        {
+          "text": "Odpuścić — VR z definicji jest wizualny.",
+          "correct": false,
+          "feedback": "Właśnie z tym założeniem zmierzyło się Biennale. Odpuszczenie oznaczałoby brak jednej z najważniejszych wystaw."
+        }
+      ],
+      "reward": {
+        "fragment": 3
+      }
+    },
+    {
+      "id": "b08",
+      "type": "interaction",
+      "widget": "reveal",
+      "text": "Zamknij na chwilę oczy i wyobraź to sobie: wystawa, której nie widzisz, ale słyszysz ją i czujesz w dłoniach. Tak wygląda VR dla osób niewidomych."
+    },
+    {
+      "id": "b09",
+      "type": "action",
+      "prompt": "Finisaż Biennale. Po ponad półtora roku przygotowań setki osób wypełniają scenę i przestrzeń wystawy. Przeskocz barierkę za kulisami, by zdążyć zrelacjonować ostatnie wydarzenie!",
+      "input": "jump",
+      "obstacle": "barierka",
+      "windowMs": 800,
+      "reward": {
+        "fragment": 4
+      }
+    },
+    {
+      "id": "b10",
+      "type": "choice",
+      "prompt": "Do konkursów Biennale chcecie zgłoszeń z całego świata. Jak je zebrać?",
+      "obstacle": "boty",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Posty na grupach na Facebooku w kilkunastu językach.",
+          "correct": true,
+          "feedback": "Tak właśnie przyszły zgłoszenia z całego świata — komunikat w języku odbiorcy działa lepiej niż jeden po angielsku.",
+          "skill": "Zarządzanie zespołem"
+        },
+        {
+          "text": "Jeden komunikat po angielsku na stronie Biennale.",
+          "correct": false,
+          "feedback": "Strona to za mało. Zgłoszenia z 8 krajów przyszły, bo redakcja poszła tam, gdzie są artyści — w ich językach."
+        },
+        {
+          "text": "Czekać, aż artyści sami napiszą.",
+          "correct": false,
+          "feedback": "Nikt nie napisze do wydarzenia, o którym nie słyszał. Zespół musiał wyjść do ludzi."
+        }
+      ],
+      "reward": {
+        "fragment": 5
+      }
+    },
+    {
+      "id": "b11",
+      "type": "narration",
+      "text": "Finisaż to święto całego zespołu. Prezentowane są dzieła artystów z 8 krajów. Uświadamiasz sobie, że dobry reportaż może zmienić życie tych, o których opowiada; że osoba niewidoma może doświadczyć wirtualnej wystawy na równi z innymi; że warto pisać posty w kilkunastu językach, aby otrzymać zgłoszenia z całego świata.",
+      "advance": "tap"
+    },
+    {
+      "id": "b12",
+      "type": "interaction",
+      "widget": "puzzle",
+      "text": "Powstaje obraz Biennale: redakcja, artyści z ośmiu krajów i wystawa, której można dotknąć. Ułóż go, zamieniając miejscami fragmenty.",
+      "reward": {
+        "fragment": 6
+      }
+    },
+    {
+      "id": "b13",
+      "type": "results",
+      "stats": [
+        {
+          "skill": "Dziennikarstwo",
+          "delta": 10
+        },
+        {
+          "skill": "Zarządzanie zespołem",
+          "delta": 10
+        },
+        {
+          "skill": "Technologia",
+          "delta": 10
+        }
+      ],
+      "kpis": [
+        {
+          "label": "Uczestnicy Biennale",
+          "value": "ponad 5000 osób"
+        },
+        {
+          "label": "Strona internetowa",
+          "value": "150 000 osób"
+        },
+        {
+          "label": "Artyści",
+          "value": "z 8 krajów"
+        },
+        {
+          "label": "Stypendium",
+          "value": "dla trzech studentek z Ukrainy"
+        },
+        {
+          "label": "Dostępność",
+          "value": "jedna z pierwszych w Europie wystaw VR dla osób niewidomych"
+        }
+      ]
+    },
+    {
+      "id": "b14",
+      "type": "finale",
+      "text": "Po ponad półtora roku przygotowań Biennale zamyka się finisażem, który wypełniają setki osób. Nauczyłeś się, że reportaż zmienia życie, że wystawa VR może być dostępna dla każdego i że warto mówić do świata w jego językach.",
+      "cta": {
+        "label": "Poznaj Arka na LinkedIn",
+        "url": "https://www.linkedin.com/in/arkadiusz-klej/"
+      }
+    }
+  ]
+}

@@ -574,138 +574,45 @@ body {
   display: block;
 }
 
-/* ---------- Finał ---------- */
-.finale {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  overflow: auto;
-  background: radial-gradient(circle at 50% 35%, #3e2219 0%, var(--c-bg-deep) 65%);
-  opacity: 0;
-  transition: opacity 0.7s;
+/* ---------- Narracja sterowana biegiem ---------- */
+.run-progress {
+  height: 3px;
+  background: rgba(38, 22, 25, 0.8);
 }
 
-.finale[hidden] {
+.run-progress-fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--c-ground), var(--c-gold));
+  transition: width 0.08s linear;
+}
+
+.hint-touch {
   display: none;
 }
 
-.finale.is-visible {
-  opacity: 1;
+@media (pointer: coarse) {
+  .hint-touch {
+    display: block;
+  }
 }
 
-.finale-stage {
-  width: min(92vw, 720px);
-  text-align: center;
-}
-
+/* ---------- Finał w panelu (obraz składa się w scenie biegu) ---------- */
 .finale-badge {
-  margin: 0 0 14px;
+  margin: 0 0 8px;
   font-family: var(--font-hud);
   font-size: 9px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--c-gold);
-  opacity: 0;
-  transition: opacity 0.5s;
-}
-
-.finale-frame {
-  position: relative;
-  padding: 10px;
-  background: var(--c-panel-bg);
-  border: 4px solid var(--c-ground);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-  transition:
-    border-color 0.6s,
-    box-shadow 0.8s;
-  overflow: hidden;
-}
-
-.finale-frame.is-complete {
-  border-color: var(--c-gold);
-  box-shadow:
-    0 0 0 2px rgba(223, 182, 124, 0.4),
-    0 0 50px rgba(223, 182, 124, 0.45),
-    0 20px 60px rgba(0, 0, 0, 0.6);
-}
-
-.finale-grid {
-  display: grid;
-  grid-template-columns: repeat(var(--cols), 1fr);
-  aspect-ratio: calc(var(--cols) / var(--rows));
-  gap: 0;
-  background: var(--c-bg-deep);
-}
-
-.finale-tile {
-  opacity: 0;
-  transform: translateX(-120vw) rotate(-18deg) scale(0.6);
-  transition:
-    transform 0.4s var(--ease-back),
-    opacity 0.25s;
-  outline: 1px solid rgba(38, 22, 25, 0.6);
-}
-
-.finale-tile.from-right {
-  transform: translateX(120vw) rotate(18deg) scale(0.6);
-}
-
-.finale-tile.is-landed {
-  opacity: 1;
-  transform: none;
-}
-
-.finale-flash {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(circle, rgba(223, 182, 124, 1) 0%, rgba(223, 182, 124, 0) 70%);
-  opacity: 0;
-}
-
-.finale-flash.is-on {
-  animation: flash 0.5s ease-out forwards;
 }
 
 .finale-caption {
-  margin: 16px auto 0;
-  max-width: 560px;
+  margin: 0 0 12px;
   font-size: 15px;
   font-style: italic;
   line-height: 1.5;
   color: var(--c-text-muted);
-  opacity: 0;
-  transition: opacity 0.4s;
-}
-
-.finale-caption.is-visible {
-  opacity: 1;
-}
-
-.finale-text {
-  margin: 18px auto 0;
-  max-width: 600px;
-  min-height: 3.2em;
-  font-size: 18px;
-  line-height: 1.6;
-}
-
-.finale-cta {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 22px;
-  opacity: 0;
-  transition: opacity 0.5s;
-}
-
-.finale-badge.is-visible,
-.finale-cta.is-visible {
-  opacity: 1;
 }
 
 /* ---------- Animacje ---------- */
@@ -802,14 +709,10 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .finale-tile {
-    transition: opacity 0.2s linear;
-  }
   .qte[data-open='true'],
   .fragment-slot.is-new {
     animation: none;
   }
-  .finale,
   .entry,
   .skill-fill {
     transition-duration: 0.01s;

@@ -77,6 +77,7 @@ export class Player {
     if (this.state === 'stumble' || this.state === 'jump') return;
     this.state = 'run';
     this.sprite.play(ANIM_RUN, true);
+    if (!this.sprite.anims.forward) this.sprite.anims.reverse();
     this.dust.start();
   }
 
@@ -142,19 +143,28 @@ export class Player {
   /**
    * Tempo animacji biegu względem mnożnika czasu świata: przy time dilation postać
    * zwalnia mniej niż tło (GDD sekcja c) — wykładnik dobrany tak, by 0.35 → 0.7.
+   * Wartość ujemna = cofanie: ta sama animacja odtwarzana wstecz (jak przewijanie taśmy).
    */
   setTimeScale(timeScale: number): void {
     const exponent =
       Math.log(TUNING.PLAYER_ANIM_DILATION_MULT) / Math.log(TUNING.TIME_DILATION_FACTOR);
-    const animScale = timeScale <= 0 ? 0 : Math.pow(timeScale, exponent);
+    const magnitude = Math.abs(timeScale);
+    const animScale = magnitude <= 0 ? 0 : Math.pow(magnitude, exponent);
     this.sprite.anims.timeScale = Math.max(animScale, 0.0001);
-    if (timeScale <= 0.001 && this.state === 'run') {
-      this.sprite.anims.pause();
-      this.dust.stop();
-    } else if (timeScale > 0.001 && this.state === 'run' && this.sprite.anims.isPaused) {
-      this.sprite.anims.resume();
-      this.dust.start();
+    if (this.state !== 'run') return;
+    const anims = this.sprite.anims;
+    if (magnitude <= 0.02) {
+      if (!anims.isPaused) {
+        anims.pause();
+        this.dust.stop();
+      }
+      return;
     }
+    if (anims.isPaused) anims.resume();
+    const backwards = timeScale < 0;
+    if (backwards === anims.forward) anims.reverse();
+    if (backwards) this.dust.stop();
+    else if (!this.dust.emitting) this.dust.start();
   }
 
   update(now: number): void {

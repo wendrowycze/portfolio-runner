@@ -15,7 +15,8 @@ export default defineConfig({
   workers: 1,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? 'github' : 'list',
-  timeout: 120_000,
+  // Pełne przejście case'a wymaga realnego biegu przez tekst (ok. 3 minuty).
+  timeout: 300_000,
   use: {
     baseURL: `http://localhost:${PORT}${BASE_PATH}`,
     trace: 'retain-on-failure',
