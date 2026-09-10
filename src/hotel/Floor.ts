@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { HOTEL_KEYS, PAINT_SCALE, WALL_TILE, worldTheme } from '../assets/generators/hotel';
 import { HOTEL } from '../config/hotel';
+import { statueImageKey } from '../assets/manifest';
 import type { World } from '../script/types';
 import { prefersReducedMotion } from '../ui/dom';
 
@@ -32,6 +33,7 @@ export class Floor {
   ) {
     const { world, top, floorY } = view;
     const width = HOTEL.floorWidth;
+    const theme = worldTheme(world);
     scene.add
       .tileSprite(0, top, width, WALL_TILE.height, HOTEL_KEYS.wall(world, 'pixel'))
       .setOrigin(0, 0)
@@ -71,13 +73,30 @@ export class Floor {
       .image(HOTEL.elevatorX + 200, floorY, HOTEL_KEYS.plant)
       .setOrigin(0.5, 1)
       .setDepth(4);
-    this.statue = scene.add
-      .image(statueX, floorY, HOTEL_KEYS.statue(world))
-      .setOrigin(0.5, 1)
-      .setDepth(5);
+    // Posąg: render z Meshy (jeśli wczytany) barwiony per świat, inaczej popiersie rysowane kodem.
+    const statueKey = statueImageKey(world);
+    if (scene.textures.exists(statueKey)) {
+      const tint = world === 'biznes' ? 0xc9a063 : world === 'edukacja' ? 0xf2f4ef : 0xe6d7c3;
+      // Cokół pod renderem, żeby posąg nie „wisiał” nad podłogą.
+      scene.add.rectangle(statueX, floorY, 72, 14, theme.wainscot, 1).setOrigin(0.5, 1).setDepth(5);
+      scene.add
+        .rectangle(statueX, floorY - 14, 60, 4, theme.ornament, 0.9)
+        .setOrigin(0.5, 1)
+        .setDepth(5);
+      this.statue = scene.add
+        .image(statueX, floorY - 18, statueKey)
+        .setOrigin(0.5, 1)
+        .setDepth(5)
+        .setTint(tint);
+      this.statue.setScale(180 / this.statue.height);
+    } else {
+      this.statue = scene.add
+        .image(statueX, floorY, HOTEL_KEYS.statue(world))
+        .setOrigin(0.5, 1)
+        .setDepth(5);
+    }
 
     // Tabliczka piętra przy windzie.
-    const theme = worldTheme(world);
     scene.add
       .rectangle(HOTEL.elevatorX, top + 90, 110, 22, theme.wainscot, 1)
       .setStrokeStyle(2, theme.ornament, 0.9)

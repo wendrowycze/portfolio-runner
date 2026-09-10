@@ -13,7 +13,13 @@ import { generateObstacles } from '../assets/generators/obstacles';
 import { generatePlayer } from '../assets/generators/player';
 import { GAME_HEIGHT, GAME_WIDTH } from '../config/gameConfig';
 import { PALETTE } from '../config/palette';
-import { assetUrl, PAINTING_RASTER, paintingTextureKey } from '../assets/manifest';
+import {
+  assetUrl,
+  fileAssetPath,
+  PAINTING_RASTER,
+  paintingTextureKey,
+  statueImageKey,
+} from '../assets/manifest';
 import type { Case } from '../script/types';
 import type { RunnerSceneData } from './RunnerScene';
 
@@ -47,10 +53,18 @@ export class BootScene extends Phaser.Scene {
         this.load.image(key, assetUrl(kejs.painting.src));
       }
     }
-    // Fasada z API na ekran startowy (opcjonalna — brak pliku = fasada rysowana kodem).
+    // Fasada z API na ekran startowy i posągi z Meshy (opcjonalne — brak pliku = wersja rysowana kodem).
     this.load.image(HOTEL_KEYS.facadeImage, assetUrl(FACADE_IMAGE_PATH));
+    const optional = new Set<string>([HOTEL_KEYS.facadeImage]);
+    for (const world of ['kultura', 'edukacja', 'biznes'] as const) {
+      const key = statueImageKey(world);
+      const path = fileAssetPath(key);
+      if (path === undefined) continue;
+      optional.add(key);
+      this.load.image(key, assetUrl(path));
+    }
     this.load.on(Phaser.Loader.Events.FILE_LOAD_ERROR, (file: Phaser.Loader.File) => {
-      if (file.key === HOTEL_KEYS.facadeImage) return;
+      if (optional.has(file.key)) return;
       console.error(`[assets] nie udało się wczytać ${file.key}`);
     });
   }
@@ -74,6 +88,13 @@ export class BootScene extends Phaser.Scene {
     generateObstacles(this);
     generateFx(this);
     generateHotel(this);
+    for (const world of ['kultura', 'edukacja', 'biznes'] as const) {
+      const key = statueImageKey(world);
+      // Rendery z Meshy to „rzeźby”, nie pixel-art — filtrowanie liniowe jak dla obrazów.
+      if (this.textures.exists(key)) {
+        this.textures.get(key).setFilter(Phaser.Textures.FilterMode.LINEAR);
+      }
+    }
 
     label.destroy();
     const runnerData = this.registry.get('runnerData') as RunnerSceneData | undefined;

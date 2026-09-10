@@ -62,6 +62,22 @@ export const ASSET_MANIFEST = {
   // --- hotel i ekran startowy: tekstury generowane kodem (src/assets/generators/hotel.ts) ---
   'hotel.*': generated,
   'start.facade': generated,
+  /** Posągi z Meshy (rendery przycięte z tła; workflow meshy-generate + scripts). Opcjonalne. */
+  'hotel.statue.image.kultura': {
+    source: 'file',
+    path: 'assets/hotel/statue-kultura.png',
+    license: 'model wygenerowany przez API Meshy na koncie właściciela — ASSETS_ATTRIBUTION.md',
+  },
+  'hotel.statue.image.edukacja': {
+    source: 'file',
+    path: 'assets/hotel/statue-edukacja.png',
+    license: 'model wygenerowany przez API Meshy na koncie właściciela — ASSETS_ATTRIBUTION.md',
+  },
+  'hotel.statue.image.biznes': {
+    source: 'file',
+    path: 'assets/hotel/statue-biznes.png',
+    license: 'model wygenerowany przez API Meshy na koncie właściciela — ASSETS_ATTRIBUTION.md',
+  },
   /** Fasada z API: public/assets/hotel/facade.jpg (workflow paintings-import), opcjonalna. */
   'start.facade.image': {
     source: 'file',
@@ -96,6 +112,16 @@ export function paintingTextureKey(caseId: string): string {
 
 /** Rozmiar, do jakiego rasteryzowany jest obraz case'a (SVG) w Phaserze — 3:2 jak siatka 3×2. */
 export const PAINTING_RASTER = { width: 960, height: 640 } as const;
+
+/** Klucz i ścieżka posągu z Meshy dla świata (wpis w manifeście). */
+export function statueImageKey(world: 'kultura' | 'edukacja' | 'biznes'): AssetKey {
+  return `hotel.statue.image.${world}`;
+}
+
+export function fileAssetPath(key: AssetKey): string | undefined {
+  const entry: AssetEntry = ASSET_MANIFEST[key];
+  return entry.source === 'file' ? entry.path : undefined;
+}
 
 /** Pełna ścieżka pliku uwzględniająca base URL Vite (GitHub Pages). */
 export function assetUrl(path: string): string {
