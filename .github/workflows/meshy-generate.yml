@@ -1,0 +1,42 @@
+# Generowanie modeli/renderów w Meshy z serwerów GitHuba (sesja Claude nie ma dostępu do meshy.ai).
+# Wymaga sekretu repozytorium MESHY_API_KEY. Uruchamiane ręcznie; wynik commitowany na wskazaną gałąź.
+name: Meshy → repo
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Gałąź, na którą wgrać wyniki
+        required: true
+        default: main
+      only:
+        description: Lista id z content/meshy/requests.json (po przecinku); puste = wszystkie
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  meshy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Generuj w Meshy
+        env:
+          MESHY_API_KEY: ${{ secrets.MESHY_API_KEY }}
+          MESHY_ONLY: ${{ inputs.only }}
+        run: node scripts/meshy.mjs
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/assets/meshy
+          git diff --cached --quiet && echo "brak zmian" && exit 0
+          git commit -m "meshy: wygenerowane modele i rendery (Meshy) do public/assets/meshy"
+          git push origin "HEAD:${{ inputs.branch }}"
