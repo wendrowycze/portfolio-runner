@@ -12,7 +12,8 @@
     "e2e": "playwright test",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
-    "paintings": "node scripts/paintings.mjs"
+    "paintings": "node scripts/paintings.mjs",
+    "layers": "node scripts/layers.mjs"
   },
   "dependencies": {
     "phaser": "^3.90.0",

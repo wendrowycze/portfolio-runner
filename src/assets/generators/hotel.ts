@@ -20,6 +20,9 @@ export const HOTEL_KEYS = {
   elevatorDoor: 'hotel.elevator.door',
   statue: (world: World): string => `hotel.statue.${world}`,
   plant: 'hotel.plant',
+  /** Wyposażenie wnętrz per świat (żyrandol, okno, regał, panel art déco, kotara, pilaster). */
+  furniture: (kind: Furniture, variant: 'pixel' | 'paint'): string =>
+    `hotel.furniture.${kind}.${variant}`,
   flame: 'fx.flame',
   glow: 'fx.glow',
   facade: 'start.facade',
@@ -30,6 +33,18 @@ export const HOTEL_KEYS = {
   torch: 'start.torch',
   gateDoor: 'start.gate',
 } as const;
+
+export type Furniture = 'chandelier' | 'window' | 'bookshelf' | 'deco' | 'drape' | 'pilaster';
+
+/** Rozmiary mebli (wersja pixel; malarska = ×PAINT_SCALE). */
+export const FURNITURE_SIZE: Record<Furniture, { width: number; height: number }> = {
+  chandelier: { width: 96, height: 96 },
+  window: { width: 104, height: 210 },
+  bookshelf: { width: 132, height: 160 },
+  deco: { width: 140, height: 76 },
+  drape: { width: 44, height: 210 },
+  pilaster: { width: 40, height: 430 },
+};
 
 interface WorldTheme {
   wallTop: number;
@@ -554,6 +569,176 @@ export const FACADE_IMAGE_PATH = 'assets/hotel/facade.jpg';
 
 export const FACADE_GATE = FACADE_CODE.gate;
 
+/**
+ * Wyposażenie wnętrz — każdy mebel w wersji pixel (S=1, ostre krawędzie) i malarskiej (S=2,
+ * gradienty, poświaty). Ten sam układ, więc Floor może je przenikać razem ze ścianą.
+ */
+function drawFurniture(g: Phaser.GameObjects.Graphics, kind: Furniture, paint: boolean): void {
+  const S = paint ? PAINT_SCALE : 1;
+  const { width, height } = FURNITURE_SIZE[kind];
+  const w = width * S;
+  const h = height * S;
+  const gold = col('gold');
+  switch (kind) {
+    case 'chandelier': {
+      // Łańcuch, korona, ramiona ze świecami, kryształowe sople.
+      g.fillStyle(gold, 0.9);
+      g.fillRect(w / 2 - 1 * S, 0, 2 * S, 22 * S);
+      g.fillStyle(gold, 1);
+      g.fillRect(w / 2 - 10 * S, 22 * S, 20 * S, 6 * S);
+      g.lineStyle(3 * S, gold, 1);
+      g.beginPath();
+      g.arc(w / 2, 30 * S, 36 * S, Math.PI * 0.15, Math.PI * 0.85, false);
+      g.strokePath();
+      for (let i = 0; i < 5; i += 1) {
+        const a = Math.PI * (0.15 + (0.7 * i) / 4);
+        const x = w / 2 + Math.cos(a) * 36 * S;
+        const y = 30 * S + Math.sin(a) * 36 * S;
+        g.fillStyle(gold, 1);
+        g.fillRect(x - 3 * S, y - 12 * S, 6 * S, 12 * S);
+        g.fillStyle(0xfff1c2, 1);
+        g.fillRect(x - 2 * S, y - 18 * S, 4 * S, 6 * S);
+        if (paint) {
+          for (let r = 14; r > 2; r -= 3) {
+            g.fillStyle(gold, 0.05);
+            g.fillCircle(x, y - 16 * S, r * S);
+          }
+        }
+        g.fillStyle(col('text'), 0.75);
+        g.fillTriangle(x - 3 * S, y + 2 * S, x + 3 * S, y + 2 * S, x, y + 18 * S);
+      }
+      g.fillStyle(col('text'), 0.8);
+      g.fillTriangle(w / 2 - 5 * S, 62 * S, w / 2 + 5 * S, 62 * S, w / 2, 90 * S);
+      break;
+    }
+    case 'window': {
+      // Okno ostrołukowe z księżycową nocą i szprosami; malarskie ma poświatę.
+      const arc = 52 * S;
+      g.fillStyle(col('ground'), 1);
+      g.fillRect(0, arc, w, h - arc);
+      g.fillCircle(w / 2, arc, w / 2);
+      g.fillStyle(0x0f1c26, 1);
+      g.fillRect(8 * S, arc, w - 16 * S, h - arc - 8 * S);
+      g.fillCircle(w / 2, arc, w / 2 - 8 * S);
+      if (paint) {
+        fillVerticalGradient(g, 8 * S, arc, w - 16 * S, h - arc - 8 * S, [
+          { at: 0, color: 0x17303f },
+          { at: 1, color: 0x0b141b },
+        ]);
+      }
+      g.fillStyle(0xf3ecd2, 1);
+      g.fillCircle(w * 0.62, arc - 4 * S, 12 * S);
+      g.fillStyle(0x0f1c26, 1);
+      g.fillCircle(w * 0.66, arc - 8 * S, 10 * S);
+      g.fillStyle(col('text'), 0.5);
+      for (let i = 0; i < 12; i += 1) {
+        g.fillRect((10 + ((i * 37) % 80)) * S, (arc / S - 30 + ((i * 53) % 26)) * S, S, S);
+      }
+      g.fillStyle(col('ground'), 1);
+      g.fillRect(w / 2 - 2 * S, 8 * S, 4 * S, h - 16 * S);
+      g.fillRect(8 * S, arc + 40 * S, w - 16 * S, 4 * S);
+      g.fillRect(8 * S, arc + 100 * S, w - 16 * S, 4 * S);
+      g.fillStyle(gold, 0.9);
+      g.fillRect(0, h - 10 * S, w, 10 * S);
+      break;
+    }
+    case 'bookshelf': {
+      g.fillStyle(0x3a2419, 1);
+      g.fillRect(0, 0, w, h);
+      g.fillStyle(gold, 0.8);
+      g.fillRect(0, 0, w, 4 * S);
+      const rnd = seededRandom(kind.length * 11);
+      const spines = [
+        col('warn'),
+        col('cool'),
+        0x6b4a2a,
+        col('parallaxMid'),
+        0x8a6d3b,
+        col('textMuted'),
+      ];
+      for (let shelf = 0; shelf < 4; shelf += 1) {
+        const y = (8 + shelf * 38) * S;
+        g.fillStyle(0x5a3a28, 1);
+        g.fillRect(4 * S, y + 32 * S, w - 8 * S, 4 * S);
+        let x = 6 * S;
+        while (x < w - 12 * S) {
+          const bw = (5 + Math.floor(rnd() * 8)) * S;
+          const bh = (20 + Math.floor(rnd() * 12)) * S;
+          g.fillStyle(spines[Math.floor(rnd() * spines.length)] ?? gold, 1);
+          g.fillRect(x, y + 32 * S - bh, bw, bh);
+          g.fillStyle(gold, 0.35);
+          g.fillRect(x + bw / 2 - S, y + 32 * S - bh + 4 * S, S, 3 * S);
+          x += bw + S;
+        }
+      }
+      break;
+    }
+    case 'deco': {
+      // Art déco: promienie słońca w półkolu (Transistor/Łempicka w mosiądzu).
+      g.fillStyle(0x2b2a2e, 1);
+      g.fillRect(0, 0, w, h);
+      g.lineStyle(2 * S, gold, 0.9);
+      g.strokeRect(S, S, w - 2 * S, h - 2 * S);
+      const cx = w / 2;
+      const cy = h - 6 * S;
+      for (let i = 0; i <= 10; i += 1) {
+        const a = Math.PI + (Math.PI * i) / 10;
+        g.lineStyle(paint ? 3 : 2, gold, paint ? 0.7 : 1);
+        g.lineBetween(cx, cy, cx + Math.cos(a) * 62 * S, cy + Math.sin(a) * 62 * S);
+      }
+      for (let r = 14; r <= 56; r += 14) {
+        g.lineStyle(2, gold, 0.6);
+        g.beginPath();
+        g.arc(cx, cy, r * S, Math.PI, Math.PI * 2, false);
+        g.strokePath();
+      }
+      g.fillStyle(gold, 1);
+      g.fillCircle(cx, cy, 6 * S);
+      break;
+    }
+    case 'drape': {
+      // Kotara: aksamit w fałdach, złota szarfa.
+      if (paint) {
+        fillVerticalGradient(g, 0, 0, w, h, [
+          { at: 0, color: 0x6a1d22 },
+          { at: 0.5, color: 0x4a1418 },
+          { at: 1, color: 0x2e0c0f },
+        ]);
+      } else {
+        g.fillStyle(0x4a1418, 1);
+        g.fillRect(0, 0, w, h);
+      }
+      for (let x = 4 * S; x < w; x += 10 * S) {
+        g.fillStyle(0x7a2a30, paint ? 0.5 : 1);
+        g.fillRect(x, 0, 3 * S, h);
+      }
+      g.fillStyle(gold, 1);
+      g.fillRect(0, 0, w, 6 * S);
+      g.fillRect(2 * S, 120 * S, w - 4 * S, 8 * S);
+      g.fillStyle(gold, 0.6);
+      g.fillRect(w / 2 - 2 * S, 128 * S, 4 * S, 20 * S);
+      break;
+    }
+    case 'pilaster': {
+      // Pilaster od gzymsu do podłogi: głowica, trzon z kanelurami, baza.
+      const body = paint ? lerpColor(col('ground'), col('gold'), 0.25) : col('ground');
+      g.fillStyle(body, 1);
+      g.fillRect(6 * S, 0, w - 12 * S, h);
+      g.fillStyle(col('bgDeep'), 0.25);
+      for (let x = 10 * S; x < w - 10 * S; x += 8 * S) g.fillRect(x, 24 * S, 2 * S, h - 48 * S);
+      g.fillStyle(gold, 1);
+      g.fillRect(0, 0, w, 10 * S);
+      g.fillRect(2 * S, 10 * S, w - 4 * S, 6 * S);
+      g.fillRect(0, h - 14 * S, w, 14 * S);
+      if (paint) {
+        g.fillStyle(0xffffff, 0.08);
+        g.fillRect(8 * S, 0, 6 * S, h);
+      }
+      break;
+    }
+  }
+}
+
 export function generateHotel(scene: Phaser.Scene): void {
   const worlds: World[] = ['kultura', 'edukacja', 'biznes'];
   for (const world of worlds) {
@@ -584,6 +769,17 @@ export function generateHotel(scene: Phaser.Scene): void {
     if (paint) {
       scene.textures.get(HOTEL_KEYS.sconce('paint')).setFilter(Phaser.Textures.FilterMode.LINEAR);
       scene.textures.get(HOTEL_KEYS.door('paint')).setFilter(Phaser.Textures.FilterMode.LINEAR);
+    }
+  }
+  const furniture: Furniture[] = ['chandelier', 'window', 'bookshelf', 'deco', 'drape', 'pilaster'];
+  for (const kind of furniture) {
+    for (const paint of [false, true]) {
+      const S = paint ? PAINT_SCALE : 1;
+      const g = makeGraphics(scene);
+      drawFurniture(g, kind, paint);
+      const key = HOTEL_KEYS.furniture(kind, paint ? 'paint' : 'pixel');
+      bake(g, key, FURNITURE_SIZE[kind].width * S, FURNITURE_SIZE[kind].height * S);
+      if (paint) scene.textures.get(key).setFilter(Phaser.Textures.FilterMode.LINEAR);
     }
   }
   drawElevator(scene);

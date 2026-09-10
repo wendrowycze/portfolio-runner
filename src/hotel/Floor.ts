@@ -1,7 +1,14 @@
 import Phaser from 'phaser';
-import { HOTEL_KEYS, PAINT_SCALE, WALL_TILE, worldTheme } from '../assets/generators/hotel';
+import {
+  FURNITURE_SIZE,
+  HOTEL_KEYS,
+  PAINT_SCALE,
+  WALL_TILE,
+  worldTheme,
+  type Furniture,
+} from '../assets/generators/hotel';
 import { HOTEL } from '../config/hotel';
-import { statueImageKey } from '../assets/manifest';
+import { statueImageKey, textureKey } from '../assets/manifest';
 import type { World } from '../script/types';
 import { prefersReducedMotion } from '../ui/dom';
 
@@ -45,7 +52,9 @@ export class Floor {
       .setTileScale(1 / PAINT_SCALE);
     this.paintLayers.push(this.paintTile);
 
-    // Drzwi między obrazami (co drugi odstęp) i kinkiety nad każdą przerwą.
+    // Drzwi między obrazami (co drugi odstęp), kinkiety nad każdą przerwą, wyposażenie per świat:
+    // Kultura — kotary przy drzwiach i żyrandole; Edukacja — okna z księżycem zamiast kinkietów
+    // i regały; Biznes — panele art déco nad drzwiami i mosiężne pilastry.
     for (
       let x = HOTEL.firstPaintingX + HOTEL.paintingGap / 2;
       x < width - 300;
@@ -60,11 +69,30 @@ export class Floor {
           .setScale(1 / PAINT_SCALE)
           .setDepth(3);
         this.paintLayers.push(paintDoor);
+        if (world === 'kultura') {
+          this.addFurniture('drape', x - 58, floorY - 172, 0.5, 0);
+          this.addFurniture('drape', x + 58, floorY - 172, 0.5, 0);
+        } else if (world === 'biznes') {
+          this.addFurniture('deco', x, floorY - 176, 0.5, 1);
+        }
+      } else if (world === 'edukacja') {
+        this.addFurniture('window', x, top + 130, 0.5, 0);
+        this.addMoonShaft(x, top + 130 + FURNITURE_SIZE.window.height, floorY);
       } else {
         this.addSconce(x, top + 150);
+        if (world === 'kultura') this.addFurniture('chandelier', x, top + 42, 0.5, 0);
+        if (world === 'biznes') this.addFurniture('pilaster', x, top + 42, 0.5, 0);
       }
     }
     this.addSconce(HOTEL.elevatorX + 130, top + 150);
+    if (world === 'edukacja') {
+      this.addFurniture('bookshelf', HOTEL.elevatorX + 300, floorY, 0.5, 1);
+      this.addFurniture('bookshelf', statueX - 220, floorY, 0.5, 1);
+    }
+    if (world === 'kultura' || world === 'biznes') {
+      this.addFurniture('pilaster', HOTEL.elevatorX + 90, top + 42, 0.5, 0);
+    }
+    this.addMotes(width, top, floorY, world);
     scene.add
       .image(statueX - 120, floorY, HOTEL_KEYS.plant)
       .setOrigin(0.5, 1)
@@ -102,6 +130,69 @@ export class Floor {
       .setStrokeStyle(2, theme.ornament, 0.9)
       .setDepth(6);
     this.setRestoration(initialRestoration);
+  }
+
+  /** Mebel w obu wersjach (pixel + malarska, ta druga przenika wraz ze ścianą). */
+  private addFurniture(
+    kind: Furniture,
+    x: number,
+    y: number,
+    originX: number,
+    originY: number,
+  ): void {
+    this.scene.add
+      .image(x, y, HOTEL_KEYS.furniture(kind, 'pixel'))
+      .setOrigin(originX, originY)
+      .setDepth(2);
+    const paint = this.scene.add
+      .image(x, y, HOTEL_KEYS.furniture(kind, 'paint'))
+      .setOrigin(originX, originY)
+      .setScale(1 / PAINT_SCALE)
+      .setDepth(3);
+    this.paintLayers.push(paint);
+  }
+
+  /** Snop księżycowego światła z okna na podłogę (Edukacja) — blend ADD, powolne falowanie. */
+  private addMoonShaft(x: number, windowBottom: number, floorY: number): void {
+    const shaft = this.scene.add
+      .image(x, windowBottom - 150, textureKey('fx.ray'))
+      .setOrigin(0.5, 0)
+      .setDepth(3.5)
+      .setBlendMode(Phaser.BlendModes.ADD)
+      .setTint(0xbfd8ff)
+      .setAlpha(0.14)
+      .setScale(0.8, (floorY - windowBottom + 200) / 480)
+      .setAngle(-16);
+    if (!this.reducedMotion) {
+      this.scene.tweens.add({
+        targets: shaft,
+        alpha: 0.2,
+        angle: -13,
+        duration: 6000,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+    }
+  }
+
+  /** Pyłki kurzu w świetle korytarza — cały świat oddycha, nawet gdy gość stoi. */
+  private addMotes(width: number, top: number, floorY: number, world: World): void {
+    const tint = world === 'biznes' ? 0x9fd8d0 : world === 'edukacja' ? 0xd8e6ff : 0xffd9a0;
+    const motes = this.scene.add.particles(0, 0, textureKey('fx.mote'), {
+      x: { min: 0, max: width },
+      y: { min: top + 60, max: floorY - 20 },
+      lifespan: { min: 5000, max: 9000 },
+      speedX: { min: -6, max: 6 },
+      speedY: { min: -5, max: 3 },
+      scale: { start: 0.25, end: 0.7 },
+      alpha: { values: [0, 0.4, 0], interpolation: 'catmull' },
+      frequency: this.reducedMotion ? 1200 : 220,
+      quantity: 1,
+      blendMode: Phaser.BlendModes.ADD,
+      tint,
+    });
+    motes.setDepth(6);
   }
 
   private addSconce(x: number, y: number): void {

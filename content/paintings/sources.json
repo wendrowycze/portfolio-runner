@@ -1,6 +1,6 @@
 {
   "_readme": "Adresy obrazów wygenerowanych przez API (Gamma). Zmiana tego pliku uruchamia workflow „Import obrazów”, który pobiera pliki do public/assets/paintings/<id>.jpg (klucz _facade → public/assets/hotel/facade.jpg).",
-  "_version": "2",
+  "_version": "3",
   "teatr-jest-nasz": "https://cdn.gamma.app/qgp0cgj9vfvihg2/design-anything/KiMN9zCQ85Z2qJXnN0ubk/no_JaA5TNBp7VCkPW2XP5.jpg",
   "kultura-futura": "https://cdn.gamma.app/qgp0cgj9vfvihg2/design-anything/XptbbB7tqbeSWJejHJONf/_6HyGkghdI9EqBaM3UUIZ.jpg",
   "cyrograf-na-kwadrat": "https://cdn.gamma.app/qgp0cgj9vfvihg2/design-anything/Rgd66BYB9c4kO41s8FM1m/6MkK4YQ_GcSoofujN3lKR.jpg",
@@ -13,5 +13,14 @@
   "nasa-space-apps": "https://cdn.gamma.app/qgp0cgj9vfvihg2/design-anything/nbWmsP3ZWHtys8U9lzMct/XQViQP1nvydpLUpfmLIAs.jpg",
   "narzedziownik-biz": "https://cdn.gamma.app/qgp0cgj9vfvihg2/design-anything/AOCPfCwC5Ql32UQvbOxYT/frsy-DoWvnpm4dG6O8r-F.jpg",
   "tajemnica-pieczeci": "https://cdn.gamma.app/qgp0cgj9vfvihg2/design-anything/lHY790RkI0kCPyXR9JRXw/H5zQc6nAcKlKVD5ie5nqE.jpg",
-  "_facade": "https://cdn.gamma.app/qgp0cgj9vfvihg2/design-anything/8Yd5CdSjk4BM7tJBnQ3WO/7NkclYF3DJW0TuOC8V8fL.jpg"
+  "_facade": "https://cdn.gamma.app/qgp0cgj9vfvihg2/design-anything/8Yd5CdSjk4BM7tJBnQ3WO/7NkclYF3DJW0TuOC8V8fL.jpg",
+  "_layer-kultura-far": "https://cdn.gamma.app/qgp0cgj9vfvihg2/design-anything/p4bdVkjDs1wyyi6seXiTW/nPJeFznoiz2aqtaeX7oSp.jpg",
+  "_layer-kultura-mid": "https://cdn.gamma.app/qgp0cgj9vfvihg2/design-anything/CEKbIm6AEefkoUek22w07/qX-8DeVdbr75RWnKYpGTu.jpg",
+  "_layer-kultura-near": "https://cdn.gamma.app/qgp0cgj9vfvihg2/design-anything/EPry4LSh6zSI2d3iMtsMF/kVW1sv32roMLzw-VuZxFN.jpg",
+  "_layer-edukacja-far": "https://cdn.gamma.app/qgp0cgj9vfvihg2/design-anything/8TUxtJJ5xdLGVVYLACQEa/nADIeOC6Irm_iic5j7p1X.jpg",
+  "_layer-edukacja-mid": "https://cdn.gamma.app/qgp0cgj9vfvihg2/design-anything/kKHQvs5fxzd6LEEBSE6wT/MUQM4g8W8pebjgyn7iDrM.jpg",
+  "_layer-edukacja-near": "https://cdn.gamma.app/qgp0cgj9vfvihg2/design-anything/5vtuLTm8r99Um1oFilL8t/wPo8DNpTKLvGbUf3ZUvr2.jpg",
+  "_layer-biznes-far": "https://cdn.gamma.app/qgp0cgj9vfvihg2/design-anything/gDPYN31iCG7a3AwQb5kYd/EpvidjW5qWNtrrmWi5d-r.jpg",
+  "_layer-biznes-mid": "https://cdn.gamma.app/qgp0cgj9vfvihg2/design-anything/pXAFbaAUFBghrgYY25Q5O/Q_Gq7joMXZ0wdm4tOFEdU.jpg",
+  "_layer-biznes-near": "https://cdn.gamma.app/qgp0cgj9vfvihg2/design-anything/wMH5WNuhQb8WkUfdYtfYX/BmwBd0lbR9XbBnryNTOtH.jpg"
 }
