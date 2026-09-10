@@ -64,9 +64,7 @@ test('pełne przejście _demo.json w layoucie side: wybory, QTE, fragmenty, fina
 
   // b04: QTE — czekamy aż pierścień otworzy okno, wtedy spacja.
   await waitForBeat(page, 'b04');
-  await expect(page.locator('[data-testid="qte"]')).toHaveAttribute('data-open', 'true', {
-    timeout: 10_000,
-  });
+  await page.locator('[data-testid="qte"][data-open="true"]').waitFor({ timeout: 10_000 });
   await page.keyboard.press('Space');
   await expect(page.locator('.fragment-slot[data-collected="true"]')).toHaveCount(2);
 

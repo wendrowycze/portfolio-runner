@@ -39,7 +39,7 @@ jobs:
             if [ "$id" = "_facade" ]; then
               convert "/tmp/$id.src" -resize 960x540^ -gravity center -extent 960x540 -quality 84 "public/assets/hotel/facade.jpg"
             elif [[ "$id" == _layer-* ]]; then
-              # Warstwy paralaksy biegu: _layer-<świat>-<far|mid|near> → public/assets/runner/<świat>/<warstwa>.jpg (1920×1080, bez kadrowania 3:2)
+              # Warstwy paralaksy biegu: _layer-<świat>-<far|mid|near> → public/assets/runner/<świat>/<warstwa>.jpg (1920×1080); potem lokalnie `npm run layers` (wycięcie magenty, WebP)
               world="${id#_layer-}"; layer="${world##*-}"; world="${world%-*}"
               mkdir -p "public/assets/runner/$world"
               convert "/tmp/$id.src" -resize 1920x1080^ -gravity center -extent 1920x1080 -quality 86 "public/assets/runner/$world/$layer.jpg"

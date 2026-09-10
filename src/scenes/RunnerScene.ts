@@ -7,6 +7,8 @@ import { TUNING } from '../config/tuning';
 import { bus } from '../events/bus';
 import { Hud } from '../runner/Hud';
 import { ObstacleSpawner } from '../runner/Obstacles';
+import { Atmosphere } from '../runner/Atmosphere';
+import { PaintingShards } from '../runner/PaintingShards';
 import { Parallax } from '../runner/Parallax';
 import { Player } from '../runner/Player';
 import { TimeDilation } from '../runner/TimeDilation';
@@ -41,6 +43,8 @@ export interface RunnerSceneData {
 export class RunnerScene extends Phaser.Scene {
   private state!: GameState;
   private parallax!: Parallax;
+  private atmosphere!: Atmosphere;
+  private shards: PaintingShards | undefined;
   private player!: Player;
   private spawner!: ObstacleSpawner;
   private timeDilation!: TimeDilation;
@@ -80,7 +84,24 @@ export class RunnerScene extends Phaser.Scene {
     this.physics.world.setBounds(0, -400, GAME_WIDTH, this.groundY + 400);
     this.physics.world.gravity.y = TUNING.GRAVITY_Y;
 
-    this.parallax = new Parallax(this, GAME_WIDTH, GAME_HEIGHT, this.groundY);
+    const kejs = this.script?.kejs;
+    this.parallax = new Parallax(this, GAME_WIDTH, GAME_HEIGHT, this.groundY, kejs?.world);
+    document.body.dataset.bg = this.parallax.usesWorldLayers ? 'layers' : 'code';
+    this.atmosphere = new Atmosphere(this, GAME_WIDTH, GAME_HEIGHT, this.groundY, kejs?.world);
+    this.atmosphere.setBaseSpeed(this.state.baseSpeed);
+    // Kawałki obrazu dryfują w scenerii (tło składa się w obraz) — tylko z warstwami z API,
+    // bo w wersji rysowanej kodem nie ma dla nich przestrzeni.
+    this.shards =
+      kejs !== undefined && this.parallax.usesWorldLayers
+        ? new PaintingShards(
+            this,
+            kejs.id,
+            kejs.painting.cols,
+            kejs.painting.rows,
+            GAME_WIDTH,
+            this.groundY,
+          )
+        : undefined;
     this.player = new Player(this, TUNING.PLAYER_X, this.groundY);
     this.spawner = new ObstacleSpawner(this, GAME_WIDTH, this.groundY, TUNING.PLAYER_X);
     this.timeDilation = new TimeDilation(this, this.state);
@@ -310,6 +331,7 @@ export class RunnerScene extends Phaser.Scene {
     this.finaleStarted = true;
     this.hud.setVisible(false);
     this.spotlight.setVisible(false);
+    this.atmosphere.fadeOut(this);
     this.timeDilation.setTarget(0, 700, 'Quad.easeOut');
     this.time.delayedCall(700, () => {
       this.player.idle();
@@ -352,28 +374,39 @@ export class RunnerScene extends Phaser.Scene {
       [0.4, 0.4],
       [0.62, 0.85],
     ];
+    // Kafle: te, które dryfowały w scenerii (składają się z miejsc, gdzie akurat są), albo —
+    // bez warstw z API — rozrzucone po scenerii rysowanej kodem.
+    const drifting = this.shards?.handOff(41);
     const tiles: Phaser.GameObjects.Image[] = [];
     for (let f = 1; f <= total; f += 1) {
       const c = (f - 1) % cols;
       const r = Math.floor((f - 1) / cols);
-      const frameName = `tile-${String(cols)}x${String(rows)}-${String(f)}`;
+      const frameName = PaintingShards.frameName(cols, rows, f);
       if (!texture.has(frameName)) texture.add(frameName, 0, c * srcW, r * srcH, srcW, srcH);
-      const spot = scatter[(f - 1) % scatter.length];
-      const spotX = spot?.[0] ?? 0.5;
-      const spotY = spot?.[1] ?? 0.5;
-      const tile = this.add
-        .image(spotX * GAME_WIDTH, spotY * this.groundY, paintingKey, frameName)
-        .setDepth(41)
-        .setScale(scale * 0.45)
-        .setAlpha(0)
-        .setAngle((f % 2 === 0 ? 1 : -1) * (8 + f * 3))
-        .setTint(0xdfb67c);
+      let tile = drifting?.get(f);
+      if (tile === undefined) {
+        const spot = scatter[(f - 1) % scatter.length];
+        const spotX = spot?.[0] ?? 0.5;
+        const spotY = spot?.[1] ?? 0.5;
+        tile = this.add
+          .image(spotX * GAME_WIDTH, spotY * this.groundY, paintingKey, frameName)
+          .setDepth(41)
+          .setScale(scale * 0.45)
+          .setAlpha(0)
+          .setAngle((f % 2 === 0 ? 1 : -1) * (8 + f * 3))
+          .setTint(0xdfb67c);
+      }
       tile.setData('target', {
         x: cx - gridW / 2 + c * tileSize + tileSize / 2,
         y: cy - gridH / 2 + r * tileSize + tileSize / 2,
       });
       tiles.push(tile);
-      this.tweens.add({ targets: tile, alpha: 0.55, duration: 900, delay: 300 + f * 90 });
+      this.tweens.add({
+        targets: tile,
+        alpha: Math.max(tile.alpha, 0.55),
+        duration: 900,
+        delay: 300 + f * 90,
+      });
     }
 
     const stagger = TUNING.FINALE_TILE_STAGGER_MS + TUNING.FINALE_TILE_FLY_MS * 0.5;
@@ -470,6 +503,7 @@ export class RunnerScene extends Phaser.Scene {
       }
     }
     if (outcome.fragment !== undefined) {
+      this.shards?.collect(outcome.fragment);
       const fromX = obstacle?.x ?? this.player.sprite.x;
       const fromY =
         obstacle !== undefined ? obstacle.y - obstacle.height / 2 : this.player.sprite.y - 60;
@@ -554,6 +588,8 @@ export class RunnerScene extends Phaser.Scene {
     const speed = worldSpeed(this.state);
     this.state.elapsedMs += delta;
     this.parallax.update(delta, speed);
+    this.shards?.update(this.parallax.distance);
+    this.atmosphere.update(delta, speed);
     this.spawner.update(time, delta, speed, this.freeRun);
     this.player.setTimeScale(this.state.timeScale);
     this.player.update(time);
