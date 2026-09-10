@@ -6,7 +6,7 @@
   "role": "Redaktor Naczelny Biennale",
   "skills": ["Dziennikarstwo", "Zarządzanie zespołem", "Technologia"],
   "painting": {
-    "src": "assets/paintings/kultura-futura.svg",
+    "src": "assets/paintings/kultura-futura.jpg",
     "cols": 3,
     "rows": 2,
     "caption": "Biennale Przyszłości Kultury — redakcja, artyści z 8 krajów i wystawa VR, której można dotknąć. Obraz odrestaurowany."

@@ -23,6 +23,8 @@ export const HOTEL_KEYS = {
   flame: 'fx.flame',
   glow: 'fx.glow',
   facade: 'start.facade',
+  /** Fasada z API (plik) — używana zamiast rysowanej, jeśli się wczyta. */
+  facadeImage: 'start.facade.image',
   light: 'fx.light',
   vignette: 'fx.vignette',
   torch: 'start.torch',
@@ -52,14 +54,15 @@ export function worldTheme(world: World): WorldTheme {
         ceiling: col('bgDeep'),
       };
     case 'edukacja':
+      // Tablica FigJam: „Edu — minimalistyczny marmur”: jasny kamień, chłodne cienie, mało ozdób.
       return {
-        wallTop: 0x24424a,
-        wallBottom: col('cool'),
-        ornament: 0xbfd1c4,
-        wainscot: 0x5b3b2a,
-        carpet: 0x1e3d44,
-        carpetEdge: 0xaccbc6,
-        ceiling: 0x152a2e,
+        wallTop: 0x8fa6a3,
+        wallBottom: 0x6f8c8b,
+        ornament: col('text'),
+        wainscot: 0x4f6664,
+        carpet: col('cool'),
+        carpetEdge: col('textMuted'),
+        ceiling: 0x3f5654,
       };
     case 'biznes':
       return {
@@ -518,14 +521,38 @@ function drawFacade(scene: Phaser.Scene): void {
   bake(torch, HOTEL_KEYS.torch, 16, 36);
 }
 
-/** Pozycje uchwytów pochodni na fasadzie (współrzędne sceny startowej). */
-export const FACADE_TORCHES: readonly { x: number; y: number }[] = [
-  { x: 480 - 110, y: 540 - 150 },
-  { x: 480 + 110, y: 540 - 150 },
-  { x: 480, y: 120 + 24 },
-];
+/** Geometria fasady: uchwyty pochodni i brama (współrzędne sceny startowej 960×540). */
+export interface FacadeLayout {
+  torches: readonly { x: number; y: number }[];
+  gate: { x: number; y: number; width: number; height: number };
+}
 
-export const FACADE_GATE = { x: 480, y: 540 - 184, width: 120, height: 184 } as const;
+/** Fasada rysowana kodem. */
+export const FACADE_CODE: FacadeLayout = {
+  torches: [
+    { x: 480 - 110, y: 540 - 150 },
+    { x: 480 + 110, y: 540 - 150 },
+    { x: 480, y: 120 + 24 },
+  ],
+  gate: { x: 480, y: 540 - 184, width: 120, height: 184 },
+};
+
+/** Fasada z API (public/assets/hotel/facade.jpg) — pochodnie i brama tam, gdzie na obrazie. */
+export const FACADE_IMAGE: FacadeLayout = {
+  torches: [
+    { x: 400, y: 362 },
+    { x: 560, y: 362 },
+    { x: 480, y: 150 },
+  ],
+  gate: { x: 480, y: 352, width: 84, height: 150 },
+};
+
+export const FACADE_TORCHES = FACADE_CODE.torches;
+
+/** Ścieżka fasady z API (importowanej workflow'em) — wpis 'facade.image' w manifeście. */
+export const FACADE_IMAGE_PATH = 'assets/hotel/facade.jpg';
+
+export const FACADE_GATE = FACADE_CODE.gate;
 
 export function generateHotel(scene: Phaser.Scene): void {
   const worlds: World[] = ['kultura', 'edukacja', 'biznes'];

@@ -1,5 +1,11 @@
 import Phaser from 'phaser';
-import { FACADE_GATE, FACADE_TORCHES, HOTEL_KEYS } from '../assets/generators/hotel';
+import {
+  FACADE_CODE,
+  FACADE_GATE,
+  FACADE_IMAGE,
+  HOTEL_KEYS,
+  type FacadeLayout,
+} from '../assets/generators/hotel';
 import { GAME_HEIGHT, GAME_WIDTH } from '../config/gameConfig';
 import { bus } from '../events/bus';
 import { prefersReducedMotion } from '../ui/dom';
@@ -24,6 +30,7 @@ export class StartScene extends Phaser.Scene {
   }[] = [];
   private gateLeft!: Phaser.GameObjects.Image;
   private gateRight!: Phaser.GameObjects.Image;
+  private layout: FacadeLayout = FACADE_CODE;
   private entering = false;
   private readonly reducedMotion = prefersReducedMotion();
   private readonly unsubscribe: (() => void)[] = [];
@@ -38,18 +45,31 @@ export class StartScene extends Phaser.Scene {
     this.torches.length = 0;
     document.body.dataset.scene = 'start';
     this.add.image(0, 0, HOTEL_KEYS.facade).setOrigin(0, 0).setDepth(0);
+    const hasImage = this.textures.exists(HOTEL_KEYS.facadeImage);
+    this.layout = hasImage ? FACADE_IMAGE : FACADE_CODE;
+    if (hasImage) {
+      // Fasada z API zakrywa rysowaną; brama i płomienie zostają kodem, dopasowane do obrazu.
+      this.add
+        .image(0, 0, HOTEL_KEYS.facadeImage)
+        .setOrigin(0, 0)
+        .setDisplaySize(GAME_WIDTH, GAME_HEIGHT)
+        .setDepth(0.5);
+    }
+    const gate = this.layout.gate;
+    const doorScale = { x: gate.width / 2 / 60, y: gate.height / 184 };
     this.gateLeft = this.add
-      .image(FACADE_GATE.x, FACADE_GATE.y + FACADE_GATE.height, HOTEL_KEYS.gateDoor)
+      .image(gate.x, gate.y + gate.height, HOTEL_KEYS.gateDoor)
       .setOrigin(1, 1)
+      .setScale(doorScale.x, doorScale.y)
       .setDepth(2)
       .setFlipX(true);
     this.gateRight = this.add
-      .image(FACADE_GATE.x, FACADE_GATE.y + FACADE_GATE.height, HOTEL_KEYS.gateDoor)
+      .image(gate.x, gate.y + gate.height, HOTEL_KEYS.gateDoor)
       .setOrigin(0, 1)
+      .setScale(doorScale.x, doorScale.y)
       .setDepth(2);
-    // Ciepłe światło z okien (bardzo słabe, zanim zapłoną pochodnie).
-    for (const t of FACADE_TORCHES) {
-      this.add.image(t.x, t.y, HOTEL_KEYS.torch).setOrigin(0.5, 0).setDepth(3);
+    for (const t of this.layout.torches) {
+      if (!hasImage) this.add.image(t.x, t.y, HOTEL_KEYS.torch).setOrigin(0.5, 0).setDepth(3);
       const halo = this.add
         .image(t.x, t.y, HOTEL_KEYS.glow)
         .setDepth(4)
@@ -142,20 +162,15 @@ export class StartScene extends Phaser.Scene {
     bus.emit('sfx', 'gate');
     const camera = this.cameras.main;
     // Brama otwiera się do środka (skrzydła zwężają się w perspektywie), światło zalewa portal.
+    const gate = this.layout.gate;
     this.tweens.add({
-      targets: this.gateLeft,
-      scaleX: 0.15,
-      duration: 900,
-      ease: 'Sine.easeInOut',
-    });
-    this.tweens.add({
-      targets: this.gateRight,
-      scaleX: 0.15,
+      targets: [this.gateLeft, this.gateRight],
+      scaleX: this.gateLeft.scaleX * 0.15,
       duration: 900,
       ease: 'Sine.easeInOut',
     });
     const glow = this.add
-      .image(FACADE_GATE.x, FACADE_GATE.y + FACADE_GATE.height / 2, HOTEL_KEYS.glow)
+      .image(gate.x, gate.y + gate.height / 2, HOTEL_KEYS.glow)
       .setDepth(3)
       .setTint(0xffe1a8)
       .setBlendMode(Phaser.BlendModes.ADD)
@@ -163,7 +178,7 @@ export class StartScene extends Phaser.Scene {
       .setScale(0.6);
     this.tweens.add({ targets: glow, alpha: 1, scale: 1.8, duration: 1100, ease: 'Quad.easeOut' });
     this.time.delayedCall(500, () => {
-      camera.pan(FACADE_GATE.x, FACADE_GATE.y + FACADE_GATE.height / 2, 1300, 'Sine.easeIn');
+      camera.pan(gate.x, gate.y + gate.height / 2, 1300, 'Sine.easeIn');
       camera.zoomTo(4, 1300, 'Sine.easeIn');
       camera.fadeOut(1200, 223, 182, 124);
       camera.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
@@ -176,8 +191,8 @@ export class StartScene extends Phaser.Scene {
   override update(time: number): void {
     if (!this.pointerSeen) {
       // Zanim gracz ruszy kursorem, pochodnia sama krąży przy bramie.
-      this.lightX = FACADE_GATE.x + Math.sin(time / 1700) * 140;
-      this.lightY = FACADE_GATE.y + 40 + Math.cos(time / 2300) * 60;
+      this.lightX = this.layout.gate.x + Math.sin(time / 1700) * 140;
+      this.lightY = this.layout.gate.y + 40 + Math.cos(time / 2300) * 60;
     }
     const flicker = this.reducedMotion
       ? 1
@@ -188,7 +203,7 @@ export class StartScene extends Phaser.Scene {
     this.torchLight.setScale(1.4 * flicker);
     this.darkness.erase(this.torchLight, this.lightX, this.lightY);
     for (let i = 0; i < this.lit; i += 1) {
-      const t = FACADE_TORCHES[i];
+      const t = this.layout.torches[i];
       if (t === undefined) continue;
       this.torchLight.setScale(0.8 * flicker);
       this.darkness.erase(this.torchLight, t.x, t.y - 10);

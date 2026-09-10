@@ -25,7 +25,7 @@ export class Hud {
   ) {
     this.debugVisible = debugVisible;
     this.fragmentsText = scene.add
-      .text(width - 16, 14, '', {
+      .text(width - 28, 16, '', {
         fontFamily: FONT_HUD,
         fontSize: '12px',
         color: PALETTE.gold,
@@ -35,7 +35,7 @@ export class Hud {
       .setOrigin(1, 0)
       .setDepth(100);
     this.stumblesText = scene.add
-      .text(width - 16, 36, '', {
+      .text(width - 28, 38, '', {
         fontFamily: FONT_HUD,
         fontSize: '10px',
         color: PALETTE.textMuted,

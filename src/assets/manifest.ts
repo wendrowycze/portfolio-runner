@@ -55,7 +55,18 @@ export const ASSET_MANIFEST = {
   // --- obrazy case'ów: ścieżki pochodzą z JSON (painting.src); klucz tekstury = painting.<id> ---
   'painting.*': {
     source: 'case',
-    license: 'placeholder SVG generowany kodem (public/assets/paintings/*, scripts/paintings.mjs)',
+    license:
+      'obrazy z API (Gamma, public/assets/paintings/*.jpg, ASSETS_ATTRIBUTION.md); placeholdery SVG ze scripts/paintings.mjs',
+  },
+
+  // --- hotel i ekran startowy: tekstury generowane kodem (src/assets/generators/hotel.ts) ---
+  'hotel.*': generated,
+  'start.facade': generated,
+  /** Fasada z API: public/assets/hotel/facade.jpg (workflow paintings-import), opcjonalna. */
+  'start.facade.image': {
+    source: 'file',
+    path: 'assets/hotel/facade.jpg',
+    license: 'obraz wygenerowany przez API (Gamma) na koncie właściciela — ASSETS_ATTRIBUTION.md',
   },
 
   // --- efekty ---

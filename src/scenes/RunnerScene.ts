@@ -197,7 +197,7 @@ export class RunnerScene extends Phaser.Scene {
   /** Skupienie na wyborze/QTE: delikatne przybliżenie i winieta (GRIS: powoli, miękko). */
   private focus(on: boolean): void {
     const camera = this.cameras.main;
-    camera.zoomTo(on ? 1.04 : 1, on ? 600 : 500, 'Sine.easeInOut');
+    camera.zoomTo(on ? 1.02 : 1, on ? 600 : 500, 'Sine.easeInOut');
     this.tweens.add({ targets: this.vignette, alpha: on ? 0.55 : 0, duration: on ? 600 : 500 });
     if (on) this.vignette.clearTint();
   }

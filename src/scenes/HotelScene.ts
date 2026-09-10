@@ -265,8 +265,20 @@ export class HotelScene extends Phaser.Scene {
       frame.fillCircle(sx * (w / 2 + pad - 6), sy * (h / 2 + pad - 6), 3);
     }
     container.add(frame);
-    const image = this.add.image(0, 0, paintingTextureKey(kejs.id)).setDisplaySize(w, h);
+    const image = this.add
+      .image(0, 0, paintingTextureKey(kejs.id))
+      .setDisplaySize(w, h)
+      .setName('image');
     container.add(image);
+    // Tablica FigJam: „gdy stoisz pod obrazem, pojawia się w nim postać” — sylwetka gościa w obrazie.
+    const ghost = this.add
+      .image(0, h / 2 - 4, textureKey('player.idle'))
+      .setOrigin(0.5, 1)
+      .setScale(0.55)
+      .setTint(0xdfb67c)
+      .setAlpha(0)
+      .setName('ghost');
+    container.add(ghost);
     if (!restored) container.add(this.drawDamage(w, h, kejs.painting.cols, kejs.painting.rows));
 
     const plaqueY = h / 2 + pad + 14;
@@ -304,6 +316,12 @@ export class HotelScene extends Phaser.Scene {
       .setDepth(41)
       .setInteractive({ useHandCursor: true });
     const label = `${kejs.title} · ${restored ? this.strings.hubRestored : this.strings.hubDamaged}`;
+    // „Jak ruszasz myszką, to poczucie, że obraz ma głębię” — obraz przesuwa się lekko za kursorem.
+    hit.on(Phaser.Input.Events.POINTER_MOVE, (pointer: Phaser.Input.Pointer) => {
+      const dx = (pointer.worldX - x) / (w / 2);
+      const dy = (pointer.worldY - y) / (h / 2);
+      image.setPosition(-dx * 4, -dy * 3);
+    });
     hit.on(Phaser.Input.Events.POINTER_OVER, () => {
       this.tweens.add({ targets: container, scale: 1.06, duration: 180, ease: 'Quad.easeOut' });
       container.setDepth(14);
@@ -311,6 +329,7 @@ export class HotelScene extends Phaser.Scene {
       this.floorLabel.setText(label);
     });
     hit.on(Phaser.Input.Events.POINTER_OUT, () => {
+      this.tweens.add({ targets: image, x: 0, y: 0, duration: 250, ease: 'Sine.easeOut' });
       if (this.nearCase !== kejs.id) {
         this.tweens.add({ targets: container, scale: 1, duration: 180 });
         container.setDepth(12);
@@ -594,6 +613,8 @@ export class HotelScene extends Phaser.Scene {
         this.tweens.add({ targets: previous, scale: 1, duration: 200 });
         const hint = previous.getByName('hint') as Phaser.GameObjects.Text | null;
         if (hint !== null) this.tweens.add({ targets: hint, alpha: 0, duration: 150 });
+        const ghost = previous.getByName('ghost') as Phaser.GameObjects.Image | null;
+        if (ghost !== null) this.tweens.add({ targets: ghost, alpha: 0, duration: 200 });
         previous.setDepth(12);
       }
       this.nearCase = nearId;
@@ -602,6 +623,11 @@ export class HotelScene extends Phaser.Scene {
         this.tweens.add({ targets: current, scale: 1.06, duration: 200, ease: 'Back.easeOut' });
         const hint = current.getByName('hint') as Phaser.GameObjects.Text | null;
         if (hint !== null) this.tweens.add({ targets: hint, alpha: 1, duration: 200 });
+        const ghost = current.getByName('ghost') as Phaser.GameObjects.Image | null;
+        if (ghost !== null) {
+          ghost.setFlipX(this.walker.sprite.flipX);
+          this.tweens.add({ targets: ghost, alpha: 0.75, duration: 450, ease: 'Sine.easeOut' });
+        }
         current.setDepth(14);
         bus.emit('sfx', 'painting.near');
       }
