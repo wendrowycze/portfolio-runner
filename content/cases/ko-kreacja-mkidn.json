@@ -1,0 +1,205 @@
+{
+  "id": "ko-kreacja-mkidn",
+  "world": "kultura",
+  "title": "Pomóż Ministerstwu Kultury edukować o ko-kreacji oferty instytucji kulturalnych",
+  "lead": "Ministerstwo Kultury chce zaangażować mieszkańców w tworzenie oferty instytucji kultury.",
+  "role": "Ekspert programu „Bardzo Młoda Kultura”",
+  "skills": ["Projektowanie usług", "Polityki publiczne", "Instytucje kultury"],
+  "painting": {
+    "src": "assets/paintings/ko-kreacja-mkidn.svg",
+    "cols": 3,
+    "rows": 2,
+    "caption": "Canvas Ko-kreacji: miasto, mieszkańcy i ośrodek kultury przy jednym stole. Obraz odrestaurowany."
+  },
+  "runner": {
+    "theme": "kultura",
+    "baseSpeed": 220,
+    "choiceSlowdown": 0.35
+  },
+  "beats": [
+    {
+      "id": "b01",
+      "type": "narration",
+      "text": "Zostałeś ekspertem w programie „Bardzo Młoda Kultura”, którego celem jest rozwój kompetencji i inicjatyw instytucji kultury. Chcesz nauczyć dyrektorów, jak konstruktywnie pytać widzów o ich potrzeby, wydobywając kluczowe informacje z szumu setek opinii. Wchodzisz do sali Centrum Spotkania Kultur w Lublinie. Przy stołach siedzi ponad 20 dyrektorów instytucji kultury.",
+      "advance": "tap"
+    },
+    {
+      "id": "b02",
+      "type": "choice",
+      "prompt": "Przedstawiciel ministerstwa wychodzi z sali. Rozglądasz się i mówisz:",
+      "obstacle": "kolumna",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Dziś wyjaśnię Państwu, w jaki sposób wprowadzać model ko-kreacji oferty w instytucji.",
+          "correct": false,
+          "feedback": "Wykład od pierwszego zdania. Sala jeszcze nie wie, po co tu jest — zacznij od pytania, nie od tezy."
+        },
+        {
+          "text": "Jest mi niezmiernie miło, że zebraliśmy się tutaj…",
+          "correct": false,
+          "feedback": "Uprzejmie, ale nic z tego nie wynika. Dyrektorzy czekają na powód, dla którego warto słuchać."
+        },
+        {
+          "text": "Kto z Państwa realnie chciałby coś zmienić w swojej instytucji?",
+          "correct": true,
+          "feedback": "Około jednej trzeciej podnosi dłonie. Masz teraz jedno zdanie, aby zapracować na szacunek całej reszty grupy.",
+          "skill": "Projektowanie usług"
+        }
+      ],
+      "reward": {
+        "fragment": 1
+      }
+    },
+    {
+      "id": "b03",
+      "type": "narration",
+      "text": "Odkładasz treść warsztatu na bok, siadasz na środku sali i cofasz się do momentu, w którym jest grupa — ustalasz oczekiwania. Jeden z dyrektorów mówi, z jakimi problemami się mierzy: trudno utrzymać dobrych pracowników, finansowanie z roku na rok jest mniejsze. Inni dodają: młodzież ucieka do większych miast, inne instytucje korzystają z infrastruktury ośrodków, generując koszty.",
+      "advance": "tap"
+    },
+    {
+      "id": "b04",
+      "type": "choice",
+      "prompt": "Z tego obrazu wyłania się jasny problem. Od czego zaczynasz właściwy warsztat?",
+      "obstacle": "dokumenty",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Od problemów instytucji — finansów i kadr. Potrzeby widzów dopiero potem.",
+          "correct": true,
+          "feedback": "Zmieniasz kolejność kroków. Musisz pokazać, jak ko-kreacja może zmienić sytuację finansową i kadrową — ko-kreacja jest tylko środkiem do celu.",
+          "skill": "Polityki publiczne"
+        },
+        {
+          "text": "Od potrzeb widzów, dokładnie tak, jak było w planie.",
+          "correct": false,
+          "feedback": "Plan zakładał widzów na początku, ale sala mówi o pieniądzach i ludziach. Warsztat, który tego nie słyszy, przegrywa."
+        },
+        {
+          "text": "Od prezentacji definicji ko-kreacji.",
+          "correct": false,
+          "feedback": "Definicja nikogo nie przekona. Dyrektorzy chcą wiedzieć, co ko-kreacja zmieni w ich budżecie i zespole."
+        }
+      ],
+      "reward": {
+        "fragment": 2
+      }
+    },
+    {
+      "id": "b05",
+      "type": "narration",
+      "text": "Zaczynasz od omawiania, jak skutecznie prowadzić testy A/B oferty przez media społecznościowe, tak aby wywoływać dyskusję mieszkańców. Tłumaczysz, że zamiast rocznego pilotażu można puścić kilka testowych reklam zajęć dodatkowych i zobaczyć, z jakimi reakcjami się spotkają.",
+      "advance": "tap"
+    },
+    {
+      "id": "b06",
+      "type": "action",
+      "prompt": "Zamiast rocznego pilotażu — kilka testowych reklam. Przeskocz stertę rocznych planów, które nikomu nie były potrzebne!",
+      "input": "jump",
+      "obstacle": "barierka",
+      "windowMs": 800,
+      "reward": {
+        "fragment": 3
+      }
+    },
+    {
+      "id": "b07",
+      "type": "interaction",
+      "widget": "puzzle",
+      "text": "Zaprojektowany przez Ciebie Canvas Ko-kreacji pokazuje, jakie obowiązki można powierzyć miastu, mieszkańcom i ośrodkowi kultury. Ułóż go, zamieniając miejscami fragmenty.",
+      "reward": {
+        "fragment": 4
+      }
+    },
+    {
+      "id": "b08",
+      "type": "choice",
+      "prompt": "Mieszkańcy aktywni w mediach społecznościowych komentują każdą propozycję. Jak ich wykorzystać?",
+      "obstacle": "boty",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Zaprosić ich do dyskusji o propozycjach w programie — jako partnerów.",
+          "correct": true,
+          "feedback": "Decydenci, na początku niechętni, zaczynają prowadzić ożywione dyskusje i wypełniają kolejne ćwiczenia.",
+          "skill": "Instytucje kultury"
+        },
+        {
+          "text": "Odpowiadać na każdy krytyczny komentarz.",
+          "correct": false,
+          "feedback": "Polemika w komentarzach to praca bez końca. Konstruktywne wykorzystanie to zaproszenie do rozmowy o programie, nie obrona."
+        },
+        {
+          "text": "Wyłączyć komentarze pod postami.",
+          "correct": false,
+          "feedback": "Bez głosów mieszkańców nie ma ko-kreacji. Właśnie ci aktywni ludzie mieli stać się źródłem informacji."
+        }
+      ],
+      "reward": {
+        "fragment": 5
+      }
+    },
+    {
+      "id": "b09",
+      "type": "action",
+      "prompt": "Jeden z dyrektorów wstaje: „To się u nas nie uda”. Przeskocz nad bramą sceptycyzmu i pokaż, jak Canvas dzieli obowiązki między miasto, mieszkańców i ośrodek!",
+      "input": "jump",
+      "obstacle": "brama",
+      "windowMs": 800,
+      "reward": {
+        "fragment": 6
+      }
+    },
+    {
+      "id": "b10",
+      "type": "narration",
+      "text": "Kilka ośrodków kultury w regionie rzeczywiście adaptuje zaproponowaną przez Ciebie strategię. Prowadząc kolejny warsztat, będziesz pamiętać, że dobrą rozmowę zaczyna się od pytań.",
+      "advance": "tap"
+    },
+    {
+      "id": "b11",
+      "type": "results",
+      "stats": [
+        {
+          "skill": "Projektowanie usług",
+          "delta": 10
+        },
+        {
+          "skill": "Polityki publiczne",
+          "delta": 10
+        },
+        {
+          "skill": "Instytucje kultury",
+          "delta": 10
+        }
+      ],
+      "kpis": [
+        {
+          "label": "Uczestnicy warsztatu",
+          "value": "ponad 20 dyrektorów instytucji kultury"
+        },
+        {
+          "label": "Narzędzie",
+          "value": "Canvas Ko-kreacji przyjęty przez kilka ośrodków w regionie"
+        },
+        {
+          "label": "Zmiana metodyki",
+          "value": "start od problemów instytucji, nie od potrzeb widzów"
+        },
+        {
+          "label": "Miejsce",
+          "value": "Centrum Spotkania Kultur w Lublinie"
+        }
+      ]
+    },
+    {
+      "id": "b12",
+      "type": "finale",
+      "text": "Warsztat, który miał zacząć się od definicji, zaczął się od pytania — i dlatego zadziałał. Kilka ośrodków kultury pracuje dziś z Canvasem Ko-kreacji. Nauczyłeś się, że dobrą rozmowę zaczyna się od pytań, a nie od tez.",
+      "cta": {
+        "label": "Poznaj Arka na LinkedIn",
+        "url": "https://www.linkedin.com/in/arkadiusz-klej/"
+      }
+    }
+  ]
+}

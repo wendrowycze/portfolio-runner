@@ -1,0 +1,90 @@
+{
+  "id": "demo",
+  "world": "kultura",
+  "title": "Demo mechaniki biegu",
+  "lead": "Sześć testowych beatów: narracja, narracja automatyczna, wybór, skok, wyniki i finał. To test mechanizmu, nie prawdziwa historia.",
+  "role": "Tester silnika",
+  "skills": ["Refleks", "Uważność"],
+  "painting": {
+    "src": "assets/paintings/_demo.svg",
+    "cols": 2,
+    "rows": 1,
+    "caption": "Obraz testowy — dwa fragmenty ornamentu maureskowego."
+  },
+  "runner": {
+    "theme": "kultura",
+    "baseSpeed": 220,
+    "choiceSlowdown": 0.35
+  },
+  "beats": [
+    {
+      "id": "b01",
+      "type": "narration",
+      "text": "To jest demo silnika. Postać biegnie sama, a opowieść przewija się tutaj, w rytmie biegu. Kliknij w tekst, żeby dopisać go od razu, i przejdź dalej, kiedy skończysz czytać.",
+      "advance": "tap"
+    },
+    {
+      "id": "b02",
+      "type": "narration",
+      "text": "Ten fragment przejdzie dalej sam, kilka sekund po tym, jak cały się wyświetli. Zaraz pojawi się pierwsza decyzja — zobacz, jak czas zwalnia.",
+      "advance": "auto",
+      "durationMs": 2500
+    },
+    {
+      "id": "b03",
+      "type": "choice",
+      "prompt": "Przed Tobą barierka. Jak ją pokonujesz?",
+      "obstacle": "barierka",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Rozpędzam się i przeskakuję.",
+          "correct": true,
+          "skill": "Refleks",
+          "feedback": "Dokładnie tak — trafna decyzja przenosi Cię nad przeszkodą."
+        },
+        {
+          "text": "Zatrzymuję się i szukam obejścia.",
+          "correct": false,
+          "feedback": "Bieg to nie spacer — zatrzymanie oznacza potknięcie. Spróbuj jeszcze raz."
+        },
+        {
+          "text": "Udaję, że jej nie ma.",
+          "correct": false,
+          "feedback": "Barierka na pewno tam jest. Wybierz opcję, która ją pokonuje."
+        }
+      ],
+      "reward": { "fragment": 1 }
+    },
+    {
+      "id": "b04",
+      "type": "action",
+      "prompt": "Skrzynia na torze! Skocz dokładnie wtedy, gdy pierścień zaświeci na złoto.",
+      "input": "jump",
+      "obstacle": "skrzynia",
+      "windowMs": 800,
+      "reward": { "fragment": 2 }
+    },
+    {
+      "id": "b05",
+      "type": "results",
+      "stats": [
+        { "skill": "Refleks", "delta": 10 },
+        { "skill": "Uważność", "delta": 5 }
+      ],
+      "kpis": [
+        { "label": "Przeszkody pokonane", "value": "2" },
+        { "label": "Fragmenty obrazu", "value": "2 z 2" }
+      ]
+    },
+    {
+      "id": "b06",
+      "type": "finale",
+      "text": "To koniec demo. Prawdziwa historia — „Teatr jest nasz” — wchodzi w Etapie 3 i używa dokładnie tego mechanizmu.",
+      "cta": {
+        "label": "Poznaj Arka na LinkedIn",
+        "url": "https://www.linkedin.com/in/arkadiusz-klej/"
+      }
+    }
+  ]
+}

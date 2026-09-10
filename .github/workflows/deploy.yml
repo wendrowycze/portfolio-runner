@@ -3,6 +3,7 @@ name: Build, test, deploy (GitHub Pages)
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -40,13 +41,17 @@ jobs:
             docs/screens
           retention-days: 7
       - uses: actions/configure-pages@v5
+        if: github.event_name != 'pull_request'
         with:
           enablement: true
       - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
         with:
           path: dist
 
   deploy:
+    # Publikacja tylko z main — pull requesty dostają wyłącznie lint/build/testy.
+    if: github.event_name != 'pull_request'
     needs: build-test
     runs-on: ubuntu-latest
     environment:

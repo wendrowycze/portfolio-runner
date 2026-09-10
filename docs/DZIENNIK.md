@@ -63,3 +63,143 @@ Zod dojdzie w Etapie 2 razem z ładowaniem treści (ADR-7).
 - Fonty z Google Fonts mogą być niedostępne bez sieci — jest fallback systemowy, testy tego nie wymagają.
 - Ekran startowy używa bazowej rozdzielczości 960×540 i Scale FIT; kolumna runnera to 60% szerokości (`#runner`), panel 40% (`#panel`), przełączane atrybutem `data-layout` na `#game`.
 - Wartości strojenia biegu (prędkość, grawitacja, skok) trzymać w `src/config/tuning.ts` wg GDD sekcja k — plik jeszcze nie istnieje, tworzy go Etap 1.
+
+---
+
+## 2026-09-09 — Etap 1: Silnik biegu
+
+### Co powstało
+
+- `src/runner/Parallax.ts` — 5 warstw tileSprite (gwiazdy 0.03, panorama miasta 0.12, kolonnada 0.35, latarnie/cyprysy 0.7, marmurowa posadzka 1.0) nad statycznym niebem z księżycem. Przewijanie wyłącznie przez `tilePositionX`.
+- `src/runner/Player.ts` — sylwetka „czarnofigurowa w negatywie” (jasna postać ze złotą przepaską i wieńcem laurowym), 6 klatek biegu + skok + potknięcie + idle generowane kodem w `BootScene`. Arcade Physics, skok tylko z ziemi, potknięcie = przechył + błysk + drgnięcie kamery (wyłączane przez `prefers-reduced-motion`). Kurz spod stóp jako emiter cząstek.
+- `src/runner/Obstacles.ts` — `ObstacleSpawner` z pulą (Phaser Group, `maxSize: 16`), dwa tryby ruchu: `flow` (płynie z prędkością świata — tryb wolnego biegu Etapu 1) i `timed` (pozycja liczona z postępu zegara beatu — przygotowane pod Etap 2, żeby przeszkoda docierała do postaci dokładnie w momencie upływu czasu, niezależnie od easingu time dilation).
+- `src/runner/TimeDilation.ts` — jeden mnożnik czasu w `GameState.timeScale`, tweenowany; potknięcie = natychmiast ×0.5, powrót do ×1.0 w 1000 ms (`Quad.easeOut`). Emituje `time:scale` na magistrali dla UI.
+- `src/runner/Hud.ts` — licznik fragmentów i potknięć (zawsze, prawy górny róg) + HUD debug (FPS, prędkość, mnożnik czasu) włączany `?debug=1` lub `F3`.
+- `src/config/tuning.ts` — wszystkie liczby z GDD sekcja k plus fizyka (grawitacja 1500, skok −620 px/s → wysokość ok. 128 px; test jednostkowy pilnuje, że skok przewyższa najwyższą przeszkodę).
+- `src/config/layout.ts` + `main.ts` — przełącznik `?layout=stack|side` zrobiony już teraz (był potrzebny do testu mobilnego), `VITE_LAYOUT` tylko jako domyślna.
+
+### Decyzje
+
+- **Brak assetów CC0 w Etapie 1.** Postać i przeszkody rysowane kodem wyszły wystarczająco czytelnie, a pobieranie paczek z sieci w sandboxie chmurowym nie działa (proxy). `ASSETS_ATTRIBUTION.md` bez zmian. Podmiana na sprite CC0 = wpis w `manifest.ts` + klatki w `Player.ts`.
+- **Postać rysowana w skali ×1.5 (72×96 px).** Wersja 48×64 była zbyt mała na scenie 960×540 przy skalowaniu do kolumny 60%.
+- **Klucze przeszkód** w słowniku `src/content/obstacles.ts`: `barierka`, `skrzynia`, `kolumna`, `kordon-kamer`, `boty`, `telefony`, `brama`. Nieznany klucz z JSON = fallback `skrzynia` (bez crasha na literówce w treści).
+- **Playwright w sandboxie**: pobranie Chromium przez CDN Playwrighta nie przechodzi przez proxy; konfiguracja czyta opcjonalną zmienną `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` (preinstalowany Chromium). Na CI zmiennej nie ma — działa domyślna instalacja z workflow.
+- **Błędy ładowania Google Fonts w testach e2e są ignorowane** (`tests/e2e/helpers.ts`) — w środowisku bez sieci fonty mają fallback, a to nie jest błąd gry. Wszystkie inne błędy konsoli nadal oblewają test.
+- Favicon jako inline SVG (złota rama na ciemnym tle) — usuwa 404 `favicon.ico` z konsoli.
+- FPS w headless Chromium (software rendering) to ok. 20–25 — nie jest miarodajny; w zwykłej przeglądarce scena to kilkanaście obiektów i celuje w 60 fps.
+
+---
+
+## 2026-09-09 — Etap 2: Skrypt i panel dialogowy
+
+### Co powstało
+
+- **zod 4** (`npm i zod`) — jedyna nowa zależność, uzasadniona ADR-7. `src/content/loader.ts`: schema zod typowana jako `z.ZodType<Case>` względem ręcznych typów w `src/script/types.ts` — rozjazd między nimi to błąd kompilacji, rozjazd z `content/schema/case.schema.json` wyłapują testy Vitest na `_demo.json`. Loader sprawdza też reguły spoza JSON Schema: unikalne id beatów, liczba fragmentów = cols×rows, każdy fragment przyznany raz, skille z opcji/results istnieją w `case.skills`, ostatni beat = finale.
+- `src/script/ScriptRunner.ts` — maszyna stanów bez Phasera i DOM; czas dostaje przez `tick(deltaMs)` (scena woła co klatkę, testy ręcznie). Zdarzenia: `beat:start`, `beat:resolved`, `beat:retry`, `fragment:collected`, `skill:gained`, `timer:progress`, `action:window`, `phase`, `case:finished`.
+- `src/ui/DialoguePanel.ts` + `typewriter.ts` — panel jako przewijana opowieść: wpisy dopisują się na dole, starsze bledną i uciekają w górę. Nagłówek z rolą, tytułem i 6 slotami fragmentów; stopka z akcjami (Dalej / opcje + pasek czasu / pierścień QTE / przycisk widgetu).
+- `src/ui/FinaleOverlay.ts` — pełnoekranowy finał: kafle wlatują w kolejności zebrania (naprzemiennie z lewej/prawej, `Back.easeOut`), złoty rozbłysk, podpis, tekst zamknięcia, CTA + powrót. W Etapie 2 powrót = „Zagraj jeszcze raz” (hub dopiero w Etapie 3).
+- `content/ui.json` + `src/content/uiStrings.ts` — teksty interfejsu (przyciski, podpowiedzi, feedback generyczny) poza kodem TS, walidowane zodem.
+- `content/cases/_demo.json` + `public/assets/paintings/_demo.svg` — 6 beatów syntetycznych, obraz 2×1.
+- Integracja w `RunnerScene`: choice/action → time dilation z `runner.choiceSlowdown` + `spawnForBeat`; sukces → auto-skok, przeszkoda „podjeżdża” pod postać, iskry, lot miniatury fragmentu do HUD; porażka → potknięcie, świat staje (0×), przeszkoda znika, po 2 s beat wraca. Złoty snop światła na ziemi pod przeszkodą aktywnego beatu.
+- `?layout=stack|side` (runtime) — oba layouty przetestowane e2e ze zrzutami `etap2-side.png`, `etap2-stack.png`; do tego `etap2-results.png`, `etap2-finale.png`.
+- `?free=1` — tryb wolnego biegu z Etapu 1 nadal dostępny (ocena tempa bez historii). `?case=_demo` wybiera case; `?debug=1` dodatkowo wystawia uchwyt `window.__portfolioRunner` do diagnostyki.
+
+### Decyzje
+
+1. **Decyzja Arka „zła decyzja zatrzymuje bieg” wdrożona dla choice ORAZ action.** Nietrafiony wybór, brak wyboru w czasie, skok za wcześnie/za późno = potknięcie + feedback (2 s, świat stoi) + powrót do tego samego beatu (`attempt` +1, przeszkoda spawnuje się ponownie). Konsekwencja: finał zawsze ma komplet fragmentów. GDD sekcja d („beat nie wraca jako pętla”) jest tym samym nadpisana — zgodnie z zapisem z Etapu 0.
+2. **Tempo maszyny do pisania sprzężone ze światem tylko dla narracji** (`rate = max(0.25, timeScale)`): przy ×1.15 tekst płynie szybciej, przy potknięciu prawie staje. Prompt wyboru i QTE piszą się szybko (×2.2), żeby nie zjadać czasu z paska; feedback i wyniki normalnie. Uzasadnienie: gracz musi zdążyć przeczytać opcje w 7 s.
+3. **Przeszkody beatu poruszają się „po zegarze”, nie po fizyce** — pozycja = interpolacja od punktu spawnu do postaci wg postępu `timerMs`. Moment dotarcia zawsze pokrywa się z upływem czasu, niezależnie od easingu time dilation (300 ms) i FPS. Dystans spawnu liczony jak w GDD sekcja e (`baseSpeed × slowdown × czas`).
+4. **Wizualna szerokość strefy QTE wynika z `windowMs`** (`baseSpeed × slowdown × windowMs`), a nie ze stałej `QTE_ZONE_WIDTH_PX` (zostaje jako fallback). Dzięki temu pasek na ziemi mówi prawdę o oknie z JSON — GDD dopuszczało rozjazd z ostrzeżeniem, tu go po prostu nie ma.
+5. **Klawiatura obsługiwana w jednym miejscu (panel DOM)**, nie w Phaserze: spacja/↑ = skok w action albo „dalej” w narracji, Enter = dalej, 1/2/3 = opcja. Phaser obsługuje tylko klik/tap w canvas (i klawisze w trybie `?free=1`). Unika podwójnych zdarzeń.
+6. **Typy beatów w `script/types.ts` mają pola opcjonalne jako `T | undefined`** — wymusza to `exactOptionalPropertyTypes` w połączeniu z typem wyjściowym zod.
+7. Sukces beatu: przeszkoda nie „znika” po poprawnym wyborze, tylko w 420 ms podjeżdża pod skaczącą postać i płynie dalej — czytelniejsze niż nagłe zniknięcie i daje moment na lot fragmentu.
+8. `.finale[hidden] { display: none }` — atrybut `hidden` przegrywa z `display: grid` klasy; bez tej reguły niewidoczny overlay przechwytywał kliknięcia (wyłapane przez e2e).
+
+---
+
+## 2026-09-09 — Etap 3: Pilot „Teatr jest nasz”
+
+### Co powstało
+
+- `content/cases/teatr-jest-nasz.json` — treść z kitu przeniesiona 1:1 (16 beatów: 7 narracji, 3 choice, 2 action, 2 interaction, results, finale; 6 fragmentów). Zmiany wyłącznie techniczne: klucze przeszkód `sala-teatru` → `telefony` (obdzwanianie mediów) i `opor-dyrekcji` → `brama` (zamknięta brama szkoły z kłódką), `painting.src` → SVG. Wszystkie beaty mieszczą się w 400 znakach (test jednostkowy pilnuje rytmu: max 3 narracje pod rząd, 3 choice, 2 action, 2 interaction).
+- `public/assets/paintings/teatr-jest-nasz.svg` — obraz-płaskorzeźba wg `docs/04` (gmach z tympanonem i maskami, sześć kolumn, portal; aktor z maską, widz z biletem i uniesionymi dłońmi, reżyser z tubą i scenariuszem jako kariatydy; rama maureskowa, inskrypcja „TEATR JEST NASZ · KRAKÓW · MMXXII”). Napisany ręcznie z prostych kształtów w palecie — nie ilustracja, nie AI. 960×640, siatka 3×2.
+- Widgety (`src/ui/widgets/`): **ButtonWidget** — licznik 0 → 200 000 zł (Cubic.easeOut, 2 s), pasek, konfetti CSS, „Dalej” dopiero po animacji; **PuzzleWidget** — siatka 3×2 z obrazu case'a, klik-klik zamienia kafle, złota obwódka na dobrym miejscu, błysk i auto-„dalej” po 800 ms; **RevealWidget** — pełnoekranowe zaciemnienie z tekstem, tap skraca pauzę (zaimplementowany, pilot go nie używa — zgodnie z `docs/00`).
+- `src/scenes/HubStubScene.ts` — ściana hotelu (tapeta maureskowa, boazeria, kinkiety), złota rama, tabliczka z tytułem i rolą. Zniszczony: kafle przyciemnione + pęknięcia; odrestaurowany: pełny obraz, pulsująca złota poświata, iskry. Klik w obraz (albo przycisk „Wejdź w obraz” w panelu — klawiatura/czytnik ekranu) → najazd kamery + fade → RunnerScene. Po `case:finished` → hub w stanie odrestaurowanym, panel proponuje „Zagraj jeszcze raz”.
+- Obraz case'a ładowany w `BootScene.preload` jako SVG rasteryzowany do 960×640 (klucz `painting.current` w manifeście, ścieżka z JSON). Ten sam plik służy hubowi (Phaser), układance i finałowi (DOM) — jedno źródło prawdy.
+- Testy: Vitest — pilot przechodzi w całości z poprawnymi wyborami (6/6, 0 potknięć) i z błędem w każdym beacie (5 potknięć, 6/6); Playwright — pełne przejście przez klikanie od hubu do odrestaurowanego obrazu z zerem błędów w konsoli i zrzutami `docs/screens/etap3-*.png` (hub, narracja, wybór, QTE, zrzutka, układanka, wyniki, finał, hub odrestaurowany).
+
+### Decyzje
+
+1. **Układanka na klikanie** (nie przeciąganie) — prostsze na telefonie i dla klawiatury (kafle to przyciski). Tasowanie deterministyczne, bez kafla na właściwym miejscu na starcie; da się ułożyć w ≤ 5 zamianach.
+2. **Licznik zrzutki kończy na 200 000 zł**, a 500 000+ zł pojawia się w wynikach jako „Zebrane łącznie” — obie liczby z treści, każda w swoim momencie historii (rekomendacja z planu etapu). Do potwierdzenia przez Arka.
+3. **Nazwisko dyrektora w KPI** (`results.kpis`) zostawione tak, jak było w JSON z kitu, mimo że `cases_raw/teatr-jest-nasz.md` go nie wymienia — to fakt publiczny, a plik z kitu był dostarczony jako dane pilota. Jeśli Arek woli bez nazwiska, to zmiana jednej wartości w JSON.
+4. **W e2e skok w QTE wywoływany spacją**, nie klikiem w pierścień: klik Playwrighta ma ok. 0,5 s narzutu (sprawdzanie stabilności elementu), co w oknie 800 ms dawało losowe „za późno”. Sam pierścień jest klikalny i pulsuje poświatą (`box-shadow`), nie transformacją — dzięki temu nie „ucieka” automatom i czytnikom.
+5. **Workflow CI uruchamia lint/build/testy także dla pull requestów** (`pull_request`), a publikację Pages tylko z `main`. Powód: praca w sesji chmurowej idzie przez gałąź i PR — bez tego PR nie miałby żadnej weryfikacji.
+6. `docs/01_GDD_RUNNER_POC.md` zaktualizowany o decyzje Arka z Etapu 0 (layout `side` domyślny; nietrafiony choice/action = powrót do tego samego beatu) — zgodnie z zapisem z Etapu 0, że GDD ma być poprawione w Etapie 2.
+
+### Pomysły spoza zakresu (nie zaimplementowane)
+
+- Dźwięk (kroki, skok, potknięcie, fragment, konfetti) — Etap 4.
+- Lepszy obraz case'a (generatywny pipeline) — backlog P2, bank promptów w `docs/04`.
+- Pauza gry przy utracie fokusu karty: Phaser sam wstrzymuje pętlę (zegary beatów stają), ale maszyna do pisania i CSS-owe animacje idą dalej — do dopracowania w Etapie 4 razem z `prefers-reduced-motion`.
+
+### Stan na koniec sesji
+
+Etapy 1–3 gotowe na gałęzi `claude/sweet-cerf-g5z7oe` (trzy commity `etap-1`, `etap-2`, `etap-3`). Build/lint/Vitest/Playwright zielone lokalnie. Publikacja na GitHub Pages następuje po scaleniu do `main` — link produkcyjny pokaże nową wersję dopiero wtedy.
+
+---
+
+## 2026-09-09 — Poprawki Arka po obejrzeniu Etapów 1–3
+
+Arek (po zagraniu w podgląd): „ogólnie jest zajebiście”, plus dwie zmiany mechaniki.
+
+### 1. Bieg i tekst sterowane trzymanym klawiszem, cofanie
+
+- **Narracja jest „odcinkiem drogi”** (`ScriptRunner.moveBy(±px)`): kolejne beaty narracji tworzą jeden ciąg; tekst odsłania się proporcjonalnie do przebiegniętych pikseli (`NARRATION_PX_PER_CHAR = 5`, oddech `NARRATION_BEAT_GAP_PX = 140` między beatami). Trzymanie **D / →** = bieg do przodu, **A / ←** = cofanie (świat i animacja postaci odtwarzane wstecz, tekst się chowa). Puszczenie klawisza = świat staje. Na dotyku: przytrzymanie prawej połowy sceny = bieg, lewej = cofanie.
+- Cofać można do początku bieżącego odcinka narracji (nie za rozstrzygnięty wybór/skok — to „kotwice” historii).
+- Przejście do kolejnego beatu (wybór, skok, widget) następuje samo, gdy gracz przebiegnie cały tekst. Nie ma już przycisku „Dalej” ani narracji „auto” — pola `advance`/`durationMs` zostają w schemacie i JSON-ach dla zgodności, silnik ich nie używa (odnotowane w `script/types.ts`).
+- Stan klawiszy obsługuje panel (DOM, `keydown`/`keyup`, reset przy `blur`) i wysyła `move:direction` magistralą; scena śledzi cel prędkości wykładniczo (`TimeDilation.track`, stała `MOVE_RESPONSE_MS = 160`). `GameState.timeScale` może być ujemny.
+- Wybory i QTE bez zmian (zegar rzeczywisty, przeszkoda po zegarze). Widgety i wyniki: świat stoi.
+- Pełne przejście „Teatru” trwa teraz ok. 2 minuty realnego biegu — limit testu e2e podniesiony do 5 minut.
+
+### 2. Tło składa się w obraz (finał w scenie biegu)
+
+- Nakładka DOM finału usunięta (`FinaleOverlay.ts`). Finał gra `RunnerScene.playFinale()`: sceneria ciemnieje, sześć fragmentów obrazu (klatki tekstury SVG) pojawia się rozrzuconych po panoramie, kolumnadzie i latarniach jak ukryte w tle, po czym w kolejności zebrania zlatują na siatkę pośrodku sceny (`Back.easeOut`), iskry, złoty rozbłysk, rama. Scena emituje `finale:assembled`; panel po lewej pokazuje wtedy podpis obrazu, tekst zamknięcia (maszyna do pisania) i CTA + „Wróć do hotelu”.
+- Do testów: `body[data-finale="assembled"]`.
+
+---
+
+## 2026-09-09 — Pozostałe historie: 8 nowych case'ów, obrazy, galeria w hubie
+
+Na prośbę Arka („przygotuj też wszystkie pozostałe historie, zrób do nich grafiki”) — poza pierwotnym zakresem PoC (backlog P1 „Kolejne case'y”), ale zamówione wprost.
+
+### Treść (`content/cases/*.json`)
+
+Przepisane z `content/cases_raw/` wg `content/cases/_SZABLON.md`: 6 fragmentów (3×2), 2–3 choice, 1–2 action, 1–2 interaction, max 3 narracje pod rząd, teksty ≤ 400 znaków, liczby wyłącznie z materiału źródłowego. Test `tests/unit/cases.test.ts` pilnuje tych reguł dla każdego pliku i przechodzi każdy case ScriptRunnerem.
+
+| id | świat | interakcje | uwagi / interpretacje do potwierdzenia przez Arka |
+|---|---|---|---|
+| kultura-futura | kultura | reveal („zamknij oczy”) + puzzle | Wybór patronów (A&B / Vogue / Wyborcza): źródło nie mówi, kogo wybrano — opcja trafna „wszystkie trzy” wzorowana na easter eggu z Kalejdoskopu. Literówka źródła „konfiltków” poprawiona. |
+| cyrograf-na-kwadrat | kultura | puzzle (wykres oszustw) + button „Otwórz gazetę” (licznik do 100 000 osób) | Linki do Facebooka/Issuu ze źródła pominięte (nie ma ich w cases_raw). |
+| ko-kreacja-mkidn | kultura | puzzle (Canvas Ko-kreacji) | Trzy zdania otwierające z tekstu źródłowego stały się dosłownie opcjami pierwszego wyboru. Brak liczbowych KPI w źródle — wyniki jakościowe. Skille skrócone do 3 słów-kluczy. |
+| kalejdoskop | kultura | puzzle | Easter egg z wersji roboczej („wybierasz jednego, potem wszystkich”) oddany jako wybór z opcją „wszyscy trzej”. Tekst źródłowy urywa się po pierwszym dniu — finał nie dopisuje kolejnych dni. Delty skilli z wersji roboczej (+10/+15/+11), „Lniane gacie… +4” jako KPI-żart. |
+| ewaluacja-festiwali | kultura | puzzle („mała postać otoczona klockami” — dosłownie motyw obrazu) | Wyniki z wersji roboczej (+8/+10/+7); pierwszy, urwany punkt „+10 do ,” przypisany do skilla Antropologia. |
+| up-arta | kultura | puzzle (ilustracja pianina) + button (licznik 20 000 widzów) | Cztery interakcje ze źródła scalone do dwóch; przyciski „TEDx / ING / dowiedz się więcej” bez linków w źródle → KPI „warsztaty dla sektora bankowego (ING)”. Czwarty skill (Filozofia cyfrowa) pominięty (limit 3). |
+| gra-teatralna-improvisio | kultura | puzzle | Wersja robocza (V1). Brak KPI liczbowych; „testy: licea, SWPS, UJ, UŚ” z notatki źródłowej. Tytuł skrócony do formy misji. |
+| scouting-pfr | **biznes** | button („Roześlij zapytania”, licznik 5 języków) | Wersja robocza. Jedyny case świata Biznes — obraz w stylu „planów konstrukcyjnych” (docs/04). Pytanie o The Mom Test oparte na metodzie, nie na cytacie ze źródła. CTA „Napisz do Arka” zgodnie z placeholderem autora. |
+| mundur | — | — | **Pominięty**: w źródle tylko nagłówek, bez treści (zasada „nie wymyślaj faktów”). |
+
+Nowe przeszkody: `dokumenty` (sterta kartek z pieczęcią), `kable` (plątanina przewodów).
+
+### Obrazy (`scripts/paintings.mjs`, `npm run paintings`)
+
+Generator SVG: wspólna rama maureskowa, marmur, promienie i sylwetki-kariatydy (jak w ręcznie napisanym obrazie „Teatru”), motyw środkowy per case (globus VR, tablica śledztwa z wykresem, Canvas, pałac w Gardzienicach z ogniskiem, przedzieranka z klockami, czterostronne pianino, trzy karty, kompas z dymkami w 5 językach). Świat Biznes: tło „blueprint” (siatka techniczna na ciemnym turkusie). Obrazy są „wygenerowane kodem” w rozumieniu docs/04 — pliki w `public/assets/paintings/` są artefaktem skryptu, nie edytować ręcznie (poza `teatr-jest-nasz.svg` i `_demo.svg`, pisanymi ręcznie wcześniej).
+
+### Silnik
+
+- `src/content/cases.ts`: rejestr wszystkich case'ów z kolejnością wieszania (wg rekomendacji `_INDEKS.md`, pilot pierwszy, `_demo` ukryty), `fetchGalleryCases()`.
+- `src/state/progress.ts`: ukończone historie — w pamięci (ADR-4).
+- `HubStubScene` = galeria: 9 obrazów w dwóch rzędach (`src/scenes/hubLayout.ts`, czysta funkcja używana też przez e2e do kliknięcia w obraz), każdy z ramą, tabliczką, stanem zniszczony/odrestaurowany, najazdem i nazwą pod kursorem. Panel po lewej: lista historii z przyciskami „Wejdź w obraz” (klawiatura/czytnik), podświetlana przy najechaniu na obraz (`hub:focus`).
+- Wejście: `hub:enter(id)` → scena emituje `hub:selected(id)` → `main.ts` przeładowuje ScriptRunner i panel na wybraną historię → najazd kamery → RunnerScene. Po finale obraz danego case'a wraca odrestaurowany (iskry), reszta bez zmian.
+- `?case=<id>` pomija hub i startuje historię od razu (także `_demo`). `BootScene` ładuje wszystkie SVG galerii na starcie (9 × 960×640).
+- Klucze tekstur: `painting.<id>` (wpis `painting.*` w manifeście).

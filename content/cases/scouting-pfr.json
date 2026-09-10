@@ -1,0 +1,226 @@
+{
+  "id": "scouting-pfr",
+  "world": "biznes",
+  "title": "Poprowadź warsztat z analizy konkurencji w Szkole Pionierów PFR",
+  "lead": "Zespoły w programach Venture Building mają kilkanaście dni na weryfikację pomysłu. Polski Fundusz Rozwoju potrzebuje metod szybkich, sprytnych i takich, które pozwolą rynkowi wykonać pracę za startup.",
+  "role": "Prowadzący warsztaty i konsultacje z analizy konkurencji dla startupów",
+  "skills": [
+    "Analiza konkurencji",
+    "Product Discovery (Mom Test, RTB)",
+    "Warsztaty w dwóch językach"
+  ],
+  "painting": {
+    "src": "assets/paintings/scouting-pfr.svg",
+    "cols": 3,
+    "rows": 2,
+    "caption": "Szkoła Pionierów: kompas, luneta i zapytania w pięciu językach — rynek sam wskazuje konkurencję. Obraz odrestaurowany."
+  },
+  "runner": {
+    "theme": "biznes",
+    "baseSpeed": 220,
+    "choiceSlowdown": 0.35
+  },
+  "beats": [
+    {
+      "id": "b01",
+      "type": "narration",
+      "text": "Jednym z największych problemów uczestników intensywnych programów inkubacyjnych jest brak czasu na weryfikację rozwiązania. W ciągu kilkunastu dni od poznania zespół (często obcych ludzi) musi przedstawić rozwiązanie, aby inwestorzy chcieli do niego dołączyć. Wielomiesięczne analizy i poprawna metodologia badań rynkowych nie zdają tu egzaminu.",
+      "advance": "tap"
+    },
+    {
+      "id": "b02",
+      "type": "narration",
+      "text": "Polski Fundusz Rozwoju prosi Cię o wybranie zestawu narzędzi i metod, które pomogą startupom w Szkole Pionierów szybko zarysować kluczowe elementy rynku. Zespoły są komplementarne — osoby techniczne, biznesowe i eksperci — ale zwykle tylko jedna osoba zna domenę, w której powstaje startup. Tempo programu priorytetyzuje szybkość efektów.",
+      "advance": "tap"
+    },
+    {
+      "id": "b03",
+      "type": "choice",
+      "prompt": "Zespół ma kilkanaście dni do prezentacji dla inwestorów. Jak badać rynek?",
+      "obstacle": "dokumenty",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Szybko i sprytnie — metodami, które pozwalają rynkowi wykonać pracę za Ciebie.",
+          "correct": true,
+          "feedback": "Właśnie tak projektujesz warsztat: nie miesiące analiz, tylko sposoby, dzięki którym klienci sami wskazują konkurencję.",
+          "skill": "Analiza konkurencji"
+        },
+        {
+          "text": "Wielomiesięczną analizą raportów branżowych.",
+          "correct": false,
+          "feedback": "Po kilkunastu dniach program się kończy. Raport, który nie zdąży, nie pomaga nikomu."
+        },
+        {
+          "text": "Wcale — liczy się tylko dobry pitch.",
+          "correct": false,
+          "feedback": "Inwestor zapyta o konkurencję w pierwszej minucie. Bez odpowiedzi pitch się kończy."
+        }
+      ],
+      "reward": {
+        "fragment": 1
+      }
+    },
+    {
+      "id": "b04",
+      "type": "narration",
+      "text": "Warsztat wprowadza podstawowe pojęcia: substytuty, produkty komplementarne, unikalną propozycję wartości (UVP). Omawia, jak ten sam problem można obsługiwać różnymi modelami biznesowymi, jak zastosować zasady The Mom Test w wywiadzie z użytkownikiem i jak zdobyć jego zaufanie zgodnie z modelem RTB (Reason To Believe).",
+      "advance": "tap"
+    },
+    {
+      "id": "b05",
+      "type": "choice",
+      "prompt": "Zgodnie z The Mom Test — jak zapytać użytkownika, żeby nie skłamał z uprzejmości?",
+      "obstacle": "telefony",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "O jego dotychczasowe zachowania i problemy, nie o to, czy kupiłby Twój produkt.",
+          "correct": true,
+          "feedback": "Pytanie o przeszłość daje fakty. Pytanie o hipotetyczny zakup daje komplementy — a te nie weryfikują pomysłu.",
+          "skill": "Product Discovery (Mom Test, RTB)"
+        },
+        {
+          "text": "„Czy podoba Ci się mój pomysł?”",
+          "correct": false,
+          "feedback": "Na takie pytanie nawet mama odpowie „tak”. The Mom Test istnieje właśnie po to, by tego uniknąć."
+        },
+        {
+          "text": "„Czy kupiłbyś to za 100 zł?”",
+          "correct": false,
+          "feedback": "Deklaracja to nie zachowanie. Ludzie mówią, że kupią — i nie kupują."
+        }
+      ],
+      "reward": {
+        "fragment": 2
+      }
+    },
+    {
+      "id": "b06",
+      "type": "action",
+      "prompt": "Cztery godziny warsztatu, dwa języki i sala pełna founderów z różnych krajów. Przeskocz barierkę między stołami, by zdążyć do każdego zespołu!",
+      "input": "jump",
+      "obstacle": "barierka",
+      "windowMs": 800,
+      "reward": {
+        "fragment": 3
+      }
+    },
+    {
+      "id": "b07",
+      "type": "narration",
+      "text": "Kluczową cechą warsztatu jest proponowanie metod aktywnego proszenia o dane zamiast poświęcania czasu na samodzielne wyszukiwanie. Poszukiwanie pasywne to nasłuchiwanie informacji, które docierają. Metody aktywne zakładają zadawanie pytań tam, gdzie już są klienci, i pozwolenie im, aby to oni wskazali konkurencję lub substytuty.",
+      "advance": "tap"
+    },
+    {
+      "id": "b08",
+      "type": "choice",
+      "prompt": "Startup szuka konkurencji. Pasywnie czy aktywnie?",
+      "obstacle": "boty",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Aktywnie: pytać tam, gdzie są klienci, i pozwolić im wskazać konkurencję i substytuty.",
+          "correct": true,
+          "feedback": "Klienci znają rynek lepiej niż wyszukiwarka. Wystarczy zapytać ich w miejscu, w którym już rozmawiają.",
+          "skill": "Analiza konkurencji"
+        },
+        {
+          "text": "Pasywnie: czekać, aż informacje same dotrą.",
+          "correct": false,
+          "feedback": "Nasłuchiwanie trwa miesiące. Zespół ma dni — dlatego warsztat uczy aktywnego pytania."
+        },
+        {
+          "text": "Wpisać nazwę produktu w wyszukiwarkę i przepisać pierwszą stronę wyników.",
+          "correct": false,
+          "feedback": "Wyszukiwarka pokazuje tych, którzy zapłacili za reklamę, nie tych, których używają klienci."
+        }
+      ],
+      "reward": {
+        "fragment": 4
+      }
+    },
+    {
+      "id": "b09",
+      "type": "interaction",
+      "widget": "button",
+      "label": "ROZEŚLIJ ZAPYTANIA",
+      "style": "zrzutka",
+      "counter": {
+        "from": 0,
+        "to": 5,
+        "suffix": " języków"
+      },
+      "text": "O dwunastej startup rozsyła zapytania, a następnego dnia o dziesiątej podsumowuje odpowiedzi. Kliknij, by zobaczyć, w ilu językach.",
+      "reward": {
+        "fragment": 5
+      }
+    },
+    {
+      "id": "b10",
+      "type": "action",
+      "prompt": "Trzy edycje programu, kilkanaście godzin warsztatów i kilkadziesiąt godzin konsultacji. Przeskocz stos notatek z ostatniej edycji!",
+      "input": "jump",
+      "obstacle": "skrzynia",
+      "windowMs": 800,
+      "reward": {
+        "fragment": 6
+      }
+    },
+    {
+      "id": "b11",
+      "type": "narration",
+      "text": "Rokrocznie warsztat był jednym z najlepiej ocenianych w całej Szkole Pionierów. Niektóre współprace kontynuowałeś jako szkoleniowiec, wspierając młodych founderów w budowie kluczowych kompetencji. Dzięki aktywnemu podejściu startupy weryfikują założenia i analizują konkurentów na różnych rynkach — w ciągu jednego czterogodzinnego warsztatu.",
+      "advance": "tap"
+    },
+    {
+      "id": "b12",
+      "type": "results",
+      "stats": [
+        {
+          "skill": "Analiza konkurencji",
+          "delta": 10
+        },
+        {
+          "skill": "Product Discovery (Mom Test, RTB)",
+          "delta": 10
+        },
+        {
+          "skill": "Warsztaty w dwóch językach",
+          "delta": 10
+        }
+      ],
+      "kpis": [
+        {
+          "label": "Edycje programu",
+          "value": "3"
+        },
+        {
+          "label": "Warsztaty",
+          "value": "kilkanaście godzin, po polsku i angielsku"
+        },
+        {
+          "label": "Konsultacje",
+          "value": "kilkadziesiąt godzin"
+        },
+        {
+          "label": "Ocena",
+          "value": "co roku jeden z najlepiej ocenianych warsztatów Szkoły Pionierów"
+        },
+        {
+          "label": "Tempo",
+          "value": "zapytania w 5 językach o 12:00, podsumowanie nazajutrz o 10:00"
+        }
+      ]
+    },
+    {
+      "id": "b13",
+      "type": "finale",
+      "text": "Cztery godziny warsztatu wystarczyły, by startupy pozwoliły rynkowi wykonać pracę za siebie. Jeśli potrzebujesz takiego warsztatu w swoim programie — odezwij się.",
+      "cta": {
+        "label": "Napisz do Arka na LinkedIn",
+        "url": "https://www.linkedin.com/in/arkadiusz-klej/"
+      }
+    }
+  ]
+}

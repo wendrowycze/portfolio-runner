@@ -1,0 +1,215 @@
+{
+  "id": "ewaluacja-festiwali",
+  "world": "kultura",
+  "title": "Pomóż teatrowi w ewaluacji międzynarodowego festiwalu",
+  "lead": "Odkryj tajemnicę niezwykłej atmosfery festiwalu teatralnego, aby pomóc organizatorom ją utrzymać.",
+  "role": "Badacz, autor narzędzia ewaluacyjnego dla festiwali teatralnych",
+  "skills": ["Antropologia i kulturoznawstwo", "Ewaluacja", "Strategia"],
+  "painting": {
+    "src": "assets/paintings/ewaluacja-festiwali.svg",
+    "cols": 3,
+    "rows": 2,
+    "caption": "„Przedzieranka”: kartka, którą naddziera się zamiast pisać, i klocki atmosfery festiwalu wokół małej postaci. Obraz odrestaurowany."
+  },
+  "runner": {
+    "theme": "kultura",
+    "baseSpeed": 220,
+    "choiceSlowdown": 0.35
+  },
+  "beats": [
+    {
+      "id": "b01",
+      "type": "narration",
+      "text": "Od sześciu lat jesteś kluczową postacią jednego z najlepszych międzynarodowych festiwali teatralnych dla młodzieży w tej części Europy. Zaczynałeś jako wolontariusz pomagający aktorom, a teraz, jako prawa ręka organizatorki, odpowiadasz za partnerstwa, kontakty z mediami i pielęgnowanie unikalnej „atmosfery” wydarzenia.",
+      "advance": "tap"
+    },
+    {
+      "id": "b02",
+      "type": "choice",
+      "prompt": "Koordynatorka przyznaje, że festiwal dotarł do ściany — brakuje zasobów i świeżych pomysłów, by wznieść go na wyższy poziom. Co robisz?",
+      "obstacle": "brama",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Zamieniam intuicję w twarde dane — antropologiczne studium przypadku.",
+          "correct": true,
+          "feedback": "Inicjujesz kompleksowe badanie: dziesiątki wywiadów z organizatorami, artystami i widownią, godziny nagrań w poszukiwaniu wzorców.",
+          "skill": "Antropologia i kulturoznawstwo"
+        },
+        {
+          "text": "Szukam nowego sponsora, zanim zrozumiem, co sprzedajemy.",
+          "correct": false,
+          "feedback": "Sponsor pyta, co jest w festiwalu wyjątkowego. Bez danych masz tylko intuicję — a ta nie przekonuje partnerów."
+        },
+        {
+          "text": "Zmieniam program na podstawie własnego przeczucia.",
+          "correct": false,
+          "feedback": "Sześć lat intuicji doprowadziło do ściany. Teraz potrzebne są wzorce, nie kolejne przeczucie."
+        }
+      ],
+      "reward": {
+        "fragment": 1
+      }
+    },
+    {
+      "id": "b03",
+      "type": "narration",
+      "text": "Przeprowadzasz dziesiątki wywiadów z organizatorami, artystami i widownią, analizując godziny nagrań w poszukiwaniu wzorców. Efektem jest blisko stustronicowy raport, ale to dopiero początek. Twoim celem staje się zaprojektowanie uniwersalnego narzędzia do ewaluacji młodzieżowych festiwali teatralnych — szablonu, który pomoże organizatorom w całym kraju.",
+      "advance": "tap"
+    },
+    {
+      "id": "b04",
+      "type": "interaction",
+      "widget": "puzzle",
+      "text": "Mała postać otoczona jest klockami symbolizującymi elementy budujące atmosferę festiwalu, odkryte w trakcie badań. Ułóż je, zamieniając miejscami fragmenty.",
+      "reward": {
+        "fragment": 2
+      }
+    },
+    {
+      "id": "b05",
+      "type": "narration",
+      "text": "Kluczowym elementem raportu okazuje się innowacyjna ankieta dla uczestników. Po wielu testach tworzysz „przedzierankę” — prostą kartkę z pytaniami, gdzie odpowiedzi zaznacza się przez naderwanie krawędzi. Kiedy juror na scenie odczytuje pytania, publiczność reaguje, tworząc swoisty performance.",
+      "advance": "tap"
+    },
+    {
+      "id": "b06",
+      "type": "action",
+      "prompt": "Juror czyta pytanie ze sceny, setki kartek naddziera się naraz. Przeskocz barierkę przed sceną, by zebrać odpowiedzi, zanim widownia wyjdzie!",
+      "input": "jump",
+      "obstacle": "barierka",
+      "windowMs": 800,
+      "reward": {
+        "fragment": 3
+      }
+    },
+    {
+      "id": "b07",
+      "type": "choice",
+      "prompt": "Jak zebrać setki odpowiedzi w kilka minut — bez długopisów i skomplikowanych zgód na przetwarzanie danych?",
+      "obstacle": "dokumenty",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Przedzieranka: odpowiedź to naderwanie krawędzi, pytania czyta juror ze sceny.",
+          "correct": true,
+          "feedback": "W ciągu zaledwie kilku minut udaje się zebrać setki odpowiedzi — bez długopisów i formularzy zgód.",
+          "skill": "Ewaluacja"
+        },
+        {
+          "text": "Ankieta online wysłana po spektaklu.",
+          "correct": false,
+          "feedback": "Po spektaklu nikt nie otwiera linku. Odpowiedzi trzeba zebrać tu i teraz, gdy widownia jeszcze siedzi."
+        },
+        {
+          "text": "Wywiad z każdym widzem osobno.",
+          "correct": false,
+          "feedback": "Setki widzów, kilka minut przerwy — arytmetyka nie pozwala. Potrzebne było narzędzie masowe i proste."
+        }
+      ],
+      "reward": {
+        "fragment": 4
+      }
+    },
+    {
+      "id": "b08",
+      "type": "narration",
+      "text": "Zebrane dane stają się fundamentem nowej strategii, która rewolucjonizuje organizację pracy i model finansowania festiwalu. Osoby, których ogromny wkład pozostawał dotąd niewidoczny, zostają wreszcie docenione.",
+      "advance": "tap"
+    },
+    {
+      "id": "b09",
+      "type": "choice",
+      "prompt": "Komu wysyłasz oficjalne zaproszenia na spektakle jako pierwszym?",
+      "obstacle": "telefony",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Rodzicom wolontariuszy — cichym sponsorom głównej siły roboczej festiwalu.",
+          "correct": true,
+          "feedback": "Rodzice wolontariuszy otrzymują oficjalne zaproszenia. Wkład, który był niewidoczny, wreszcie zostaje nazwany.",
+          "skill": "Strategia"
+        },
+        {
+          "text": "Tylko jurorom i sponsorom.",
+          "correct": false,
+          "feedback": "Oni już są zaproszeni. Dane pokazały, kogo festiwal pomijał — i to tam trzeba było wysłać zaproszenia."
+        },
+        {
+          "text": "Nikomu — zaproszenia to koszt.",
+          "correct": false,
+          "feedback": "Zaproszenie kosztuje mniej niż utrata ludzi, na których festiwal stoi. Docenienie to część strategii."
+        }
+      ],
+      "reward": {
+        "fragment": 5
+      }
+    },
+    {
+      "id": "b10",
+      "type": "action",
+      "prompt": "Twarde dowody na jakość festiwalu otwierają drzwi do międzynarodowych źródeł finansowania. Przeskocz bramę, którą dotąd miałeś zamkniętą!",
+      "input": "jump",
+      "obstacle": "brama",
+      "windowMs": 800,
+      "reward": {
+        "fragment": 6
+      }
+    },
+    {
+      "id": "b11",
+      "type": "narration",
+      "text": "Dzięki Twojej ewaluacji organizatorzy otrzymali twarde dowody na wyjątkową jakość festiwalu. To otworzyło im drzwi do międzynarodowych źródeł finansowania i ułatwiło rozmowy z dużymi, strategicznymi partnerami. Kluczem do rozwoju jest dogłębne zrozumienie tego, co stanowi o prawdziwej wartości wydarzenia, i przełożenie tej wiedzy na mierzalne dane.",
+      "advance": "tap"
+    },
+    {
+      "id": "b12",
+      "type": "results",
+      "stats": [
+        {
+          "skill": "Antropologia i kulturoznawstwo",
+          "delta": 10
+        },
+        {
+          "skill": "Ewaluacja",
+          "delta": 8
+        },
+        {
+          "skill": "Strategia",
+          "delta": 7
+        }
+      ],
+      "kpis": [
+        {
+          "label": "Raport",
+          "value": "blisko 100 stron z dziesiątek wywiadów"
+        },
+        {
+          "label": "Szansa na międzynarodowe finansowanie",
+          "value": "+8"
+        },
+        {
+          "label": "Łatwość sukcesji merytorycznej w zespole",
+          "value": "+10"
+        },
+        {
+          "label": "Onboarding nowych osób",
+          "value": "+7"
+        },
+        {
+          "label": "Narzędzie",
+          "value": "„przedzieranka” — setki odpowiedzi w kilka minut"
+        }
+      ]
+    },
+    {
+      "id": "b13",
+      "type": "finale",
+      "text": "Festiwal, który dotarł do ściany, dostał mapę: raport, przedzierankę i strategię, w której widać wszystkich, nie tylko tych na scenie. Nauczyłeś się, że wartość wydarzenia da się zmierzyć — jeśli najpierw dobrze się jej przyjrzysz.",
+      "cta": {
+        "label": "Poznaj Arka na LinkedIn",
+        "url": "https://www.linkedin.com/in/arkadiusz-klej/"
+      }
+    }
+  ]
+}

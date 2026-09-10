@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" width="960" height="640">
+  <!--
+    Placeholder obrazu case'a „Teatr jest nasz” (docs/04_STYL_I_ASSETY.md, sekcja „Specyfikacja placeholdera”).
+    Płaskorzeźba: gmach teatru wspierany przez trzy postacie — aktora, widza i reżysera.
+    Siatka 3×2 (kafle 320×320). Wygenerowany kodem, nie ilustracja. Paleta: #261619 #3E2219 #895F47 #DFB67C #E2E9E1.
+  -->
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="38%" r="60%">
+      <stop offset="0" stop-color="#3E2219"/>
+      <stop offset="1" stop-color="#261619"/>
+    </radialGradient>
+    <pattern id="mauresque" width="48" height="48" patternUnits="userSpaceOnUse">
+      <rect width="48" height="48" fill="#3E2219"/>
+      <path d="M24 3 L30 18 L45 24 L30 30 L24 45 L18 30 L3 24 L18 18 Z" fill="none" stroke="#DFB67C" stroke-width="2"/>
+      <circle cx="24" cy="24" r="4" fill="#DFB67C"/>
+      <path d="M0 0 L8 0 L0 8 Z M48 48 L40 48 L48 40 Z M48 0 L40 0 L48 8 Z M0 48 L8 48 L0 40 Z" fill="#895F47"/>
+    </pattern>
+    <pattern id="marble" width="160" height="160" patternUnits="userSpaceOnUse">
+      <rect width="160" height="160" fill="#3E2219"/>
+      <path d="M-10 40 Q40 20 90 60 T170 50" fill="none" stroke="#895F47" stroke-opacity="0.35" stroke-width="2"/>
+      <path d="M-10 120 Q60 90 110 130 T170 110" fill="none" stroke="#DFB67C" stroke-opacity="0.12" stroke-width="1.5"/>
+    </pattern>
+    <linearGradient id="stone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#DFB67C"/>
+      <stop offset="1" stop-color="#895F47"/>
+    </linearGradient>
+    <g id="column">
+      <rect x="-14" y="0" width="28" height="182" fill="url(#stone)"/>
+      <rect x="-8" y="8" width="3" height="166" fill="#895F47" opacity="0.7"/>
+      <rect x="0" y="8" width="3" height="166" fill="#895F47" opacity="0.7"/>
+      <rect x="8" y="8" width="3" height="166" fill="#895F47" opacity="0.7"/>
+      <rect x="-20" y="-10" width="40" height="12" fill="#DFB67C"/>
+      <rect x="-24" y="-16" width="48" height="6" fill="#DFB67C"/>
+      <rect x="-20" y="180" width="40" height="10" fill="#DFB67C"/>
+    </g>
+    <g id="figure">
+      <!-- sylwetka z uniesionymi rękami (kariatyda) -->
+      <circle cx="0" cy="-118" r="22" fill="#895F47" stroke="#DFB67C" stroke-width="3"/>
+      <path d="M-26 -92 L26 -92 L38 24 L-38 24 Z" fill="#895F47" stroke="#DFB67C" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M-14 -70 L14 -70 L18 -58 L-18 -58 Z" fill="#DFB67C"/>
+      <path d="M-20 -86 L-58 -122 L-62 -150" fill="none" stroke="#895F47" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M20 -86 L58 -122 L62 -150" fill="none" stroke="#895F47" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M-20 -86 L-58 -122 L-62 -150 M20 -86 L58 -122 L62 -150" fill="none" stroke="#DFB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+      <path d="M-24 24 L-20 96 M24 24 L20 96" fill="none" stroke="#895F47" stroke-width="16" stroke-linecap="round"/>
+      <path d="M-34 100 L-6 100 M6 100 L34 100" fill="none" stroke="#DFB67C" stroke-width="6" stroke-linecap="round"/>
+    </g>
+  </defs>
+
+  <!-- tło i rama -->
+  <rect width="960" height="640" fill="url(#mauresque)"/>
+  <rect x="36" y="36" width="888" height="568" fill="url(#marble)"/>
+  <rect x="36" y="36" width="888" height="568" fill="url(#glow)" opacity="0.75"/>
+  <rect x="36" y="36" width="888" height="568" fill="none" stroke="#DFB67C" stroke-width="6"/>
+  <rect x="48" y="48" width="864" height="544" fill="none" stroke="#895F47" stroke-width="2"/>
+
+  <!-- promienie za teatrem -->
+  <g stroke="#DFB67C" stroke-opacity="0.09" stroke-width="10">
+    <path d="M480 120 L120 380"/><path d="M480 120 L220 60"/><path d="M480 120 L840 380"/><path d="M480 120 L740 60"/>
+    <path d="M480 120 L60 200"/><path d="M480 120 L900 200"/><path d="M480 120 L480 -20"/>
+  </g>
+
+  <!-- gmach teatru -->
+  <g id="theatre">
+    <!-- tylna ściana i portal -->
+    <rect x="300" y="200" width="360" height="200" fill="#261619"/>
+    <path d="M440 400 L440 300 A40 40 0 0 1 520 300 L520 400 Z" fill="#3E2219" stroke="#DFB67C" stroke-width="4"/>
+    <path d="M452 400 L452 306 A28 28 0 0 1 508 306 L508 400 Z" fill="#DFB67C" opacity="0.35"/>
+    <!-- kolumny -->
+    <use href="#column" x="320" y="212"/>
+    <use href="#column" x="384" y="212"/>
+    <use href="#column" x="448" y="212" opacity="0"/>
+    <use href="#column" x="512" y="212" opacity="0"/>
+    <use href="#column" x="576" y="212"/>
+    <use href="#column" x="640" y="212"/>
+    <use href="#column" x="416" y="212"/>
+    <use href="#column" x="544" y="212"/>
+    <!-- belkowanie z meandrem -->
+    <rect x="280" y="176" width="400" height="24" fill="#895F47" stroke="#DFB67C" stroke-width="3"/>
+    <path d="M292 188 h12 v6 h-6 v-3 M316 188 h12 v6 h-6 v-3 M340 188 h12 v6 h-6 v-3 M364 188 h12 v6 h-6 v-3 M388 188 h12 v6 h-6 v-3 M412 188 h12 v6 h-6 v-3 M436 188 h12 v6 h-6 v-3 M460 188 h12 v6 h-6 v-3 M484 188 h12 v6 h-6 v-3 M508 188 h12 v6 h-6 v-3 M532 188 h12 v6 h-6 v-3 M556 188 h12 v6 h-6 v-3 M580 188 h12 v6 h-6 v-3 M604 188 h12 v6 h-6 v-3 M628 188 h12 v6 h-6 v-3 M652 188 h12 v6 h-6 v-3" fill="none" stroke="#DFB67C" stroke-width="2"/>
+    <!-- tympanon z maskami -->
+    <path d="M268 176 L692 176 L480 84 Z" fill="#3E2219" stroke="#DFB67C" stroke-width="5" stroke-linejoin="round"/>
+    <g transform="translate(452 140)">
+      <path d="M-18 -16 Q0 -30 18 -16 Q22 6 0 16 Q-22 6 -18 -16 Z" fill="#DFB67C"/>
+      <path d="M-11 -8 Q-6 -12 -1 -8 M1 -8 Q6 -12 11 -8" stroke="#3E2219" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M-9 4 Q0 12 9 4" stroke="#3E2219" stroke-width="3" fill="none" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(508 140)">
+      <path d="M-18 -16 Q0 -30 18 -16 Q22 6 0 16 Q-22 6 -18 -16 Z" fill="#DFB67C"/>
+      <path d="M-11 -6 Q-6 -10 -1 -6 M1 -6 Q6 -10 11 -6" stroke="#3E2219" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M-9 8 Q0 0 9 8" stroke="#3E2219" stroke-width="3" fill="none" stroke-linecap="round"/>
+    </g>
+    <!-- akroteriony -->
+    <circle cx="480" cy="84" r="8" fill="#DFB67C"/>
+    <path d="M262 176 L268 158 L276 176 Z M698 176 L692 158 L684 176 Z" fill="#DFB67C"/>
+    <!-- stylobat / schody -->
+    <rect x="276" y="400" width="408" height="12" fill="#DFB67C"/>
+    <rect x="260" y="412" width="440" height="12" fill="#895F47" stroke="#DFB67C" stroke-width="2"/>
+    <rect x="244" y="424" width="472" height="14" fill="#895F47" stroke="#DFB67C" stroke-width="2"/>
+  </g>
+
+  <!-- trzy postacie-kariatydy -->
+  <g id="figures">
+    <!-- aktor (lewa) z maską -->
+    <g transform="translate(262 470)">
+      <use href="#figure"/>
+      <g transform="translate(-74 -132) rotate(-12)">
+        <path d="M-16 -14 Q0 -28 16 -14 Q20 8 0 18 Q-20 8 -16 -14 Z" fill="#E2E9E1" stroke="#DFB67C" stroke-width="2"/>
+        <circle cx="-6" cy="-6" r="2.5" fill="#3E2219"/><circle cx="6" cy="-6" r="2.5" fill="#3E2219"/>
+        <path d="M-7 6 Q0 12 7 6" stroke="#3E2219" stroke-width="2.5" fill="none"/>
+      </g>
+    </g>
+    <!-- widz (środek) z uniesionymi dłońmi i biletem -->
+    <g transform="translate(480 476)">
+      <use href="#figure"/>
+      <rect x="54" y="-166" width="30" height="16" rx="2" transform="rotate(20 69 -158)" fill="#E2E9E1" stroke="#DFB67C" stroke-width="2"/>
+      <path d="M-70 -160 l-6 -8 M-62 -164 l-3 -10 M-54 -164 l2 -10" stroke="#DFB67C" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <!-- reżyser (prawa) z tubą i scenariuszem -->
+    <g transform="translate(698 470)">
+      <use href="#figure"/>
+      <path d="M62 -150 L98 -184 L104 -160 L74 -140 Z" fill="#E2E9E1" stroke="#DFB67C" stroke-width="2" stroke-linejoin="round"/>
+      <rect x="-90" y="-166" width="26" height="34" rx="3" fill="#E2E9E1" stroke="#DFB67C" stroke-width="2"/>
+      <path d="M-84 -156 h14 M-84 -148 h14 M-84 -140 h10" stroke="#895F47" stroke-width="2"/>
+    </g>
+  </g>
+
+  <!-- posadzka i inskrypcja -->
+  <rect x="60" y="576" width="840" height="4" fill="#DFB67C"/>
+  <text x="480" y="600" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" letter-spacing="6" fill="#DFB67C">TEATR JEST NASZ · KRAKÓW · MMXXII</text>
+</svg>

@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" width="960" height="640">
+  <!-- Wygenerowane przez scripts/paintings.mjs (npm run paintings). Nie edytować ręcznie. -->
+  
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="38%" r="60%">
+      <stop offset="0" stop-color="#3E2219"/>
+      <stop offset="1" stop-color="#261619"/>
+    </radialGradient>
+    <pattern id="mauresque" width="48" height="48" patternUnits="userSpaceOnUse">
+      <rect width="48" height="48" fill="#3E2219"/>
+      <path d="M24 3 L30 18 L45 24 L30 30 L24 45 L18 30 L3 24 L18 18 Z" fill="none" stroke="#DFB67C" stroke-width="2"/>
+      <circle cx="24" cy="24" r="4" fill="#DFB67C"/>
+      <path d="M0 0 L8 0 L0 8 Z M48 48 L40 48 L48 40 Z M48 0 L40 0 L48 8 Z M0 48 L8 48 L0 40 Z" fill="#895F47"/>
+    </pattern>
+    <pattern id="blueprint" width="40" height="40" patternUnits="userSpaceOnUse">
+      <rect width="40" height="40" fill="#0B2F2E"/>
+      <path d="M0 0 H40 M0 0 V40" fill="none" stroke="#DFB67C" stroke-opacity="0.35" stroke-width="1"/>
+      <path d="M20 0 V40 M0 20 H40" fill="none" stroke="#DFB67C" stroke-opacity="0.12" stroke-width="1"/>
+    </pattern>
+    <pattern id="marble" width="160" height="160" patternUnits="userSpaceOnUse">
+      <rect width="160" height="160" fill="#3E2219"/>
+      <path d="M-10 40 Q40 20 90 60 T170 50" fill="none" stroke="#895F47" stroke-opacity="0.35" stroke-width="2"/>
+      <path d="M-10 120 Q60 90 110 130 T170 110" fill="none" stroke="#DFB67C" stroke-opacity="0.12" stroke-width="1.5"/>
+    </pattern>
+    <linearGradient id="stone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#DFB67C"/>
+      <stop offset="1" stop-color="#895F47"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="640" fill="url(#mauresque)"/>
+  <rect x="36" y="36" width="888" height="568" fill="url(#marble)"/>
+  <rect x="36" y="36" width="888" height="568" fill="url(#glow)" opacity="0.75"/>
+  <rect x="36" y="36" width="888" height="568" fill="none" stroke="#DFB67C" stroke-width="6"/>
+  <rect x="48" y="48" width="864" height="544" fill="none" stroke="#895F47" stroke-width="2"/>
+  <g stroke="#DFB67C" stroke-opacity="0.09" stroke-width="10">
+    <path d="M480 120 L120 380"/><path d="M480 120 L220 60"/><path d="M480 120 L840 380"/><path d="M480 120 L740 60"/>
+    <path d="M480 120 L60 200"/><path d="M480 120 L900 200"/><path d="M480 120 L480 -20"/>
+  </g>
+  
+      <rect x="200" y="100" width="560" height="260" rx="8" fill="#E2E9E1" stroke="#DFB67C" stroke-width="8"/>
+      <g transform="translate(200 100)"><rect x="0" y="0" width="186.6" height="44" fill="#895F47" stroke="#DFB67C" stroke-width="2"/><text x="93" y="29" text-anchor="middle" font-family="Georgia, serif" font-size="16" letter-spacing="2" fill="#E2E9E1">MIASTO</text><rect x="22" y="64" width="140" height="44" rx="3" fill="#DFB67C" fill-opacity="0.85" transform="rotate(-2 93 86)"/><rect x="32" y="128" width="140" height="44" rx="3" fill="#ACCBC6" fill-opacity="0.85" transform="rotate(0 93 150)"/><rect x="22" y="192" width="140" height="44" rx="3" fill="#742224" fill-opacity="0.85" transform="rotate(2 93 214)"/></g><g transform="translate(386.6 100)"><rect x="0" y="0" width="186.6" height="44" fill="#895F47" stroke="#DFB67C" stroke-width="2"/><text x="93" y="29" text-anchor="middle" font-family="Georgia, serif" font-size="16" letter-spacing="2" fill="#E2E9E1">MIESZKAŃCY</text><rect x="22" y="64" width="140" height="44" rx="3" fill="#ACCBC6" fill-opacity="0.85" transform="rotate(2 93 86)"/><rect x="32" y="128" width="140" height="44" rx="3" fill="#742224" fill-opacity="0.85" transform="rotate(0 93 150)"/><rect x="22" y="192" width="140" height="44" rx="3" fill="#DFB67C" fill-opacity="0.85" transform="rotate(-2 93 214)"/></g><g transform="translate(573.2 100)"><rect x="0" y="0" width="186.6" height="44" fill="#895F47" stroke="#DFB67C" stroke-width="2"/><text x="93" y="29" text-anchor="middle" font-family="Georgia, serif" font-size="16" letter-spacing="2" fill="#E2E9E1">OŚRODEK</text><rect x="22" y="64" width="140" height="44" rx="3" fill="#742224" fill-opacity="0.85" transform="rotate(-2 93 86)"/><rect x="32" y="128" width="140" height="44" rx="3" fill="#DFB67C" fill-opacity="0.85" transform="rotate(0 93 150)"/><rect x="22" y="192" width="140" height="44" rx="3" fill="#ACCBC6" fill-opacity="0.85" transform="rotate(2 93 214)"/></g>
+      <line x1="386.6" y1="100" x2="386.6" y2="360" stroke="#DFB67C" stroke-width="3"/>
+      <line x1="573.2" y1="100" x2="573.2" y2="360" stroke="#DFB67C" stroke-width="3"/>
+      <rect x="160" y="420" width="640" height="16" fill="#895F47" stroke="#DFB67C" stroke-width="2"/>
+      <g transform="translate(262 476) scale(0.9)">
+    <circle cx="0" cy="-118" r="22" fill="#895F47" stroke="#DFB67C" stroke-width="3"/>
+    <path d="M-26 -92 L26 -92 L38 24 L-38 24 Z" fill="#895F47" stroke="#DFB67C" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M-14 -70 L14 -70 L18 -58 L-18 -58 Z" fill="#DFB67C"/>
+    <path d="M-20 -86 L-38.4 -118 L-64 -150" fill="none" stroke="#895F47" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+     <path d="M-20 -86 L-38.4 -118 L-64 -150" fill="none" stroke="#DFB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <path d="M20 -86 L33.6 -123 L56 -160" fill="none" stroke="#895F47" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+     <path d="M20 -86 L33.6 -123 L56 -160" fill="none" stroke="#DFB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <path d="M-24 24 L-20 96 M24 24 L20 96" fill="none" stroke="#895F47" stroke-width="16" stroke-linecap="round"/>
+    <path d="M-34 100 L-6 100 M6 100 L34 100" fill="none" stroke="#DFB67C" stroke-width="6" stroke-linecap="round"/>
+  </g>
+      <g transform="translate(480 480) scale(0.9)">
+    <circle cx="0" cy="-118" r="22" fill="#895F47" stroke="#DFB67C" stroke-width="3"/>
+    <path d="M-26 -92 L26 -92 L38 24 L-38 24 Z" fill="#895F47" stroke="#DFB67C" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M-14 -70 L14 -70 L18 -58 L-18 -58 Z" fill="#DFB67C"/>
+    <path d="M-20 -86 L-36 -123 L-60 -160" fill="none" stroke="#895F47" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+     <path d="M-20 -86 L-36 -123 L-60 -160" fill="none" stroke="#DFB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <path d="M20 -86 L36 -123 L60 -160" fill="none" stroke="#895F47" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+     <path d="M20 -86 L36 -123 L60 -160" fill="none" stroke="#DFB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <path d="M-24 24 L-20 96 M24 24 L20 96" fill="none" stroke="#895F47" stroke-width="16" stroke-linecap="round"/>
+    <path d="M-34 100 L-6 100 M6 100 L34 100" fill="none" stroke="#DFB67C" stroke-width="6" stroke-linecap="round"/>
+  </g>
+      <g transform="translate(698 476) scale(0.9)">
+    <circle cx="0" cy="-118" r="22" fill="#895F47" stroke="#DFB67C" stroke-width="3"/>
+    <path d="M-26 -92 L26 -92 L38 24 L-38 24 Z" fill="#895F47" stroke="#DFB67C" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M-14 -70 L14 -70 L18 -58 L-18 -58 Z" fill="#DFB67C"/>
+    <path d="M-20 -86 L-33.6 -123 L-56 -160" fill="none" stroke="#895F47" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+     <path d="M-20 -86 L-33.6 -123 L-56 -160" fill="none" stroke="#DFB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <path d="M20 -86 L38.4 -118 L64 -150" fill="none" stroke="#895F47" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+     <path d="M20 -86 L38.4 -118 L64 -150" fill="none" stroke="#DFB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <path d="M-24 24 L-20 96 M24 24 L20 96" fill="none" stroke="#895F47" stroke-width="16" stroke-linecap="round"/>
+    <path d="M-34 100 L-6 100 M6 100 L34 100" fill="none" stroke="#DFB67C" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <rect x="60" y="576" width="840" height="4" fill="#DFB67C"/>
+  <text x="480" y="600" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" letter-spacing="6" fill="#DFB67C">CANVAS KO-KREACJI · BARDZO MŁODA KULTURA · LUBLIN</text>
+</svg>
