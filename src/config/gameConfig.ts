@@ -2,7 +2,8 @@ import Phaser from 'phaser';
 import { PALETTE } from './palette';
 import { TUNING } from './tuning';
 import { BootScene } from '../scenes/BootScene';
-import { HubStubScene } from '../scenes/HubStubScene';
+import { HotelScene } from '../scenes/HotelScene';
+import { StartScene } from '../scenes/StartScene';
 import { RunnerScene } from '../scenes/RunnerScene';
 
 /** Bazowa rozdzielczość sceny biegu; Scale Manager (FIT) dopasowuje ją do kontenera. */
@@ -27,6 +28,6 @@ export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameCon
       arcade: { gravity: { x: 0, y: TUNING.GRAVITY_Y }, debug: false },
     },
     fps: { target: 60 },
-    scene: [BootScene, HubStubScene, RunnerScene],
+    scene: [BootScene, StartScene, HotelScene, RunnerScene],
   };
 }

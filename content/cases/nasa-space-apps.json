@@ -1,0 +1,203 @@
+{
+  "id": "nasa-space-apps",
+  "world": "biznes",
+  "draft": true,
+  "title": "Zbuduj w 48 godzin projekt, który doceni NASA Space Apps Challenge",
+  "lead": "Największy hackathon świata: dane z satelitów, dwie doby i zespół ludzi, którzy poznali się przed chwilą. Zbuduj projekt PCIS i doprowadź go do finału.",
+  "role": "Współtwórca projektu PCIS na NASA Space Apps Challenge 2023",
+  "skills": ["Szybkie prototypowanie", "Pitch przed jury", "Zespół interdyscyplinarny"],
+  "painting": {
+    "src": "assets/paintings/nasa-space-apps.svg",
+    "cols": 3,
+    "rows": 2,
+    "caption": "NASA Space Apps 2023: orbita, satelita nad Polską i zespół przy jednym monitorze o czwartej nad ranem. Obraz odrestaurowany."
+  },
+  "runner": {
+    "theme": "biznes",
+    "baseSpeed": 220,
+    "choiceSlowdown": 0.35
+  },
+  "beats": [
+    {
+      "id": "b01",
+      "type": "narration",
+      "text": "NASA Space Apps Challenge to hackathon, w którym zespoły na całym świecie mają 48 godzin na rozwiązanie wyzwania opartego na danych kosmicznych. Przyjeżdżasz z pomysłem, poznajesz zespół i zaczyna się odliczanie. Projekt nazywa się PCIS.",
+      "advance": "tap"
+    },
+    {
+      "id": "b02",
+      "type": "choice",
+      "prompt": "Pierwsza godzina hackathonu. Na co ją poświęcasz?",
+      "obstacle": "kable",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Na ustalenie, kto co potrafi, i podział ról — zanim ktokolwiek otworzy edytor.",
+          "correct": true,
+          "feedback": "Zespół obcych ludzi wygrywa wtedy, gdy każdy wie, za co odpowiada. Pierwsza godzina na role zwraca się dwudziestokrotnie.",
+          "skill": "Zespół interdyscyplinarny"
+        },
+        {
+          "text": "Na pisanie kodu — czas ucieka.",
+          "correct": false,
+          "feedback": "Kod pisany bez planu o drugiej w nocy trzeba wyrzucić o szóstej."
+        },
+        {
+          "text": "Na projektowanie logo.",
+          "correct": false,
+          "feedback": "Jury nie ocenia logo. Ocenia, czy rozwiązanie działa."
+        }
+      ],
+      "reward": {
+        "fragment": 1
+      }
+    },
+    {
+      "id": "b03",
+      "type": "narration",
+      "text": "Wybieracie dane, których naprawdę użyjecie, i wersję pomysłu, którą da się pokazać po dwóch dobach — nie tę idealną. Każda funkcja ma właściciela i termin. Noc mija na prototypie, poranek na testach, popołudnie na przygotowaniu prezentacji.",
+      "advance": "tap"
+    },
+    {
+      "id": "b04",
+      "type": "action",
+      "prompt": "Godzina trzydziesta szósta: awaria integracji danych. Przeskocz plątaninę kabli i wróć do pracy!",
+      "input": "jump",
+      "obstacle": "kable",
+      "windowMs": 800,
+      "reward": {
+        "fragment": 2
+      }
+    },
+    {
+      "id": "b05",
+      "type": "choice",
+      "prompt": "Pitch przed jury trwa kilka minut. Od czego zaczynasz?",
+      "obstacle": "kolumna",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Od problemu i tego, komu PCIS pomaga — technologia dopiero potem.",
+          "correct": true,
+          "feedback": "Jury pamięta historię o ludziach, nie listę bibliotek. Problem najpierw, rozwiązanie po nim.",
+          "skill": "Pitch przed jury"
+        },
+        {
+          "text": "Od architektury systemu.",
+          "correct": false,
+          "feedback": "Po pierwszej minucie o architekturze sala patrzy w telefony."
+        },
+        {
+          "text": "Od podziękowań dla sponsorów.",
+          "correct": false,
+          "feedback": "Sponsorzy nie oceniają. Oceniają jurorzy — i chcą usłyszeć, co zbudowaliście."
+        }
+      ],
+      "reward": {
+        "fragment": 3
+      }
+    },
+    {
+      "id": "b06",
+      "type": "interaction",
+      "widget": "puzzle",
+      "text": "Ułóż obraz: orbita, satelita nad Polską i zespół przy jednym monitorze.",
+      "reward": {
+        "fragment": 4
+      }
+    },
+    {
+      "id": "b07",
+      "type": "choice",
+      "prompt": "Prototyp działa tylko na przykładowych danych. Co mówisz jury?",
+      "obstacle": "boty",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Prawdę: pokazujesz, co działa, i mówisz, co jest następnym krokiem.",
+          "correct": true,
+          "feedback": "Uczciwy zakres buduje zaufanie. Jury woli działający wycinek niż obietnicę wszystkiego.",
+          "skill": "Szybkie prototypowanie"
+        },
+        {
+          "text": "Że wszystko jest gotowe do wdrożenia.",
+          "correct": false,
+          "feedback": "Jedno pytanie z sali obnaża przesadę i zabiera wiarygodność całemu zespołowi."
+        },
+        {
+          "text": "Nic — może nie zapytają.",
+          "correct": false,
+          "feedback": "Zapytają. Zawsze pytają."
+        }
+      ],
+      "reward": {
+        "fragment": 5
+      }
+    },
+    {
+      "id": "b08",
+      "type": "interaction",
+      "widget": "button",
+      "label": "OGŁOSZENIE WYNIKÓW",
+      "style": "zrzutka",
+      "counter": {
+        "from": 0,
+        "to": 5,
+        "suffix": ". miejsce"
+      },
+      "text": "Ogłaszają wyniki. Kliknij, by zobaczyć, jak wysoko zaszedł PCIS.",
+      "reward": {
+        "fragment": 6
+      }
+    },
+    {
+      "id": "b09",
+      "type": "results",
+      "stats": [
+        {
+          "skill": "Szybkie prototypowanie",
+          "delta": 10
+        },
+        {
+          "skill": "Pitch przed jury",
+          "delta": 10
+        },
+        {
+          "skill": "Zespół interdyscyplinarny",
+          "delta": 10
+        }
+      ],
+      "kpis": [
+        {
+          "label": "Miejsce",
+          "value": "5. w klasyfikacji ogólnej"
+        },
+        {
+          "label": "Nagroda",
+          "value": "5 000 zł"
+        },
+        {
+          "label": "Nagroda specjalna SES",
+          "value": "wyjazd do centrum kontroli SES w Luksemburgu"
+        },
+        {
+          "label": "Wyróżnienie",
+          "value": "nagroda ARP S.A."
+        },
+        {
+          "label": "Czas",
+          "value": "48 godzin"
+        }
+      ]
+    },
+    {
+      "id": "b10",
+      "type": "finale",
+      "text": "Dwie doby, obcy ludzie i dane z orbity — a na koniec piąte miejsce i bilet do centrum kontroli satelitów. Jeśli organizujesz hackathon albo program dla startupów — chętnie pomogę zespołom dojść do finału.",
+      "cta": {
+        "label": "Napisz do Arka na LinkedIn",
+        "url": "https://www.linkedin.com/in/arkadiusz-klej/"
+      }
+    }
+  ]
+}

@@ -1,0 +1,199 @@
+{
+  "id": "tajemnica-pieczeci",
+  "world": "edukacja",
+  "draft": true,
+  "title": "Wprowadź tysiące studentów na uczelnię przez grę „Tajemnica pieczęci”",
+  "lead": "Pierwsze dni na uczelni decydują, czy student zostanie. Uniwersytet SWPS potrzebuje narzędzia, które uczy pracy zespołowej i regulacji emocji, zanim zacznie się pierwszy egzamin.",
+  "role": "Projektant platformy onboardingowej „Tajemnica pieczęci” dla Uniwersytetu SWPS",
+  "skills": ["Projektowanie gier edukacyjnych", "Onboarding studentów", "Praca zespołowa i emocje"],
+  "painting": {
+    "src": "assets/paintings/tajemnica-pieczeci.svg",
+    "cols": 3,
+    "rows": 2,
+    "caption": "Tajemnica pieczęci: lakowa pieczęć, sześć wież kampusów i krąg studentów przy jednym stole. Obraz odrestaurowany."
+  },
+  "runner": {
+    "theme": "edukacja",
+    "baseSpeed": 220,
+    "choiceSlowdown": 0.35
+  },
+  "beats": [
+    {
+      "id": "b01",
+      "type": "narration",
+      "text": "Kilkanaście tysięcy studentów rocznie zaczyna studia na sześciu kampusach Uniwersytetu SWPS. Większość nie zna nikogo, część nie wie, jak pracować w zespole, a stres pierwszych tygodni potrafi wyprowadzić z równowagi najlepszych. Uczelnia prosi Cię o narzędzie, które pomoże im wejść w nową rolę.",
+      "advance": "tap"
+    },
+    {
+      "id": "b02",
+      "type": "choice",
+      "prompt": "Jak wprowadzić tysiące osób naraz, żeby nie skończyło się na wykładzie powitalnym?",
+      "obstacle": "kolumna",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Grą: zespołową zagadką, w której trzeba współpracować i panować nad emocjami.",
+          "correct": true,
+          "feedback": "Gra angażuje tam, gdzie wykład usypia. Zespół, który wspólnie rozwiąże zagadkę, zostaje zespołem także po zajęciach.",
+          "skill": "Projektowanie gier edukacyjnych"
+        },
+        {
+          "text": "Serią wykładów o regulacji emocji.",
+          "correct": false,
+          "feedback": "O emocjach nie da się opowiedzieć — trzeba je poczuć w bezpiecznym zadaniu."
+        },
+        {
+          "text": "Wysłać PDF z regulaminem studiów.",
+          "correct": false,
+          "feedback": "Regulamin nikogo nie połączył z grupą. A o to chodzi w pierwszych dniach."
+        }
+      ],
+      "reward": {
+        "fragment": 1
+      }
+    },
+    {
+      "id": "b03",
+      "type": "narration",
+      "text": "Powstaje „Tajemnica pieczęci”: platforma, na której zespoły nowych studentów rozwiązują zagadkę osadzoną w historii uczelni. Każde zadanie wymaga rozmowy, podziału ról i zauważenia, co dzieje się z emocjami w grupie, gdy czas się kończy.",
+      "advance": "tap"
+    },
+    {
+      "id": "b04",
+      "type": "action",
+      "prompt": "Pierwszy tydzień roku akademickiego: sześć kampusów startuje jednocześnie. Przeskocz bramę kampusu — platforma musi wytrzymać wszystkich naraz!",
+      "input": "jump",
+      "obstacle": "brama",
+      "windowMs": 800,
+      "reward": {
+        "fragment": 2
+      }
+    },
+    {
+      "id": "b05",
+      "type": "choice",
+      "prompt": "Zespół utknął na zadaniu i zaczyna się kłócić. Co robi gra?",
+      "obstacle": "boty",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Zatrzymuje się na chwilę i prosi zespół, by nazwał, co czuje, zanim ruszy dalej.",
+          "correct": true,
+          "feedback": "Regulacja emocji to umiejętność, którą ćwiczy się w trudnym momencie, nie po nim. Gra daje do tego bezpieczną przestrzeń.",
+          "skill": "Praca zespołowa i emocje"
+        },
+        {
+          "text": "Kasuje punkty za kłótnię.",
+          "correct": false,
+          "feedback": "Kara uczy ukrywania emocji, nie ich rozumienia."
+        },
+        {
+          "text": "Nic — niech się wyładują.",
+          "correct": false,
+          "feedback": "Bez sygnału ze strony gry zespół rozpada się w pierwszym tygodniu."
+        }
+      ],
+      "reward": {
+        "fragment": 3
+      }
+    },
+    {
+      "id": "b06",
+      "type": "interaction",
+      "widget": "puzzle",
+      "text": "Ułóż obraz: pieczęć, wieże kampusów i krąg studentów przy stole.",
+      "reward": {
+        "fragment": 4
+      }
+    },
+    {
+      "id": "b07",
+      "type": "choice",
+      "prompt": "Jak sprawić, żeby platforma działała co roku bez Ciebie?",
+      "obstacle": "dokumenty",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Zaprojektować ją tak, by prowadzący i studenci obsługiwali ją sami — z gotowymi scenariuszami i instrukcjami.",
+          "correct": true,
+          "feedback": "Narzędzie, które potrzebuje autora przy każdym starcie, nie skaluje się. Dobre narzędzie oddaje się w ręce innych.",
+          "skill": "Onboarding studentów"
+        },
+        {
+          "text": "Prowadzić każdą edycję osobiście.",
+          "correct": false,
+          "feedback": "Sześć kampusów i kilkanaście tysięcy osób rocznie — jedna osoba tego nie udźwignie."
+        },
+        {
+          "text": "Nagrać jedno wideo powitalne.",
+          "correct": false,
+          "feedback": "Wideo ogląda się samotnie. Onboarding ma budować zespół."
+        }
+      ],
+      "reward": {
+        "fragment": 5
+      }
+    },
+    {
+      "id": "b08",
+      "type": "interaction",
+      "widget": "button",
+      "label": "URUCHOM ROK AKADEMICKI",
+      "style": "zrzutka",
+      "counter": {
+        "from": 0,
+        "to": 6,
+        "suffix": " kampusów"
+      },
+      "text": "Platforma startuje na wszystkich kampusach jednocześnie. Kliknij, by zobaczyć skalę.",
+      "reward": {
+        "fragment": 6
+      }
+    },
+    {
+      "id": "b09",
+      "type": "results",
+      "stats": [
+        {
+          "skill": "Projektowanie gier edukacyjnych",
+          "delta": 10
+        },
+        {
+          "skill": "Onboarding studentów",
+          "delta": 10
+        },
+        {
+          "skill": "Praca zespołowa i emocje",
+          "delta": 10
+        }
+      ],
+      "kpis": [
+        {
+          "label": "Studenci rocznie",
+          "value": "kilkanaście tysięcy"
+        },
+        {
+          "label": "Kampusy",
+          "value": "6"
+        },
+        {
+          "label": "Uczelnia",
+          "value": "Uniwersytet SWPS"
+        },
+        {
+          "label": "Cel",
+          "value": "praca zespołowa i regulacja emocji od pierwszego tygodnia"
+        }
+      ]
+    },
+    {
+      "id": "b10",
+      "type": "finale",
+      "text": "Pierwsze dni studiów zaczynają się od wspólnej zagadki, nie od samotnego regulaminu. Jeśli Twoja uczelnia lub organizacja wprowadza nowe osoby — mogę pomóc zaprojektować ich pierwszy tydzień.",
+      "cta": {
+        "label": "Napisz do Arka na LinkedIn",
+        "url": "https://www.linkedin.com/in/arkadiusz-klej/"
+      }
+    }
+  ]
+}

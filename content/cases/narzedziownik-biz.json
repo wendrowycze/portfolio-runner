@@ -1,0 +1,209 @@
+{
+  "id": "narzedziownik-biz",
+  "world": "edukacja",
+  "draft": true,
+  "title": "Daj nauczycielom narzędziownik do nowego przedmiotu „biznes i zarządzanie”",
+  "lead": "Do szkół wchodzi nowy przedmiot: biznes i zarządzanie. Nauczyciele potrzebują gotowych, sprawdzonych materiałów — i to szybko. Zbuduj dla nich narzędziownik, który zadziała w tysiącach klas.",
+  "role": "Autor Narzędziownika BIZ dla Zwolnionych z Teorii (e-learning + materiały dla nauczycieli)",
+  "skills": [
+    "Projektowanie e-learningu",
+    "Materiały dla nauczycieli",
+    "Skalowanie programu edukacyjnego"
+  ],
+  "painting": {
+    "src": "assets/paintings/narzedziownik-biz.svg",
+    "cols": 3,
+    "rows": 2,
+    "caption": "Narzędziownik BIZ: otwarta skrzynka z narzędziami, tablica i tysiące ławek w perspektywie. Obraz odrestaurowany."
+  },
+  "runner": {
+    "theme": "edukacja",
+    "baseSpeed": 220,
+    "choiceSlowdown": 0.35
+  },
+  "beats": [
+    {
+      "id": "b01",
+      "type": "narration",
+      "text": "W szkołach pojawia się nowy przedmiot: biznes i zarządzanie. Podstawa programowa jest, podręczniki dopiero powstają, a nauczyciele — często poloniści, historycy, matematycy — mają go uczyć od września. Fundacja Zwolnieni z Teorii prosi Cię o narzędziownik: zestaw materiałów, które pozwolą poprowadzić lekcje bez wcześniejszego doświadczenia w biznesie.",
+      "advance": "tap"
+    },
+    {
+      "id": "b02",
+      "type": "choice",
+      "prompt": "Od czego zaczynasz projektowanie narzędziownika?",
+      "obstacle": "dokumenty",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Od potrzeb nauczyciela: gotowe scenariusze lekcji, które da się poprowadzić od razu.",
+          "correct": true,
+          "feedback": "Nauczyciel ma 45 minut i klasę przed sobą. Scenariusz, który działa „z pudełka”, to najcenniejsza rzecz, jaką możesz mu dać.",
+          "skill": "Materiały dla nauczycieli"
+        },
+        {
+          "text": "Od teorii zarządzania: pełny kurs akademicki dla nauczycieli.",
+          "correct": false,
+          "feedback": "Kurs akademicki wymaga miesięcy. Nauczyciel potrzebuje materiału na najbliższy poniedziałek."
+        },
+        {
+          "text": "Od aplikacji mobilnej dla uczniów — nauczyciel poradzi sobie sam.",
+          "correct": false,
+          "feedback": "Bez wsparcia nauczyciela nowy przedmiot zostaje na papierze. To on prowadzi lekcję, nie aplikacja."
+        }
+      ],
+      "reward": {
+        "fragment": 1
+      }
+    },
+    {
+      "id": "b03",
+      "type": "narration",
+      "text": "Narzędziownik łączy e-learning z materiałami do pracy w klasie: scenariusze, karty pracy, przykłady z życia młodych przedsiębiorców. Wszystko projektujesz tak, by dało się je wydrukować w szkolnej kserokopiarce i wyświetlić na najstarszym rzutniku w budynku.",
+      "advance": "tap"
+    },
+    {
+      "id": "b04",
+      "type": "action",
+      "prompt": "Pierwszy semestr rusza. Przeskocz stos formularzy — materiały muszą trafić do szkół przed pierwszym dzwonkiem!",
+      "input": "jump",
+      "obstacle": "dokumenty",
+      "windowMs": 800,
+      "reward": {
+        "fragment": 2
+      }
+    },
+    {
+      "id": "b05",
+      "type": "choice",
+      "prompt": "Jak sprawdzić, czy narzędziownik naprawdę działa w klasie?",
+      "obstacle": "brama",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Testować z nauczycielami i uczniami, zbierać uwagi i poprawiać kolejne wersje.",
+          "correct": true,
+          "feedback": "Materiał edukacyjny sprawdza się dopiero w klasie. Każda iteracja z nauczycielami czyni go bardziej użytecznym.",
+          "skill": "Projektowanie e-learningu"
+        },
+        {
+          "text": "Wystarczy recenzja eksperta od zarządzania.",
+          "correct": false,
+          "feedback": "Ekspert oceni poprawność, ale nie powie, czy 28 piętnastolatków wytrzyma 45 minut z tym materiałem."
+        },
+        {
+          "text": "Opublikować i czekać na oceny w internecie.",
+          "correct": false,
+          "feedback": "Nauczyciele nie mają czasu pisać recenzji. Trzeba do nich pójść."
+        }
+      ],
+      "reward": {
+        "fragment": 3
+      }
+    },
+    {
+      "id": "b06",
+      "type": "interaction",
+      "widget": "button",
+      "label": "WYŚLIJ DO SZKÓŁ",
+      "style": "zrzutka",
+      "counter": {
+        "from": 0,
+        "to": 1993,
+        "suffix": " nauczycieli"
+      },
+      "text": "Narzędziownik trafia do nauczycieli w całej Polsce. Kliknij, by zobaczyć, ilu z nich z niego skorzystało.",
+      "reward": {
+        "fragment": 4
+      }
+    },
+    {
+      "id": "b07",
+      "type": "narration",
+      "text": "Za nauczycielami idą uczniowie: każda klasa, w której narzędziownik zadziałał, to kilkudziesięciu młodych ludzi, którzy po raz pierwszy liczą marżę, planują projekt i dzielą się rolami w zespole. Skala rośnie szybciej, niż zakładał ktokolwiek przy pierwszym szkicu.",
+      "advance": "tap"
+    },
+    {
+      "id": "b08",
+      "type": "interaction",
+      "widget": "puzzle",
+      "text": "Ułóż obraz: skrzynka z narzędziami, tablica i ławki — narzędziownik w klasie.",
+      "reward": {
+        "fragment": 5
+      }
+    },
+    {
+      "id": "b09",
+      "type": "choice",
+      "prompt": "Program dostaje nagrodę „Innovation 2023”. Co jest w nim najbardziej innowacyjne?",
+      "obstacle": "kable",
+      "timerMs": 7000,
+      "options": [
+        {
+          "text": "Że skaluje się bez Ciebie: nauczyciele prowadzą lekcje sami, materiały żyją własnym życiem.",
+          "correct": true,
+          "feedback": "Najlepsze narzędzie edukacyjne to takie, które nie potrzebuje autora w sali. Dlatego działa w tysiącach klas naraz.",
+          "skill": "Skalowanie programu edukacyjnego"
+        },
+        {
+          "text": "Że jest w internecie.",
+          "correct": false,
+          "feedback": "E-learning to forma, nie innowacja. Wartość tkwi w tym, że nauczyciel bez doświadczenia biznesowego prowadzi dobrą lekcję."
+        },
+        {
+          "text": "Że ma ładną okładkę.",
+          "correct": false,
+          "feedback": "Okładki nie uczą. Uczą scenariusze, które działają."
+        }
+      ],
+      "reward": {
+        "fragment": 6
+      }
+    },
+    {
+      "id": "b10",
+      "type": "results",
+      "stats": [
+        {
+          "skill": "Projektowanie e-learningu",
+          "delta": 10
+        },
+        {
+          "skill": "Materiały dla nauczycieli",
+          "delta": 10
+        },
+        {
+          "skill": "Skalowanie programu edukacyjnego",
+          "delta": 10
+        }
+      ],
+      "kpis": [
+        {
+          "label": "Nauczyciele",
+          "value": "1 993"
+        },
+        {
+          "label": "Uczniowie",
+          "value": "60 003"
+        },
+        {
+          "label": "Nagroda",
+          "value": "Innovation 2023"
+        },
+        {
+          "label": "Program",
+          "value": "Zwolnieni z Teorii — Narzędziownik BIZ"
+        }
+      ]
+    },
+    {
+      "id": "b11",
+      "type": "finale",
+      "text": "Nowy przedmiot zaczął się w tysiącach klas od gotowego scenariusza, nie od pustej tablicy. Jeśli Twoja organizacja wprowadza program edukacyjny na dużą skalę — porozmawiajmy.",
+      "cta": {
+        "label": "Napisz do Arka na LinkedIn",
+        "url": "https://www.linkedin.com/in/arkadiusz-klej/"
+      }
+    }
+  ]
+}

@@ -33,7 +33,7 @@
       <stop offset="1" stop-color="#895F47"/>
     </linearGradient>
   </defs>
-  <rect width="960" height="640" fill="url(#mauresque)"/>
+  <rect width="960" height="640" fill="url(#shelves)"/>
   <rect x="36" y="36" width="888" height="568" fill="url(#marble)"/>
   <rect x="36" y="36" width="888" height="568" fill="url(#glow)" opacity="0.75"/>
   <rect x="36" y="36" width="888" height="568" fill="none" stroke="#DFB67C" stroke-width="6"/>
@@ -43,42 +43,38 @@
     <path d="M480 120 L60 200"/><path d="M480 120 L900 200"/><path d="M480 120 L480 -20"/>
   </g>
   
-      <g transform="translate(480 250)" fill="none" stroke="#DFB67C" stroke-opacity="0.5" stroke-width="2">
-        <polygon points="0,-150 130,75 -130,75" transform="rotate(0)"/><polygon points="0,-150 130,75 -130,75" transform="rotate(30)"/><polygon points="0,-150 130,75 -130,75" transform="rotate(60)"/><polygon points="0,-150 130,75 -130,75" transform="rotate(90)"/><polygon points="0,-150 130,75 -130,75" transform="rotate(120)"/><polygon points="0,-150 130,75 -130,75" transform="rotate(150)"/>
+      <g transform="translate(480 230)">
+        <rect x="-150" y="-70" width="300" height="130" rx="8" fill="#895F47" stroke="#DFB67C" stroke-width="5"/>
+        <rect x="-150" y="-70" width="300" height="22" fill="#DFB67C"/>
+        <rect x="-30" y="-92" width="60" height="30" rx="6" fill="none" stroke="#DFB67C" stroke-width="5"/>
+        <g stroke="#E2E9E1" stroke-width="10" stroke-linecap="round"><path d="M-110 -20 L-60 40"/><path d="M-40 -30 L-40 40"/><path d="M20 -30 L60 40"/><path d="M100 -20 L100 40"/></g>
+        <circle cx="-110" cy="-24" r="14" fill="#DFB67C"/><rect x="-52" y="-42" width="24" height="16" fill="#DFB67C"/><path d="M8 -40 L32 -40 L20 -18 Z" fill="#DFB67C"/><rect x="88" y="-40" width="24" height="24" rx="12" fill="#DFB67C"/>
       </g>
-      <g id="palace">
-        <rect x="280" y="230" width="400" height="150" fill="#3E2219" stroke="#DFB67C" stroke-width="4"/>
-        <path d="M262 232 L698 232 L480 150 Z" fill="#895F47" stroke="#DFB67C" stroke-width="4" stroke-linejoin="round"/>
-        <rect x="308" y="240" width="24" height="140" fill="url(#stone)"/><rect x="302" y="236" width="36" height="8" fill="#DFB67C"/><rect x="388" y="240" width="24" height="140" fill="url(#stone)"/><rect x="382" y="236" width="36" height="8" fill="#DFB67C"/><rect x="468" y="240" width="24" height="140" fill="url(#stone)"/><rect x="462" y="236" width="36" height="8" fill="#DFB67C"/><rect x="548" y="240" width="24" height="140" fill="url(#stone)"/><rect x="542" y="236" width="36" height="8" fill="#DFB67C"/><rect x="628" y="240" width="24" height="140" fill="url(#stone)"/><rect x="622" y="236" width="36" height="8" fill="#DFB67C"/>
-        <rect x="344" y="270" width="32" height="48" fill="#DFB67C" fill-opacity="0.35" stroke="#DFB67C" stroke-width="2"/><rect x="424" y="270" width="32" height="48" fill="#DFB67C" fill-opacity="0.35" stroke="#DFB67C" stroke-width="2"/><rect x="504" y="270" width="32" height="48" fill="#DFB67C" fill-opacity="0.35" stroke="#DFB67C" stroke-width="2"/><rect x="584" y="270" width="32" height="48" fill="#DFB67C" fill-opacity="0.35" stroke="#DFB67C" stroke-width="2"/>
-        <path d="M456 380 L456 320 A24 24 0 0 1 504 320 L504 380 Z" fill="#DFB67C" fill-opacity="0.5" stroke="#DFB67C" stroke-width="3"/>
-        <rect x="270" y="380" width="420" height="12" fill="#DFB67C"/><rect x="254" y="392" width="452" height="12" fill="#895F47" stroke="#DFB67C" stroke-width="2"/>
-      </g>
-      <g transform="translate(480 500)"><path d="M-40 40 L-10 -30 L0 -60 L10 -30 L40 40 Z" fill="#742224" stroke="#DFB67C" stroke-width="3" stroke-linejoin="round"/><path d="M-18 40 L-4 0 L0 -20 L4 0 L18 40 Z" fill="#DFB67C"/><rect x="-60" y="40" width="120" height="8" fill="#895F47"/></g>
-      <g transform="translate(230 470) scale(1)">
+      <g transform="translate(120 130)"><path d="M0 0 V120 H170" fill="none" stroke="#DFB67C" stroke-width="3"/><rect x="6" y="109" width="22" height="11" fill="#895F47" stroke="#DFB67C" stroke-width="2"/><rect x="40" y="98" width="22" height="22" fill="#895F47" stroke="#DFB67C" stroke-width="2"/><rect x="74" y="70.5" width="22" height="49.5" fill="#895F47" stroke="#DFB67C" stroke-width="2"/><rect x="108" y="43" width="22" height="77" fill="#895F47" stroke="#DFB67C" stroke-width="2"/><rect x="142" y="10" width="22" height="110" fill="#742224" stroke="#DFB67C" stroke-width="2"/></g>
+      <g transform="translate(700 130)"><rect x="0" y="0" width="150" height="100" fill="#0B2F2E" stroke="#DFB67C" stroke-width="4"/><text x="75" y="60" text-anchor="middle" font-family="Georgia, serif" font-size="34" fill="#E2E9E1">BIZ</text></g>
+      <rect x="140" y="430" width="90" height="18" fill="#895F47" stroke="#DFB67C" stroke-width="2"/><rect x="260" y="430" width="90" height="18" fill="#895F47" stroke="#DFB67C" stroke-width="2"/><rect x="380" y="430" width="90" height="18" fill="#895F47" stroke="#DFB67C" stroke-width="2"/><rect x="500" y="430" width="90" height="18" fill="#895F47" stroke="#DFB67C" stroke-width="2"/><rect x="620" y="430" width="90" height="18" fill="#895F47" stroke="#DFB67C" stroke-width="2"/><rect x="740" y="430" width="90" height="18" fill="#895F47" stroke="#DFB67C" stroke-width="2"/>
+      <g transform="translate(240 520) scale(0.75)">
     <circle cx="0" cy="-118" r="22" fill="#895F47" stroke="#DFB67C" stroke-width="3"/>
     <path d="M-26 -92 L26 -92 L38 24 L-38 24 Z" fill="#895F47" stroke="#DFB67C" stroke-width="3" stroke-linejoin="round"/>
     <path d="M-14 -70 L14 -70 L18 -58 L-18 -58 Z" fill="#DFB67C"/>
     <path d="M-20 -86 L-36 -118 L-60 -150" fill="none" stroke="#895F47" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
      <path d="M-20 -86 L-36 -118 L-60 -150" fill="none" stroke="#DFB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
-    <path d="M20 -86 L48 -138 L80 -190" fill="none" stroke="#895F47" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
-     <path d="M20 -86 L48 -138 L80 -190" fill="none" stroke="#DFB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <path d="M20 -86 L42 -138 L70 -190" fill="none" stroke="#895F47" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+     <path d="M20 -86 L42 -138 L70 -190" fill="none" stroke="#DFB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
     <path d="M-24 24 L-20 96 M24 24 L20 96" fill="none" stroke="#895F47" stroke-width="16" stroke-linecap="round"/>
     <path d="M-34 100 L-6 100 M6 100 L34 100" fill="none" stroke="#DFB67C" stroke-width="6" stroke-linecap="round"/>
   </g>
-      <path d="M310 275 L330 240" stroke="#E2E9E1" stroke-width="8" stroke-linecap="round"/><rect x="298" y="268" width="24" height="6" transform="rotate(-60 310 271)" fill="#DFB67C"/>
-      <g transform="translate(730 470) scale(1)">
+      <g transform="translate(720 520) scale(0.75)">
     <circle cx="0" cy="-118" r="22" fill="#895F47" stroke="#DFB67C" stroke-width="3"/>
     <path d="M-26 -92 L26 -92 L38 24 L-38 24 Z" fill="#895F47" stroke="#DFB67C" stroke-width="3" stroke-linejoin="round"/>
     <path d="M-14 -70 L14 -70 L18 -58 L-18 -58 Z" fill="#DFB67C"/>
-    <path d="M-20 -86 L-48 -138 L-80 -190" fill="none" stroke="#895F47" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
-     <path d="M-20 -86 L-48 -138 L-80 -190" fill="none" stroke="#DFB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
-    <path d="M20 -86 L33.6 -118 L56 -150" fill="none" stroke="#895F47" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
-     <path d="M20 -86 L33.6 -118 L56 -150" fill="none" stroke="#DFB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <path d="M-20 -86 L-42 -138 L-70 -190" fill="none" stroke="#895F47" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+     <path d="M-20 -86 L-42 -138 L-70 -190" fill="none" stroke="#DFB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <path d="M20 -86 L36 -118 L60 -150" fill="none" stroke="#895F47" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+     <path d="M20 -86 L36 -118 L60 -150" fill="none" stroke="#DFB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
     <path d="M-24 24 L-20 96 M24 24 L20 96" fill="none" stroke="#895F47" stroke-width="16" stroke-linecap="round"/>
     <path d="M-34 100 L-6 100 M6 100 L34 100" fill="none" stroke="#DFB67C" stroke-width="6" stroke-linecap="round"/>
   </g>
-      <path d="M650 280 L622 250 L648 232 L670 262 Z" fill="#E2E9E1" stroke="#DFB67C" stroke-width="2"/>
   <rect x="60" y="576" width="840" height="4" fill="#DFB67C"/>
-  <text x="480" y="600" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" letter-spacing="6" fill="#DFB67C">KALEJDOSKOP · GARDZIENICE · 120 AKTORÓW · 4 KRAJE</text>
+  <text x="480" y="600" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" letter-spacing="6" fill="#DFB67C">ZWOLNIENI Z TEORII · NARZĘDZIOWNIK BIZ · 60 003 UCZNIÓW</text>
 </svg>

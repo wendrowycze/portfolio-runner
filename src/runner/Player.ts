@@ -17,6 +17,7 @@ export class Player {
   readonly sprite: Phaser.Physics.Arcade.Sprite;
   private state: PlayerState = 'run';
   private stumbleUntil = 0;
+  private breathing: Phaser.Tweens.Tween | undefined;
   private readonly dust: Phaser.GameObjects.Particles.ParticleEmitter;
   private readonly reducedMotion: boolean;
 
@@ -76,6 +77,7 @@ export class Player {
   run(): void {
     if (this.state === 'stumble' || this.state === 'jump') return;
     this.state = 'run';
+    this.stopBreathing();
     this.sprite.play(ANIM_RUN, true);
     if (!this.sprite.anims.forward) this.sprite.anims.reverse();
     this.dust.start();
@@ -87,6 +89,25 @@ export class Player {
     this.sprite.anims.stop();
     this.sprite.setTexture(textureKey('player.idle'));
     this.dust.stop();
+    if (!this.reducedMotion) {
+      // Oddech: delikatne unoszenie barków, żeby postać nie „zamarzała”.
+      this.breathing = this.scene.tweens.add({
+        targets: this.sprite,
+        scaleY: 1.025,
+        scaleX: 0.99,
+        duration: 1300,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+    }
+  }
+
+  private stopBreathing(): void {
+    if (this.breathing === undefined) return;
+    this.breathing.stop();
+    this.breathing = undefined;
+    this.sprite.setScale(1);
   }
 
   /** Skok — tylko z ziemi i nie w trakcie potknięcia. Zwraca true, jeśli skok się odbył. */
@@ -184,11 +205,23 @@ export class Player {
         this.sprite.play(ANIM_RUN, true);
         this.dust.explode(6);
         this.dust.start();
+        if (!this.reducedMotion) {
+          // Lądowanie: „squash” (GRIS/Hades — ciężar postaci widać w stopach).
+          this.scene.tweens.add({
+            targets: this.sprite,
+            scaleX: 1.14,
+            scaleY: 0.86,
+            duration: 90,
+            yoyo: true,
+            ease: 'Quad.easeOut',
+          });
+        }
       }
     }
   }
 
   destroy(): void {
+    this.stopBreathing();
     this.dust.destroy();
     this.sprite.destroy();
   }

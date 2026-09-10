@@ -13,7 +13,10 @@ import type {
   StatDelta,
 } from '../script/types';
 import { totalFragments } from '../script/types';
+import { choiceTimerMs } from '../script/timing';
 import type { GameState } from '../state/GameState';
+import { canEnter, isValidEmail, litTorches, TORCHES_TOTAL, type Visitor } from '../state/Visitor';
+import { FLOORS } from '../config/hotel';
 import { clear, el, formatDuration, prefersReducedMotion } from './dom';
 import { typewrite, type TypewriterHandle } from './typewriter';
 import { createWidget, type Widget } from './widgets/createWidget';
@@ -122,10 +125,170 @@ export class DialoguePanel {
   }
 
   /**
-   * Widok hubu: lista historii z galerii (tytuł, rola, świat, stan obrazu) i przyciski wejścia.
-   * Wejście = zdarzenie `hub:enter` na magistrali (scena hubu robi przejście).
+   * Ekran startowy: formularz imię + mail + dźwignia RODO. Każde wypełnione pole zapala
+   * pochodnię na fasadzie (`start:progress`); „Wejdź” aktywne, gdy płoną wszystkie
+   * (albo gość wchodzi bez danych). Dane zostają w pamięci (Visitor), nic nie jest wysyłane.
    */
-  showHubGallery(cases: Case[], completed: ReadonlySet<string>): void {
+  showStart(visitor: Visitor): void {
+    this.kejs = undefined;
+    clear(this.header);
+    clear(this.story);
+    clear(this.footer);
+    this.fragmentSlots.length = 0;
+    this.narrationParagraphs.clear();
+    this.root.dataset.phase = 'start';
+    delete this.root.dataset.beat;
+
+    const torches = el('p', { className: 'case-role', attrs: { 'data-testid': 'start-torches' } });
+    this.header.append(
+      torches,
+      el('h1', {
+        className: 'case-title',
+        attrs: { id: 'panel-title' },
+        text: this.strings.startTitle,
+      }),
+    );
+    const lead = this.appendEntry('entry-narration entry-lead');
+    lead.append(
+      el('p', { className: 'narration-text', text: this.strings.startLead }),
+      el('p', { className: 'hint hint-touch', text: this.strings.startTouchHint }),
+    );
+
+    const form = el('form', {
+      className: 'start-form',
+      attrs: { id: 'start-form', 'data-testid': 'start-form', novalidate: '' },
+    });
+    const name = el('input', {
+      className: 'field-input',
+      attrs: {
+        id: 'start-name',
+        type: 'text',
+        autocomplete: 'given-name',
+        placeholder: this.strings.startNamePlaceholder,
+        maxlength: '40',
+        'data-testid': 'start-name',
+      },
+    });
+    const email = el('input', {
+      className: 'field-input',
+      attrs: {
+        id: 'start-email',
+        type: 'email',
+        autocomplete: 'email',
+        placeholder: this.strings.startEmailPlaceholder,
+        'data-testid': 'start-email',
+      },
+    });
+    const consent = el('input', {
+      className: 'lever-input',
+      attrs: { id: 'start-consent', type: 'checkbox', 'data-testid': 'start-consent' },
+    });
+    const enter = el('button', {
+      className: 'button button-primary button-enter',
+      text: this.strings.startEnter,
+      // Przycisk stoi w stopce panelu (poza formularzem) — atrybut form spina go z formularzem.
+      attrs: { type: 'submit', form: 'start-form', 'data-testid': 'start-enter', disabled: '' },
+    });
+    const guest = el('button', {
+      className: 'button button-link',
+      text: this.strings.startGuest,
+      attrs: { type: 'button', 'data-testid': 'start-guest' },
+    });
+    const field = (id: string, label: string, input: HTMLElement, hint?: string): HTMLElement =>
+      el('div', {
+        className: 'field',
+        children: [
+          el('label', { className: 'field-label', attrs: { for: id }, text: label }),
+          input,
+          ...(hint === undefined ? [] : [el('p', { className: 'hint', text: hint })]),
+        ],
+      });
+    const lever = el('div', {
+      className: 'field field-lever',
+      children: [
+        el('label', {
+          className: 'lever',
+          attrs: { for: 'start-consent' },
+          children: [
+            consent,
+            el('span', {
+              className: 'lever-track',
+              children: [el('span', { className: 'lever-knob' })],
+            }),
+            el('span', { className: 'lever-text', text: this.strings.startConsent }),
+          ],
+        }),
+        el('p', { className: 'hint', text: this.strings.startConsentHint }),
+      ],
+    });
+    form.append(
+      field('start-name', this.strings.startName, name),
+      field('start-email', this.strings.startEmail, email, this.strings.startEmailHint),
+      lever,
+    );
+    const entry = this.appendEntry('entry-start');
+    entry.append(form);
+
+    let lastLit = -1;
+    const refresh = (): void => {
+      visitor.name = name.value;
+      visitor.email = email.value;
+      visitor.consent = consent.checked;
+      const lit = litTorches(visitor);
+      torches.textContent = format(this.strings.startTorches, { lit, total: TORCHES_TOTAL });
+      email.classList.toggle('is-invalid', email.value.length > 0 && !isValidEmail(email.value));
+      enter.disabled = !canEnter(visitor);
+      if (lit !== lastLit) {
+        lastLit = lit;
+        bus.emit('start:progress', lit, TORCHES_TOTAL);
+      }
+    };
+    for (const input of [name, email]) {
+      input.addEventListener('input', () => {
+        bus.emit('sfx', 'ui.type');
+        refresh();
+      });
+    }
+    consent.addEventListener('change', () => {
+      bus.emit('sfx', 'ui.tick');
+      refresh();
+    });
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      refresh();
+      if (!canEnter(visitor)) return;
+      this.lockStart(form, enter, guest);
+      bus.emit('sfx', 'ui.confirm');
+      bus.emit('start:enter');
+    });
+    guest.addEventListener('click', (event) => {
+      event.stopPropagation();
+      visitor.guest = true;
+      this.lockStart(form, enter, guest);
+      bus.emit('sfx', 'ui.confirm');
+      bus.emit('start:enter');
+    });
+    this.footer.append(enter, guest, this.audioToggle());
+    refresh();
+    name.focus({ preventScroll: true });
+  }
+
+  private lockStart(
+    form: HTMLFormElement,
+    enter: HTMLButtonElement,
+    guest: HTMLButtonElement,
+  ): void {
+    for (const input of form.querySelectorAll('input')) input.disabled = true;
+    enter.disabled = true;
+    guest.disabled = true;
+    this.root.dataset.phase = 'entering';
+  }
+
+  /**
+   * Widok hotelu: powitanie, opis sterowania, przyciski pięter (winda) i lista historii
+   * pogrupowana piętrami. Wejście = `hub:enter`, piętro = `hotel:go`.
+   */
+  showHotel(cases: Case[], completed: ReadonlySet<string>, visitor: Visitor, floor: number): void {
     this.kejs = undefined;
     clear(this.header);
     clear(this.story);
@@ -140,53 +303,172 @@ export class DialoguePanel {
         className: 'case-role',
         text: format(this.strings.hubProgress, { done: completed.size, total: cases.length }),
       }),
-      el('h1', { className: 'case-title', attrs: { id: 'panel-title' }, text: 'Portfolio Runner' }),
+      el('h1', {
+        className: 'case-title',
+        attrs: { id: 'panel-title' },
+        text: this.strings.hotelTitle,
+      }),
     );
     const lead = this.appendEntry('entry-narration entry-lead');
-    lead.append(el('p', { className: 'narration-text', text: this.strings.hubGalleryLead }));
+    const greeting =
+      visitor.name.trim().length > 0
+        ? `${format(this.strings.hotelWelcome, { name: visitor.name.trim() })} `
+        : '';
+    lead.append(
+      el('p', { className: 'narration-text', text: `${greeting}${this.strings.hotelLead}` }),
+      el('p', { className: 'hint', text: this.strings.hotelControls }),
+      el('p', { className: 'hint hint-touch', text: this.strings.hotelControlsTouch }),
+    );
 
-    const list = el('ol', { className: 'gallery', attrs: { 'data-testid': 'gallery' } });
-    for (const kejs of cases) {
-      const restored = completed.has(kejs.id);
-      const worldLabel =
-        kejs.world === 'biznes'
-          ? this.strings.hubWorldBiznes
-          : kejs.world === 'edukacja'
-            ? this.strings.hubWorldEdukacja
-            : this.strings.hubWorldKultura;
+    // Winda: przyciski pięter (od góry).
+    const floorsBox = el('div', {
+      className: 'floors',
+      attrs: { role: 'group', 'aria-label': this.strings.hotelElevator, 'data-testid': 'floors' },
+    });
+    const floorButtons: HTMLButtonElement[] = [];
+    for (const def of [...FLOORS].reverse()) {
+      const world = this.worldLabel(def.world);
+      const label =
+        def.index === 0
+          ? this.strings.hotelFloorGround
+          : format(this.strings.hotelFloorN, { n: def.index });
       const button = el('button', {
-        className: 'button gallery-enter',
-        text: restored ? this.strings.playAgain : this.strings.hubEnter,
-        attrs: { type: 'button', 'data-testid': 'hub-enter', 'data-case': kejs.id },
+        className: 'floor-button',
+        attrs: { type: 'button', 'data-testid': 'floor', 'data-floor': String(def.index) },
+        children: [
+          el('span', { className: 'floor-name', text: label }),
+          el('span', { className: 'floor-world', text: world }),
+        ],
       });
       button.addEventListener('click', (event) => {
         event.stopPropagation();
-        bus.emit('hub:enter', kejs.id);
+        bus.emit('sfx', 'ui.tick');
+        bus.emit('hotel:go', def.index);
       });
-      const item = el('li', {
-        className: `gallery-item${restored ? ' is-restored' : ''}`,
-        attrs: { 'data-case': kejs.id },
-        children: [
-          el('p', {
-            className: 'gallery-meta',
+      floorButtons.push(button);
+      floorsBox.append(button);
+    }
+    const setFloor = (index: number): void => {
+      for (const button of floorButtons) {
+        const here = button.dataset.floor === String(index);
+        button.classList.toggle('is-here', here);
+        button.setAttribute('aria-current', here ? 'true' : 'false');
+      }
+    };
+    setFloor(floor);
+    const elevatorEntry = this.appendEntry('entry-elevator');
+    elevatorEntry.append(
+      el('p', { className: 'hint', text: this.strings.hotelElevator }),
+      floorsBox,
+    );
+
+    // Lista historii pogrupowana piętrami.
+    const list = el('ol', { className: 'gallery', attrs: { 'data-testid': 'gallery' } });
+    for (const def of [...FLOORS].reverse()) {
+      const onFloor = cases.filter((c) => c.world === def.world);
+      if (onFloor.length === 0) continue;
+      const floorName =
+        def.index === 0
+          ? this.strings.hotelFloorGround
+          : format(this.strings.hotelFloorN, { n: def.index });
+      list.append(
+        el('li', {
+          className: 'gallery-floor',
+          attrs: { 'data-floor': String(def.index) },
+          text: `${floorName} · ${this.worldLabel(def.world)}`,
+        }),
+      );
+      for (const kejs of onFloor) {
+        const restored = completed.has(kejs.id);
+        const button = el('button', {
+          className: 'button gallery-enter',
+          text: restored ? this.strings.playAgain : this.strings.hubEnter,
+          attrs: { type: 'button', 'data-testid': 'hub-enter', 'data-case': kejs.id },
+        });
+        button.addEventListener('click', (event) => {
+          event.stopPropagation();
+          bus.emit('hub:enter', kejs.id);
+        });
+        const meta = el('p', {
+          className: 'gallery-meta',
+          children: [
+            el('span', { className: 'gallery-world', text: this.worldLabel(kejs.world) }),
+            el('span', {
+              className: 'gallery-status',
+              text: restored ? this.strings.hubRestored : this.strings.hubDamaged,
+            }),
+          ],
+        });
+        if (kejs.draft === true)
+          meta.append(el('span', { className: 'gallery-draft', text: this.strings.hotelDraft }));
+        list.append(
+          el('li', {
+            className: `gallery-item${restored ? ' is-restored' : ''}`,
+            attrs: { 'data-case': kejs.id },
             children: [
-              el('span', { className: 'gallery-world', text: worldLabel }),
-              el('span', {
-                className: 'gallery-status',
-                text: restored ? this.strings.hubRestored : this.strings.hubDamaged,
-              }),
+              meta,
+              el('h2', { className: 'gallery-title', text: kejs.title }),
+              el('p', { className: 'gallery-role', text: kejs.role }),
+              button,
             ],
           }),
-          el('h2', { className: 'gallery-title', text: kejs.title }),
-          el('p', { className: 'gallery-role', text: kejs.role }),
-          button,
-        ],
-      });
-      list.append(item);
+        );
+      }
     }
     const entry = this.appendEntry('entry-gallery');
     entry.append(list);
+    this.footer.append(this.audioToggle());
     this.story.scrollTop = 0;
+    this.hotelFloorSetter = setFloor;
+  }
+
+  private hotelFloorSetter: ((index: number) => void) | undefined;
+
+  /** Zmiana piętra (winda) — podświetla przycisk i przewija listę do piętra. */
+  setHotelFloor(index: number): void {
+    this.hotelFloorSetter?.(index);
+    const heading = this.story.querySelector<HTMLElement>(
+      `.gallery-floor[data-floor="${String(index)}"]`,
+    );
+    heading?.scrollIntoView({ block: 'start', behavior: this.reducedMotion ? 'auto' : 'smooth' });
+  }
+
+  private worldLabel(world: Case['world']): string {
+    return world === 'biznes'
+      ? this.strings.hubWorldBiznes
+      : world === 'edukacja'
+        ? this.strings.hubWorldEdukacja
+        : this.strings.hubWorldKultura;
+  }
+
+  private muted = false;
+
+  /** Przycisk wyciszenia — stan trzyma panel, dźwięk reaguje przez magistralę. */
+  private audioToggle(): HTMLElement {
+    const button = el('button', {
+      className: 'button button-audio',
+      attrs: {
+        type: 'button',
+        'data-testid': 'audio-toggle',
+        'aria-pressed': this.muted ? 'true' : 'false',
+        title: this.strings.audioToggle,
+      },
+      text: this.muted ? this.strings.audioOff : this.strings.audioOn,
+    });
+    button.addEventListener('click', (event) => {
+      event.stopPropagation();
+      this.setMuted(!this.muted);
+    });
+    return button;
+  }
+
+  setMuted(muted: boolean): void {
+    this.muted = muted;
+    for (const button of document.querySelectorAll<HTMLButtonElement>('.button-audio')) {
+      button.textContent = muted ? this.strings.audioOff : this.strings.audioOn;
+      button.setAttribute('aria-pressed', muted ? 'true' : 'false');
+    }
+    bus.emit('audio:muted', muted);
   }
 
   /** Podświetla pozycję listy odpowiadającą obrazowi pod kursorem w scenie hubu. */
@@ -280,8 +562,17 @@ export class DialoguePanel {
     });
     this.timerFill = el('div', { className: 'timer-fill' });
     timer.append(this.timerFill);
-    this.footer.append(el('p', { className: 'hint', text: this.strings.choiceHint }), list, timer);
+    this.footer.append(
+      el('p', { className: 'hint', text: this.strings.choiceHint }),
+      list,
+      timer,
+      el('p', {
+        className: 'hint timer-hint',
+        text: format(this.strings.choiceTimeHint, { seconds: Math.round(timerMs / 1000) }),
+      }),
+    );
     this.optionButtons[0]?.focus({ preventScroll: true });
+    bus.emit('sfx', 'choice.open');
     this.scrollToEnd(true);
   }
 
@@ -511,7 +802,9 @@ export class DialoguePanel {
     if (this.timerFill !== undefined) {
       const remaining = 1 - fraction;
       this.timerFill.style.width = `${String(remaining * 100)}%`;
-      this.timerFill.classList.toggle('is-low', remaining < 0.3);
+      const low = remaining < 0.3;
+      if (low && !this.timerFill.classList.contains('is-low')) bus.emit('sfx', 'timer.low');
+      this.timerFill.classList.toggle('is-low', low);
     }
     if (this.qteRing !== undefined) {
       const circumference = 2 * Math.PI * 44;
@@ -589,7 +882,7 @@ export class DialoguePanel {
         this.showNarration(beat.id);
         break;
       case 'choice':
-        this.showChoice(beat.prompt, beat.options, beat.timerMs);
+        this.showChoice(beat.prompt, beat.options, choiceTimerMs(beat));
         break;
       case 'action':
         this.showAction(beat.prompt, beat.windowMs);
@@ -702,6 +995,10 @@ export class DialoguePanel {
           this.heldKeys.add(event.code);
           this.emitDirection();
         }
+        break;
+      case 'KeyM':
+        if (event.repeat) return;
+        this.setMuted(!this.muted);
         break;
       case 'Space':
       case 'ArrowUp':

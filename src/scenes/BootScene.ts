@@ -8,6 +8,7 @@ import {
   generateStars,
 } from '../assets/generators/background';
 import { generateFx } from '../assets/generators/fx';
+import { generateHotel } from '../assets/generators/hotel';
 import { generateObstacles } from '../assets/generators/obstacles';
 import { generatePlayer } from '../assets/generators/player';
 import { GAME_HEIGHT, GAME_WIDTH } from '../config/gameConfig';
@@ -60,6 +61,7 @@ export class BootScene extends Phaser.Scene {
     generatePlayer(this);
     generateObstacles(this);
     generateFx(this);
+    generateHotel(this);
 
     label.destroy();
     const runnerData = this.registry.get('runnerData') as RunnerSceneData | undefined;
@@ -67,9 +69,12 @@ export class BootScene extends Phaser.Scene {
     if (runnerData?.startInRunner === true && runnerData.script !== undefined) {
       // ?case=… startuje historię od razu.
       this.scene.start('RunnerScene', runnerData);
+    } else if (gallery.length > 0 && runnerData?.skipStart === true) {
+      // ?guest=1 (i testy): prosto do hotelu.
+      this.scene.start('HotelScene', { floor: 0 });
     } else if (gallery.length > 0) {
-      // Domyślnie: hub z galerią obrazów.
-      this.scene.start('HubStubScene', {});
+      // Domyślnie: ciemny ekran startowy z pochodniami, potem hotel.
+      this.scene.start('StartScene');
     } else {
       // Tryb wolnego biegu (?free=1).
       this.scene.start('RunnerScene', runnerData ?? {});

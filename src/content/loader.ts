@@ -153,6 +153,7 @@ export const CaseSchema: z.ZodType<Case> = z
   .strictObject({
     id: z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'id case’a: kebab-case'),
     world: WorldSchema,
+    draft: z.boolean().optional(),
     title: z.string().min(1),
     lead: z.string().min(1),
     role: z.string().min(1),

@@ -9,6 +9,8 @@ import { ScriptRunner } from './script/ScriptRunner';
 import type { Case } from './script/types';
 import { createGameState, resetGameState } from './state/GameState';
 import { createProgress } from './state/progress';
+import { createVisitor } from './state/Visitor';
+import { AudioDirector } from './audio/AudioDirector';
 import { bus } from './events/bus';
 import { DialoguePanel } from './ui/DialoguePanel';
 import { clear, el } from './ui/dom';
@@ -54,13 +56,25 @@ async function start(): Promise<void> {
       : undefined;
 
   const progress = createProgress();
+  const visitor = createVisitor();
   const state = createGameState(TUNING.BASE_SPEED);
   const runner = new ScriptRunner(state);
   const panel = new DialoguePanel(panelContainer, runner, state, strings, {
     overlayParent: gameRoot,
     returnLabel: strings.finaleReturn,
   });
-  const runnerData: RunnerSceneData = { debug, startInRunner: startCase !== undefined };
+  const muted = urlFlag(search, 'mute');
+  const audio = new AudioDirector(runner, { muted });
+  if (muted) panel.setMuted(true);
+  // ?guest=1 pomija ekran startowy (także testy e2e); ?case=… pomija i start, i hotel.
+  const guest = urlFlag(search, 'guest');
+  if (guest) visitor.guest = true;
+  const runnerData: RunnerSceneData = {
+    debug,
+    startInRunner: startCase !== undefined,
+    skipStart: guest,
+  };
+  let currentFloor = 0;
 
   /** Przygotowuje silnik i panel na wybraną historię (świeży stan, przeładowany skrypt). */
   const prepare = (kejs: Case): void => {
@@ -79,7 +93,27 @@ async function start(): Promise<void> {
   });
 
   if (startCase !== undefined) prepare(startCase);
-  else panel.showHubGallery(gallery, progress.completed);
+  else if (guest) panel.showHotel(gallery, progress.completed, visitor, currentFloor);
+  else panel.showStart(visitor);
+
+  // Ekran startowy → hotel: panel przełącza się na widok hotelu, gdy brama się otwiera.
+  bus.on('start:enter', () => {
+    window.setTimeout(() => {
+      panel.showHotel(gallery, progress.completed, visitor, currentFloor);
+    }, 1200);
+  });
+  bus.on('hotel:floor', (floor, world) => {
+    currentFloor = floor;
+    panel.setHotelFloor(floor);
+    document.body.dataset.world = world;
+  });
+  bus.on('runner:ready', () => {
+    const world = runnerData.script?.kejs.world;
+    audio.ambient(world ?? 'kultura');
+  });
+  bus.on('start:progress', () => {
+    audio.ambient('start');
+  });
 
   // Czekamy na fonty, żeby tekst w canvasie nie renderował się fontem zastępczym.
   await document.fonts.ready;
@@ -96,8 +130,8 @@ async function start(): Promise<void> {
     if (finished !== undefined) progress.completed.add(finished);
     document.body.dataset.painting = 'restored';
     document.title = 'Portfolio Runner';
-    panel.showHubGallery(gallery, progress.completed);
-    game.scene.getScene('RunnerScene').scene.start('HubStubScene', { justFinished: finished });
+    panel.showHotel(gallery, progress.completed, visitor, currentFloor);
+    game.scene.getScene('RunnerScene').scene.start('HotelScene', { justFinished: finished });
   });
 
   watchResize(game);
@@ -109,6 +143,7 @@ async function start(): Promise<void> {
       runner,
       state,
       progress,
+      visitor,
     };
   }
 

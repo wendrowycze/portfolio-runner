@@ -1,4 +1,5 @@
 import { TUNING } from '../config/tuning';
+import { choiceTimerMs } from './timing';
 import { Emitter } from '../events/Emitter';
 import type { GameState } from '../state/GameState';
 import { hasReward, type Beat, type Case } from './types';
@@ -189,9 +190,10 @@ export class ScriptRunner extends Emitter<ScriptEvents> {
       case 'choice': {
         if (beat.type !== 'choice') break;
         this.beatElapsedMs += deltaMs;
-        const fraction = Math.min(1, this.beatElapsedMs / beat.timerMs);
-        this.emit('timer:progress', fraction, Math.max(0, beat.timerMs - this.beatElapsedMs));
-        if (this.beatElapsedMs >= beat.timerMs) this.fail('timeout');
+        const limit = choiceTimerMs(beat);
+        const fraction = Math.min(1, this.beatElapsedMs / limit);
+        this.emit('timer:progress', fraction, Math.max(0, limit - this.beatElapsedMs));
+        if (this.beatElapsedMs >= limit) this.fail('timeout');
         break;
       }
       case 'action': {

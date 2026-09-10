@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { textureKey } from '../assets/manifest';
+import { HOTEL_KEYS } from '../assets/generators/hotel';
 import { col } from '../assets/generators/draw';
 import { GAME_HEIGHT, GAME_WIDTH } from '../config/gameConfig';
 import { TUNING } from '../config/tuning';
@@ -10,6 +11,7 @@ import { Parallax } from '../runner/Parallax';
 import { Player } from '../runner/Player';
 import { TimeDilation } from '../runner/TimeDilation';
 import type { BeatOutcome, ScriptRunner } from '../script/ScriptRunner';
+import { choiceTimerMs } from '../script/timing';
 import { totalFragments, type Beat, type Case } from '../script/types';
 import { PAINTING_RASTER, paintingTextureKey } from '../assets/manifest';
 import { createGameState, worldSpeed, type GameState } from '../state/GameState';
@@ -25,6 +27,8 @@ export interface RunnerSceneData {
   debug?: boolean;
   /** Pomiń hub i zacznij bieg od razu (?case=…). */
   startInRunner?: boolean;
+  /** Pomiń ekran startowy z pochodniami (?guest=1) — prosto do hotelu. */
+  skipStart?: boolean;
   /** Tryb skryptowany (Etap 2+). Brak = wolny bieg z przeszkodami proceduralnymi (Etap 1). */
   script?: RunnerScriptData;
 }
@@ -44,6 +48,7 @@ export class RunnerScene extends Phaser.Scene {
   private sparks!: Phaser.GameObjects.Particles.ParticleEmitter;
   private zoneMarker!: Phaser.GameObjects.Rectangle;
   private spotlight!: Phaser.GameObjects.Ellipse;
+  private vignette!: Phaser.GameObjects.Image;
   private script: RunnerScriptData | undefined;
   /** Kierunek biegu w narracji: klawiatura (przez magistralę) i dotyk/klik w scenę. */
   private keyDirection: -1 | 0 | 1 = 0;
@@ -104,6 +109,14 @@ export class RunnerScene extends Phaser.Scene {
       .ellipse(0, this.groundY - 2, 140, 22, col('gold'), 0.22)
       .setDepth(6)
       .setVisible(false);
+
+    // Winieta: ciemnieje przy wyborze/QTE (uwaga skupia się na środku), błyska przy potknięciu.
+    this.vignette = this.add
+      .image(GAME_WIDTH / 2, GAME_HEIGHT / 2, HOTEL_KEYS.vignette)
+      .setDisplaySize(GAME_WIDTH * 1.2, GAME_HEIGHT * 1.35)
+      .setDepth(35)
+      .setAlpha(0);
+    this.cameras.main.setZoom(1);
 
     this.physics.add.overlap(this.player.sprite, this.spawner.group, (_p, obstacle) => {
       this.onObstacleHit(obstacle as Phaser.Physics.Arcade.Image);
@@ -181,6 +194,27 @@ export class RunnerScene extends Phaser.Scene {
     if (runner.phase === 'action') runner.triggerAction();
   }
 
+  /** Skupienie na wyborze/QTE: delikatne przybliżenie i winieta (GRIS: powoli, miękko). */
+  private focus(on: boolean): void {
+    const camera = this.cameras.main;
+    camera.zoomTo(on ? 1.04 : 1, on ? 600 : 500, 'Sine.easeInOut');
+    this.tweens.add({ targets: this.vignette, alpha: on ? 0.55 : 0, duration: on ? 600 : 500 });
+    if (on) this.vignette.clearTint();
+  }
+
+  private stumbleFlash(): void {
+    this.vignette.setTint(col('warn'));
+    this.tweens.add({
+      targets: this.vignette,
+      alpha: { from: 0.75, to: 0 },
+      duration: 480,
+      ease: 'Quad.easeOut',
+      onComplete: () => {
+        this.vignette.clearTint();
+      },
+    });
+  }
+
   private onObstacleHit(obstacle: Phaser.Physics.Arcade.Image): void {
     const info = this.spawner.info(obstacle);
     if (info === undefined || info.cleared || info.motion === 'timed') return;
@@ -189,6 +223,7 @@ export class RunnerScene extends Phaser.Scene {
     this.lastStumbleAt = now;
     this.state.stumbles += 1;
     this.player.stumble();
+    this.stumbleFlash();
     this.timeDilation.stumble();
     this.spawner.dismiss(obstacle);
     this.hud.refreshCounters();
@@ -229,14 +264,16 @@ export class RunnerScene extends Phaser.Scene {
         break;
       case 'choice':
         this.timeDilation.enter(slowdown);
+        this.focus(true);
         this.spawner.spawnForBeat({
           obstacleKey: beat.obstacle,
-          arriveInMs: beat.timerMs,
+          arriveInMs: choiceTimerMs(beat),
           worldSpeedPxPerSec: this.state.baseSpeed * slowdown,
         });
         break;
       case 'action': {
         this.timeDilation.enter(slowdown);
+        this.focus(true);
         const arriveInMs = TUNING.ACTION_ZONE_START_MS + beat.windowMs;
         const zoneWidth = (this.state.baseSpeed * slowdown * beat.windowMs) / 1000;
         this.spawner.spawnForBeat({
@@ -389,6 +426,9 @@ export class RunnerScene extends Phaser.Scene {
       this.tweens.add({ targets: frame, alpha: 1, duration: 500 });
       this.sparks.explode(40, cx, cy - gridH / 2);
       this.sparks.explode(40, cx, cy + gridH / 2);
+      // Powolny najazd kamery na ułożony obraz (GRIS: cisza po złożeniu).
+      this.cameras.main.pan(cx, cy, 3200, 'Sine.easeInOut');
+      this.cameras.main.zoomTo(1.16, 3400, 'Sine.easeInOut');
       document.body.dataset.finale = 'assembled';
       bus.emit('finale:assembled');
     });
@@ -396,8 +436,10 @@ export class RunnerScene extends Phaser.Scene {
 
   private onBeatResolved(beat: Beat, outcome: BeatOutcome): void {
     this.zoneMarker.setVisible(false);
+    this.focus(false);
     if (!outcome.correct) {
       this.player.stumble();
+      this.stumbleFlash();
       this.timeDilation.setTarget(0, 500, 'Quad.easeOut');
       this.spawner.dismissAll(220);
       this.hud.refreshCounters();
@@ -410,6 +452,11 @@ export class RunnerScene extends Phaser.Scene {
       this.player.jump();
       if (obstacle !== undefined) {
         // Przeszkoda „podjeżdża” pod skaczącą postać, potem płynie dalej z prędkością świata.
+        // Złoty błysk: przeszkoda „zaliczona”.
+        obstacle.setTint(col('gold'));
+        this.time.delayedCall(350, () => {
+          obstacle.clearTint();
+        });
         const info = this.spawner.info(obstacle);
         this.tweens.add({
           targets: obstacle,
@@ -435,6 +482,20 @@ export class RunnerScene extends Phaser.Scene {
   /** Miniatura fragmentu odrywa się od przeszkody i leci do licznika w HUD (GDD sekcja f). */
   private flyFragment(fromX: number, fromY: number): void {
     this.sparks.explode(14, fromX, fromY);
+    const ring = this.add
+      .circle(fromX, fromY, 12, col('gold'), 0)
+      .setStrokeStyle(3, col('gold'), 0.9)
+      .setDepth(29);
+    this.tweens.add({
+      targets: ring,
+      scale: 5,
+      alpha: 0,
+      duration: 520,
+      ease: 'Quad.easeOut',
+      onComplete: () => {
+        ring.destroy();
+      },
+    });
     const icon = this.add.image(fromX, fromY, textureKey('fx.fragment')).setDepth(30).setScale(0.6);
     const anchor = this.hud.fragmentsAnchor;
     this.tweens.chain({
