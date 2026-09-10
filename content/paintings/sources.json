@@ -1,4 +1,5 @@
 {
+  "_readme": "Adresy obrazów wygenerowanych przez API (Gamma). Zmiana tego pliku uruchamia workflow „Import obrazów”, który pobiera pliki do public/assets/paintings/<id>.jpg (klucz _facade → public/assets/hotel/facade.jpg).",
   "teatr-jest-nasz": "https://cdn.gamma.app/qgp0cgj9vfvihg2/design-anything/KiMN9zCQ85Z2qJXnN0ubk/no_JaA5TNBp7VCkPW2XP5.jpg",
   "kultura-futura": "https://cdn.gamma.app/qgp0cgj9vfvihg2/design-anything/XptbbB7tqbeSWJejHJONf/_6HyGkghdI9EqBaM3UUIZ.jpg",
   "cyrograf-na-kwadrat": "https://cdn.gamma.app/qgp0cgj9vfvihg2/design-anything/Rgd66BYB9c4kO41s8FM1m/6MkK4YQ_GcSoofujN3lKR.jpg",

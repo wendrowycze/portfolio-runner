@@ -6,6 +6,10 @@
 name: Import obrazów (Gamma → repo)
 
 on:
+  # Zmiana listy źródeł na dowolnej gałęzi importuje obrazy na tę gałąź.
+  push:
+    paths:
+      - content/paintings/sources.json
   workflow_dispatch:
     inputs:
       branch:
@@ -22,13 +26,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.branch }}
+          ref: ${{ inputs.branch || github.ref_name }}
       - name: Pobierz i skadruj
         run: |
           set -euo pipefail
           sudo apt-get update -qq && sudo apt-get install -y -qq imagemagick jq >/dev/null
           mkdir -p public/assets/paintings
-          jq -r 'to_entries[] | "\(.key) \(.value)"' content/paintings/sources.json | while read -r id url; do
+          jq -r 'to_entries[] | select(.value | startswith("https://")) | "\(.key) \(.value)"' content/paintings/sources.json | while read -r id url; do
             [ -z "$url" ] && continue
             echo "== $id"
             curl -fsSL --retry 3 -o "/tmp/$id.src" "$url"
@@ -46,4 +50,4 @@ jobs:
           git add public/assets/paintings public/assets/hotel 2>/dev/null || git add public/assets/paintings
           git diff --cached --quiet && echo "brak zmian" && exit 0
           git commit -m "obrazy: import wygenerowanych obrazów (Gamma) do public/assets"
-          git push origin "HEAD:${{ inputs.branch }}"
+          git push origin "HEAD:${{ inputs.branch || github.ref_name }}"
