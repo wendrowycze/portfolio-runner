@@ -231,3 +231,9 @@ Notatki z sekcji „ścieżka V1/V2”, które weszły wprost: ciemny ekran → 
 ### Zakres backlogu, który wszedł (na prośbę Arka)
 
 P1 „Hotel jako przestrzeń”, P2 „Ekran startowy” (bez zapisu postępu), P2 „Pipeline generatywny” (Gamma zamiast Imagen), P3 „Dźwięk/muzyka” (placeholdery), P3 „Easter eggi” (posąg, melodyjka-placeholder). Nadal w backlogu: zapis postępu po mailu, galeria finałowa, sztandary partnerów, i18n, CMS z Notion, spersonalizowana historia, deploy na domenie.
+
+---
+
+## 2026-09-10 — Meshy: posągi z modeli 3D
+
+Arek chciał użyć Meshy. Domena `meshy.ai` jest zablokowana sieciowo w środowisku sesji, więc generowanie robi **GitHub Actions** (`meshy-generate.yml`, sekret `MESHY_API_KEY` dodany przez Arka; sesja nie może zakładać sekretów — zabezpieczenia blokują bezpośrednie użycie tokena GitHuba poza wbudowanymi narzędziami). API v2 przyjmuje wyłącznie `art_style: realistic` (400 dla `sculpture`) — charakter rzeźby idzie w prompcie. Pierwsze zamówienie: trzy popiersia (Kultura: marmur z wieńcem, Edukacja: minimalistyczny marmur z książką, Biznes: art-deco brąz) i barokowy kinkiet. Wynik: podglądowe rendery 512×512 (szara „glina” na białym tle) i modele GLB (~1 MB każdy) w `public/assets/meshy/`. Rendery mają wycięte tło (próg bieli z miękką krawędzią) i są przycięte do zawartości — `public/assets/hotel/statue-<świat>.png`; w hotelu stoją na cokole przy końcu korytarza, barwione per świat (marmur / biały / brąz), filtr liniowy (rzeźba, nie pixel-art), fallback: popiersie rysowane kodem. Kinkiet z Meshy zapisany, nieużywany (kinkiety rysowane kodem trzymają płomień w stałym miejscu). Kolejne zamówienia = dopisanie wpisu do `content/meshy/requests.json` i uruchomienie workflow (wejście `only` ogranicza do wybranych id).
