@@ -6,7 +6,7 @@
   "role": "Redaktor prowadzący śledztwo dziennikarskie",
   "skills": ["Dziennikarstwo śledcze", "Zarządzanie zespołem", "Analiza danych"],
   "painting": {
-    "src": "assets/paintings/cyrograf-na-kwadrat.svg",
+    "src": "assets/paintings/cyrograf-na-kwadrat.jpg",
     "cols": 3,
     "rows": 2,
     "caption": "Tablica śledztwa: nazwiska, numery NIP i wykres, który rośnie po 2020 roku. Obraz odrestaurowany."

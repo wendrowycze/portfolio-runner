@@ -120,6 +120,8 @@ export interface RunnerConfig {
 export interface Case {
   id: string;
   world: World;
+  /** Wersja robocza treści (tekst źródłowy niedomknięty) — panel pokazuje odznakę. */
+  draft?: boolean | undefined;
   title: string;
   lead: string;
   role: string;

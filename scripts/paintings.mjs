@@ -35,6 +35,12 @@ const defs = (theme) => `
       <path d="M0 0 H40 M0 0 V40" fill="none" stroke="${C.gold}" stroke-opacity="0.35" stroke-width="1"/>
       <path d="M20 0 V40 M0 20 H40" fill="none" stroke="${C.gold}" stroke-opacity="0.12" stroke-width="1"/>
     </pattern>
+    <pattern id="shelves" width="64" height="48" patternUnits="userSpaceOnUse">
+      <rect width="64" height="48" fill="${C.far}"/>
+      <rect x="0" y="40" width="64" height="4" fill="${C.ground}"/>
+      <rect x="6" y="10" width="8" height="30" fill="${C.warn}"/><rect x="16" y="6" width="10" height="34" fill="${C.cool}"/>
+      <rect x="28" y="12" width="7" height="28" fill="${C.gold}" fill-opacity="0.8"/><rect x="37" y="8" width="11" height="32" fill="${C.mid}"/><rect x="50" y="14" width="8" height="26" fill="${C.warn}"/>
+    </pattern>
     <pattern id="marble" width="160" height="160" patternUnits="userSpaceOnUse">
       <rect width="160" height="160" fill="${theme === 'biznes' ? C.far : C.panelBg}"/>
       <path d="M-10 40 Q40 20 90 60 T170 50" fill="none" stroke="${C.ground}" stroke-opacity="0.35" stroke-width="2"/>
@@ -68,7 +74,7 @@ const rays = `<g stroke="${C.gold}" stroke-opacity="0.09" stroke-width="10">
   </g>`;
 
 function frame(theme, inner, inscription) {
-  const pattern = theme === 'biznes' ? 'blueprint' : 'mauresque';
+  const pattern = theme === 'biznes' ? 'blueprint' : theme === 'edukacja' ? 'shelves' : 'mauresque';
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" width="960" height="640">
   <!-- Wygenerowane przez scripts/paintings.mjs (npm run paintings). Nie edytować ręcznie. -->
   ${defs(theme)}
@@ -312,6 +318,68 @@ const PAINTINGS = {
       ${figure(262, 520, { left: [-60, -150], right: [56, -150], scale: 0.75 })}
       ${figure(480, 526, { left: [-56, -150], right: [56, -150], scale: 0.75 })}
       ${figure(698, 520, { left: [-56, -150], right: [60, -150], scale: 0.75 })}`,
+  },
+  'narzedziownik-biz': {
+    theme: 'edukacja',
+    inscription: 'ZWOLNIENI Z TEORII · NARZĘDZIOWNIK BIZ · 60 003 UCZNIÓW',
+    inner: `
+      <g transform="translate(480 230)">
+        <rect x="-150" y="-70" width="300" height="130" rx="8" fill="${C.ground}" stroke="${C.gold}" stroke-width="5"/>
+        <rect x="-150" y="-70" width="300" height="22" fill="${C.gold}"/>
+        <rect x="-30" y="-92" width="60" height="30" rx="6" fill="none" stroke="${C.gold}" stroke-width="5"/>
+        <g stroke="${C.text}" stroke-width="10" stroke-linecap="round"><path d="M-110 -20 L-60 40"/><path d="M-40 -30 L-40 40"/><path d="M20 -30 L60 40"/><path d="M100 -20 L100 40"/></g>
+        <circle cx="-110" cy="-24" r="14" fill="${C.gold}"/><rect x="-52" y="-42" width="24" height="16" fill="${C.gold}"/><path d="M8 -40 L32 -40 L20 -18 Z" fill="${C.gold}"/><rect x="88" y="-40" width="24" height="24" rx="12" fill="${C.gold}"/>
+      </g>
+      ${chart(120, 130, [2, 4, 9, 14, 20], 170, 120)}
+      <g transform="translate(700 130)"><rect x="0" y="0" width="150" height="100" fill="${C.far}" stroke="${C.gold}" stroke-width="4"/><text x="75" y="60" text-anchor="middle" font-family="Georgia, serif" font-size="34" fill="${C.text}">BIZ</text></g>
+      ${[0, 1, 2, 3, 4, 5].map((i) => `<rect x="${140 + i * 120}" y="430" width="90" height="18" fill="${C.ground}" stroke="${C.gold}" stroke-width="2"/>`).join('')}
+      ${figure(240, 520, { left: [-60, -150], right: [70, -190], scale: 0.75 })}
+      ${figure(720, 520, { left: [-70, -190], right: [60, -150], scale: 0.75 })}`,
+  },
+  'tajemnica-pieczeci': {
+    theme: 'edukacja',
+    inscription: 'UNIWERSYTET SWPS · TAJEMNICA PIECZĘCI · 6 KAMPUSÓW',
+    inner: `
+      <g transform="translate(480 220)">
+        <circle r="86" fill="${C.warn}" stroke="${C.gold}" stroke-width="6"/>
+        <circle r="62" fill="none" stroke="${C.gold}" stroke-width="3" stroke-dasharray="8 6"/>
+        <path d="M0 -44 L14 -12 L48 -12 L20 10 L30 44 L0 24 L-30 44 L-20 10 L-48 -12 L-14 -12 Z" fill="${C.gold}"/>
+      </g>
+      ${[0, 1, 2, 3, 4, 5]
+        .map((i) => {
+          const x = 110 + i * 148;
+          const h = 60 + (i % 3) * 22;
+          return `<g transform="translate(${x} 400)"><rect x="-22" y="${-h}" width="44" height="${h}" fill="${C.cool}" stroke="${C.gold}" stroke-width="3"/><path d="M-28 ${-h} L0 ${-h - 28} L28 ${-h} Z" fill="${C.ground}" stroke="${C.gold}" stroke-width="3"/><rect x="-6" y="${-h + 16}" width="12" height="18" fill="${C.text}"/></g>`;
+        })
+        .join('')}
+      <ellipse cx="480" cy="470" rx="200" ry="30" fill="${C.ground}" stroke="${C.gold}" stroke-width="4"/>
+      ${figure(330, 560, { left: [-50, -150], right: [60, -150], scale: 0.62 })}
+      ${figure(480, 566, { left: [-56, -170], right: [56, -170], scale: 0.62 })}
+      ${figure(630, 560, { left: [-60, -150], right: [50, -150], scale: 0.62 })}`,
+  },
+  'nasa-space-apps': {
+    theme: 'biznes',
+    inscription: 'NASA SPACE APPS CHALLENGE 2023 · PCIS · 5. MIEJSCE',
+    inner: `
+      <g transform="translate(480 250)" fill="none" stroke="${C.gold}" stroke-width="3">
+        <ellipse rx="300" ry="110" stroke-dasharray="10 8"/><ellipse rx="220" ry="80" stroke-opacity="0.5"/>
+        <circle r="70" fill="${C.mid}" stroke-width="5"/>
+        <path d="M-40 -10 Q-10 -40 20 -20 T60 10" stroke="${C.text}" stroke-width="6" stroke-linecap="round"/>
+      </g>
+      <g transform="translate(700 150) rotate(-20)"><rect x="-26" y="-14" width="52" height="28" fill="${C.text}" stroke="${C.gold}" stroke-width="3"/><rect x="-90" y="-8" width="56" height="16" fill="${C.cool}" stroke="${C.gold}" stroke-width="3"/><rect x="34" y="-8" width="56" height="16" fill="${C.cool}" stroke="${C.gold}" stroke-width="3"/><circle cx="0" cy="-30" r="8" fill="${C.gold}"/></g>
+      ${[
+        [120, 110],
+        [200, 70],
+        [860, 90],
+        [820, 160],
+        [150, 300],
+      ]
+        .map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3" fill="${C.text}"/>`)
+        .join('')}
+      <g transform="translate(480 470)"><rect x="-130" y="-70" width="260" height="70" fill="${C.far}" stroke="${C.gold}" stroke-width="4"/><path d="M-110 -20 L-80 -45 L-50 -30 L-20 -55 L10 -35 L40 -50 L70 -25 L100 -40" fill="none" stroke="${C.gold}" stroke-width="4"/><rect x="-140" y="0" width="280" height="12" fill="${C.ground}"/></g>
+      <text x="480" y="130" text-anchor="middle" font-family="Georgia, serif" font-size="26" letter-spacing="10" fill="${C.gold}">PCIS</text>
+      ${figure(300, 560, { left: [-50, -150], right: [70, -190], scale: 0.66 })}
+      ${figure(660, 560, { left: [-70, -190], right: [50, -150], scale: 0.66 })}`,
   },
 };
 

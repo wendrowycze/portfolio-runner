@@ -1,0 +1,53 @@
+# Import obrazów wygenerowanych przez API (Gamma) do repozytorium.
+# Środowisko Claude Code w chmurze nie ma dostępu sieciowego do CDN generatora, więc pobieranie
+# i konwersję wykonuje runner GitHub Actions: czyta content/paintings/sources.json
+# ({ "<id>": "<url>" }), pobiera, kadruje do 960×640 (3:2, siatka 3×2) JPEG i commituje
+# do public/assets/paintings/<id>.jpg na wskazanej gałęzi. Uruchamiane ręcznie (workflow_dispatch).
+name: Import obrazów (Gamma → repo)
+
+on:
+  # Zmiana listy źródeł na dowolnej gałęzi importuje obrazy na tę gałąź.
+  push:
+    paths:
+      - content/paintings/sources.json
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Gałąź, na którą wgrać obrazy
+        required: true
+        default: main
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch || github.ref_name }}
+      - name: Pobierz i skadruj
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq imagemagick jq >/dev/null
+          mkdir -p public/assets/paintings public/assets/hotel
+          jq -r 'to_entries[] | select(.value | startswith("https://")) | "\(.key) \(.value)"' content/paintings/sources.json | while read -r id url; do
+            [ -z "$url" ] && continue
+            echo "== $id"
+            curl -fsSL --retry 3 -o "/tmp/$id.src" "$url"
+            if [ "$id" = "_facade" ]; then
+              convert "/tmp/$id.src" -resize 960x540^ -gravity center -extent 960x540 -quality 84 "public/assets/hotel/facade.jpg"
+            else
+              convert "/tmp/$id.src" -resize 960x640^ -gravity center -extent 960x640 -quality 84 "public/assets/paintings/$id.jpg"
+            fi
+          done
+          ls -la public/assets/paintings
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/assets/paintings public/assets/hotel 2>/dev/null || git add public/assets/paintings
+          git diff --cached --quiet && echo "brak zmian" && exit 0
+          git commit -m "obrazy: import wygenerowanych obrazów (Gamma) do public/assets"
+          git push origin "HEAD:${{ inputs.branch || github.ref_name }}"

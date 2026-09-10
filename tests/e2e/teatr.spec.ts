@@ -1,7 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 import { loadCase } from '../../src/content/loader';
-import { hubSlots } from '../../src/scenes/hubLayout';
 import { collectErrors, runThroughNarration } from './helpers';
 
 /**
@@ -15,6 +14,7 @@ const kejs = loadCase(
 );
 
 const panel = (page: Page) => page.locator('#panel');
+const GALLERY_COUNT = 12;
 
 async function waitForBeat(page: Page, id: string): Promise<void> {
   await expect(panel(page)).toHaveAttribute('data-beat', id, { timeout: 30_000 });
@@ -47,23 +47,24 @@ test('hub → pełny case „Teatr jest nasz” → odrestaurowany obraz, zero b
   page,
 }) => {
   const errors = collectErrors(page);
-  await page.goto('./');
+  await page.goto('./?guest=1');
   await expect(page.locator('body')).toHaveAttribute('data-game-ready', 'true');
   await expect(page.locator('body')).toHaveAttribute('data-scene', 'hub', { timeout: 15_000 });
   await expect(page.locator('body')).toHaveAttribute('data-painting', 'damaged');
-  await expect(page.locator('[data-testid="gallery"] .gallery-item')).toHaveCount(9);
+  await expect(page.locator('body')).toHaveAttribute('data-floor', '0');
+  await expect(page.locator('[data-testid="gallery"] .gallery-item')).toHaveCount(GALLERY_COUNT);
   await page.waitForTimeout(900);
-  await shot(page, 'etap3-hub');
+  await shot(page, 'hotel-parter');
 
-  // Klik w pierwszy obraz na ścianie („Teatr jest nasz”) — pozycja z układu galerii.
-  const canvas = await page.locator('#runner canvas').boundingBox();
-  const slot = hubSlots(9)[0];
-  expect(canvas).not.toBeNull();
-  expect(slot).toBeDefined();
-  if (canvas !== null && slot !== undefined) {
-    const scale = canvas.width / 960;
-    await page.mouse.click(canvas.x + slot.x * scale, canvas.y + slot.y * scale);
-  }
+  // Gość idzie korytarzem (D) do pierwszego obrazu („Teatr jest nasz”) i wchodzi klawiszem E.
+  await page.keyboard.down('KeyD');
+  await expect(page.locator('body')).toHaveAttribute('data-near', 'teatr-jest-nasz', {
+    timeout: 20_000,
+  });
+  await page.keyboard.up('KeyD');
+  await page.waitForTimeout(500);
+  await shot(page, 'hotel-przy-obrazie');
+  await page.keyboard.press('KeyE');
   await expect(page.locator('body')).toHaveAttribute('data-scene', 'runner', { timeout: 15_000 });
   await expect(page.locator('body')).toHaveAttribute('data-case-id', 'teatr-jest-nasz');
   await expect(page.locator('#panel-title')).toHaveText(kejs.title);
@@ -161,8 +162,12 @@ test('hub → pełny case „Teatr jest nasz” → odrestaurowany obraz, zero b
   await expect(page.locator('body')).toHaveAttribute('data-scene', 'hub', { timeout: 15_000 });
   await expect(page.locator('body')).toHaveAttribute('data-restored', /teatr-jest-nasz/);
   await expect(page.locator('.gallery-item.is-restored')).toHaveCount(1);
-  await page.waitForTimeout(1200);
-  await shot(page, 'etap3-hub-restored');
+  // Piętro naprawia się falą po odrestaurowanym obrazie.
+  await expect(page.locator('body')).toHaveAttribute('data-floor-restored', /partial|full/, {
+    timeout: 15_000,
+  });
+  await page.waitForTimeout(600);
+  await shot(page, 'hotel-parter-naprawiony');
   expect(errors).toEqual([]);
 });
 
@@ -170,7 +175,7 @@ test('hub: przycisk w panelu wchodzi w wybraną historię (klawiatura/czytnik ek
   page,
 }) => {
   const errors = collectErrors(page);
-  await page.goto('./?layout=stack');
+  await page.goto('./?layout=stack&guest=1');
   await expect(page.locator('body')).toHaveAttribute('data-scene', 'hub', { timeout: 15_000 });
   await page.locator('[data-testid="hub-enter"][data-case="kultura-futura"]').click();
   await expect(page.locator('body')).toHaveAttribute('data-scene', 'runner', { timeout: 15_000 });

@@ -17,6 +17,10 @@
       "description": "Świat/tożsamość, do którego należy case.",
       "enum": ["kultura", "edukacja", "biznes"]
     },
+    "draft": {
+      "type": "boolean",
+      "description": "Wersja robocza treści (źródło niedomknięte) — panel pokazuje odznakę „wersja robocza”."
+    },
     "title": {
       "type": "string",
       "description": "Tytuł misji/case'a wyświetlany w hubie i na starcie runnera.",

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import demo from '../../content/cases/_demo.json';
 import { TUNING } from '../../src/config/tuning';
 import { loadCase } from '../../src/content/loader';
+import { choiceTimerMs } from '../../src/script/timing';
 import { ScriptRunner, type Phase } from '../../src/script/ScriptRunner';
 import type { Beat, Case } from '../../src/script/types';
 import { createGameState } from '../../src/state/GameState';
@@ -153,7 +154,12 @@ describe('ScriptRunner — błędne wybory: potknięcie i powrót do tego samego
     const { runner, state, log } = setup();
     runner.start();
     runner.moveBy(10_000);
-    elapse(runner, 7000);
+    // Limit rośnie z długością tekstu (choiceTimerMs) — tuż przed nim jeszcze bez potknięcia.
+    const beat = runner.current;
+    const limit = beat?.type === 'choice' ? choiceTimerMs(beat) : 0;
+    elapse(runner, limit - 100);
+    expect(log).not.toContain('fail:b03:timeout');
+    elapse(runner, 200);
     expect(log).toContain('fail:b03:timeout');
     expect(state.stumbles).toBe(1);
     elapse(runner, 500);

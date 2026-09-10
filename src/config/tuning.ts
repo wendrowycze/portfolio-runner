@@ -32,6 +32,13 @@ export const TUNING = {
    * powrocie z innej karty nie „przewijamy” zegarów beatów o kilkadziesiąt sekund.
    */
   MAX_FRAME_MS: 100,
+  /**
+   * Czas na wybór rośnie z długością tekstu (decyzja Arka z 2026-09-10: odliczanie było za szybkie):
+   * limit = max(timerMs z JSON, długość promptu i opcji / CHOICE_READ_CPS + CHOICE_READ_BUFFER_MS).
+   * 22 znaki/s to spokojne czytanie z wyborem; bufor to czas na decyzję.
+   */
+  CHOICE_READ_CPS: 22,
+  CHOICE_READ_BUFFER_MS: 3000,
   /** Ile ms po spawnie przeszkoda wchodzi w strefę QTE (action). */
   ACTION_ZONE_START_MS: 1500,
   /** Domyślna szerokość strefy QTE (px) — używana, gdy beat nie definiuje okna. */

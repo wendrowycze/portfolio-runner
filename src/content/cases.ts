@@ -23,6 +23,10 @@ const CASE_REGISTRY: Record<string, CaseEntry> = {
     load: () => import('../../content/cases/gra-teatralna-improvisio.json'),
   },
   'scouting-pfr': { load: () => import('../../content/cases/scouting-pfr.json') },
+  // Piętro Edukacja i drugi case Biznesu — wersje robocze z inwentarza (content/inwentarz_tresci.md).
+  'narzedziownik-biz': { load: () => import('../../content/cases/narzedziownik-biz.json') },
+  'tajemnica-pieczeci': { load: () => import('../../content/cases/tajemnica-pieczeci.json') },
+  'nasa-space-apps': { load: () => import('../../content/cases/nasa-space-apps.json') },
   _demo: { load: () => import('../../content/cases/_demo.json'), hidden: true },
 };
 

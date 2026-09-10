@@ -8,6 +8,7 @@ import {
   generateStars,
 } from '../assets/generators/background';
 import { generateFx } from '../assets/generators/fx';
+import { FACADE_IMAGE_PATH, generateHotel, HOTEL_KEYS } from '../assets/generators/hotel';
 import { generateObstacles } from '../assets/generators/obstacles';
 import { generatePlayer } from '../assets/generators/player';
 import { GAME_HEIGHT, GAME_WIDTH } from '../config/gameConfig';
@@ -35,11 +36,23 @@ export class BootScene extends Phaser.Scene {
     const current = runnerData?.script?.kejs;
     if (current !== undefined && !cases.some((c) => c.id === current.id)) cases.push(current);
     for (const kejs of cases) {
-      this.load.svg(paintingTextureKey(kejs.id), assetUrl(kejs.painting.src), {
-        width: PAINTING_RASTER.width,
-        height: PAINTING_RASTER.height,
-      });
+      const key = paintingTextureKey(kejs.id);
+      if (/\.svg$/i.test(kejs.painting.src)) {
+        this.load.svg(key, assetUrl(kejs.painting.src), {
+          width: PAINTING_RASTER.width,
+          height: PAINTING_RASTER.height,
+        });
+      } else {
+        // Obrazy z API (JPG/PNG) — rasterowane już w rozmiarze PAINTING_RASTER.
+        this.load.image(key, assetUrl(kejs.painting.src));
+      }
     }
+    // Fasada z API na ekran startowy (opcjonalna — brak pliku = fasada rysowana kodem).
+    this.load.image(HOTEL_KEYS.facadeImage, assetUrl(FACADE_IMAGE_PATH));
+    this.load.on(Phaser.Loader.Events.FILE_LOAD_ERROR, (file: Phaser.Loader.File) => {
+      if (file.key === HOTEL_KEYS.facadeImage) return;
+      console.error(`[assets] nie udało się wczytać ${file.key}`);
+    });
   }
 
   create(): void {
@@ -60,6 +73,7 @@ export class BootScene extends Phaser.Scene {
     generatePlayer(this);
     generateObstacles(this);
     generateFx(this);
+    generateHotel(this);
 
     label.destroy();
     const runnerData = this.registry.get('runnerData') as RunnerSceneData | undefined;
@@ -67,9 +81,12 @@ export class BootScene extends Phaser.Scene {
     if (runnerData?.startInRunner === true && runnerData.script !== undefined) {
       // ?case=… startuje historię od razu.
       this.scene.start('RunnerScene', runnerData);
+    } else if (gallery.length > 0 && runnerData?.skipStart === true) {
+      // ?guest=1 (i testy): prosto do hotelu.
+      this.scene.start('HotelScene', { floor: 0 });
     } else if (gallery.length > 0) {
-      // Domyślnie: hub z galerią obrazów.
-      this.scene.start('HubStubScene', {});
+      // Domyślnie: ciemny ekran startowy z pochodniami, potem hotel.
+      this.scene.start('StartScene');
     } else {
       // Tryb wolnego biegu (?free=1).
       this.scene.start('RunnerScene', runnerData ?? {});

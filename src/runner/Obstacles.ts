@@ -67,8 +67,17 @@ export class ObstacleSpawner {
       .setPosition(x, this.groundY)
       .setDepth(8)
       .setAlpha(1)
+      .setScale(1)
       .setActive(true)
       .setVisible(true);
+    // Wejście przeszkody: lekki „pop” zamiast pojawienia się znikąd.
+    this.scene.tweens.add({
+      targets: image,
+      scaleX: { from: 0.8, to: 1 },
+      scaleY: { from: 1.12, to: 1 },
+      duration: 260,
+      ease: 'Back.easeOut',
+    });
     const body = image.body as Phaser.Physics.Arcade.Body | null;
     if (body !== null) {
       body.enable = true;

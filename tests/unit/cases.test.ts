@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { TUNING } from '../../src/config/tuning';
 import { caseWarnings, loadCase } from '../../src/content/loader';
@@ -49,9 +49,11 @@ describe.each(files)('case %s', (file) => {
   it('spełnia schemat, ma grafiki przeszkód i trzyma rytm z _SZABLON.md', () => {
     expect(file).toBe(`${kejs.id === 'demo' ? '_demo' : kejs.id}.json`);
     expect(caseWarnings(kejs)).toEqual([]);
-    expect(kejs.painting.src).toBe(
-      `assets/paintings/${kejs.id === 'demo' ? '_demo' : kejs.id}.svg`,
+    // Obraz: JPG z API (public/assets/paintings) albo placeholder SVG (_demo); plik musi istnieć.
+    expect(kejs.painting.src).toMatch(
+      new RegExp(`^assets/paintings/${kejs.id === 'demo' ? '_demo' : kejs.id}\\.(jpg|svg)$`),
     );
+    expect(existsSync(new URL(`../../public/${kejs.painting.src}`, import.meta.url))).toBe(true);
     const types = kejs.beats.map((b) => b.type);
     let streak = 0;
     for (const type of types) {

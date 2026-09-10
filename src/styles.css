@@ -986,3 +986,272 @@ body {
   padding: 8px 14px;
   font-size: 9px;
 }
+
+/* ---------- Ekran startowy: formularz i dźwignia RODO ---------- */
+.start-form {
+  display: grid;
+  gap: 14px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.field-label {
+  font-family: var(--font-hud);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-gold);
+}
+
+.field-input {
+  min-height: 44px;
+  padding: 8px 12px;
+  font: 16px var(--font-text);
+  color: var(--c-text);
+  background: rgba(38, 22, 25, 0.6);
+  border: 1px solid rgba(223, 182, 124, 0.45);
+  border-radius: 2px;
+  outline: none;
+  transition:
+    border-color 0.25s,
+    box-shadow 0.35s;
+}
+
+.field-input:focus {
+  border-color: var(--c-gold);
+  box-shadow: 0 0 18px rgba(223, 182, 124, 0.35);
+}
+
+.field-input.is-invalid {
+  border-color: var(--c-warn);
+}
+
+.lever {
+  display: grid;
+  grid-template-columns: 58px 1fr;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.lever-input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.lever-track {
+  position: relative;
+  display: block;
+  width: 58px;
+  height: 28px;
+  border: 2px solid var(--c-ground);
+  border-radius: 14px;
+  background: rgba(38, 22, 25, 0.8);
+  transition:
+    background 0.3s,
+    border-color 0.3s;
+}
+
+.lever-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--c-text-muted);
+  transition:
+    transform 0.35s var(--ease-back),
+    background 0.3s,
+    box-shadow 0.3s;
+}
+
+.lever-input:checked + .lever-track {
+  border-color: var(--c-gold);
+  background: rgba(223, 182, 124, 0.25);
+}
+
+.lever-input:checked + .lever-track .lever-knob {
+  transform: translateX(30px);
+  background: var(--c-gold);
+  box-shadow: 0 0 14px rgba(223, 182, 124, 0.9);
+}
+
+.lever-input:focus-visible + .lever-track {
+  outline: 2px solid var(--c-gold);
+  outline-offset: 3px;
+}
+
+.lever-text {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.button-enter {
+  min-height: 48px;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+}
+
+.button-enter:not(:disabled) {
+  animation: glow 1.4s ease-in-out infinite alternate;
+}
+
+.button-link {
+  background: transparent;
+  border-color: transparent;
+  color: var(--c-text-muted);
+  font-family: var(--font-text);
+  font-size: 14px;
+  text-transform: none;
+  letter-spacing: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.button-link:hover,
+.button-link:focus-visible {
+  color: var(--c-gold);
+  background: transparent;
+  box-shadow: none;
+}
+
+.button-audio {
+  align-self: flex-end;
+  font-size: 7px;
+  padding: 6px 10px;
+  min-height: 30px;
+  opacity: 0.8;
+}
+
+.button-audio[aria-pressed='true'] {
+  color: var(--c-text-muted);
+  border-color: rgba(172, 203, 198, 0.5);
+}
+
+/* ---------- Hotel: winda i piętra ---------- */
+.floors {
+  display: grid;
+  gap: 6px;
+}
+
+.floor-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid rgba(223, 182, 124, 0.4);
+  border-left: 3px solid var(--c-cool);
+  background: rgba(38, 22, 25, 0.35);
+  color: var(--c-text);
+  font-family: var(--font-hud);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    transform 0.2s var(--ease-back);
+}
+
+.floor-button:hover,
+.floor-button:focus-visible {
+  border-color: var(--c-gold);
+  background: rgba(223, 182, 124, 0.12);
+  transform: translateX(3px);
+  outline: none;
+}
+
+.floor-button.is-here {
+  border-left-color: var(--c-gold);
+  background: rgba(223, 182, 124, 0.18);
+}
+
+.floor-button.is-here .floor-world::after {
+  content: ' ●';
+  color: var(--c-gold);
+}
+
+.floor-world {
+  color: var(--c-text-muted);
+}
+
+.gallery-floor {
+  margin-top: 10px;
+  padding: 4px 0 2px;
+  border-bottom: 1px solid rgba(223, 182, 124, 0.35);
+  font-family: var(--font-hud);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-gold);
+}
+
+.gallery-draft {
+  color: var(--c-ground);
+}
+
+.timer-hint {
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+/* ---------- „Miękkie” wejścia elementów (GRIS: powoli, bez skoków) ---------- */
+.entry {
+  animation: entry-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+@keyframes entry-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.options .option {
+  animation: entry-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.options .option:nth-child(2) {
+  animation-delay: 0.08s;
+}
+
+.options .option:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.button,
+.option,
+.floor-button,
+.puzzle-tile {
+  transition-property: transform, background, border-color, box-shadow, color;
+}
+
+.button:active:not(:disabled),
+.option:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .entry,
+  .options .option,
+  .button-enter:not(:disabled) {
+    animation: none;
+  }
+  .lever-knob {
+    transition-duration: 0.01s;
+  }
+}
