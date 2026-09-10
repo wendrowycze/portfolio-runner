@@ -1,0 +1,22 @@
+[
+  {
+    "id": "posag-kultura",
+    "taskId": "01a08b1d-9c3a-777d-9c15-6d8e656fbb19",
+    "prompt": "Marble bust sculpture of a theatre director with a laurel wreath, classical Greek style, weathered white marble, on a simple square plinth, gold accents, museum statue"
+  },
+  {
+    "id": "posag-edukacja",
+    "taskId": "01a08b1e-bcba-7740-a1b5-67117a531064",
+    "prompt": "Minimalist white marble bust sculpture of a teacher holding a small open book, smooth simple forms, on a plain plinth, museum statue"
+  },
+  {
+    "id": "posag-biznes",
+    "taskId": "01a08b1f-ded5-714e-b8ab-d7c290b9d72b",
+    "prompt": "Art deco bronze bust sculpture of an entrepreneur with geometric brass ornaments, dark teal patina, on a stepped plinth, museum statue"
+  },
+  {
+    "id": "kinkiet",
+    "taskId": "01a08b21-0102-76e1-a397-95c014f570a4",
+    "prompt": "Ornate gold wall sconce torch holder with a small flame, palace interior, baroque style"
+  }
+]
