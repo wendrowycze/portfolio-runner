@@ -21,7 +21,8 @@ for (const req of requests) {
     body: JSON.stringify({
       mode: 'preview',
       prompt: req.prompt,
-      art_style: req.art_style ?? 'realistic',
+      // API v2 przyjmuje obecnie tylko 'realistic' (400 dla 'sculpture'); styl rzeźby idzie w prompcie.
+      art_style: 'realistic',
       should_remesh: true,
       topology: 'triangle',
       target_polycount: 30000,
