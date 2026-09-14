@@ -38,6 +38,11 @@ jobs:
             curl -fsSL --retry 3 -o "/tmp/$id.src" "$url"
             if [ "$id" = "_facade" ]; then
               convert "/tmp/$id.src" -resize 960x540^ -gravity center -extent 960x540 -quality 84 "public/assets/hotel/facade.jpg"
+            elif [[ "$id" == _layer-* ]]; then
+              # Warstwy paralaksy biegu: _layer-<świat>-<far|mid|near> → public/assets/runner/<świat>/<warstwa>.jpg (1920×1080); potem lokalnie `npm run layers` (wycięcie magenty, WebP)
+              world="${id#_layer-}"; layer="${world##*-}"; world="${world%-*}"
+              mkdir -p "public/assets/runner/$world"
+              convert "/tmp/$id.src" -resize 1920x1080^ -gravity center -extent 1920x1080 -quality 86 "public/assets/runner/$world/$layer.jpg"
             else
               convert "/tmp/$id.src" -resize 960x640^ -gravity center -extent 960x640 -quality 84 "public/assets/paintings/$id.jpg"
             fi
@@ -47,7 +52,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add public/assets/paintings public/assets/hotel 2>/dev/null || git add public/assets/paintings
+          git add public/assets/paintings public/assets/hotel public/assets/runner 2>/dev/null || git add public/assets/paintings
           git diff --cached --quiet && echo "brak zmian" && exit 0
           git commit -m "obrazy: import wygenerowanych obrazów (Gamma) do public/assets"
           git push origin "HEAD:${{ inputs.branch || github.ref_name }}"

@@ -26,6 +26,17 @@ export type AssetEntry = GeneratedAsset | FileAsset | CaseAsset;
 
 const generated: GeneratedAsset = { source: 'generated', license: 'wygenerowane kodem' };
 
+export type RunnerLayer = 'far' | 'mid' | 'near';
+type RunnerWorld = 'kultura' | 'edukacja' | 'biznes';
+
+function runnerLayer(world: RunnerWorld, layer: RunnerLayer): FileAsset {
+  return {
+    source: 'file',
+    path: `assets/runner/${world}/${layer}.webp`,
+    license: 'obraz wygenerowany przez API (Gamma) na koncie właściciela — ASSETS_ATTRIBUTION.md',
+  };
+}
+
 export const ASSET_MANIFEST = {
   // --- tło i paralaksa (świat Kultura) ---
   'bg.sky': generated,
@@ -85,8 +96,23 @@ export const ASSET_MANIFEST = {
     license: 'obraz wygenerowany przez API (Gamma) na koncie właściciela — ASSETS_ATTRIBUTION.md',
   },
 
+  // --- tła biegu z API: trzy warstwy paralaksy per świat (workflow paintings-import + npm run layers) ---
+  // Brak pliku = paralaksa rysowana kodem (bg.*). mid/near mają przezroczystość (wycięta magenta).
+  'runner.layer.kultura.far': runnerLayer('kultura', 'far'),
+  'runner.layer.kultura.mid': runnerLayer('kultura', 'mid'),
+  'runner.layer.kultura.near': runnerLayer('kultura', 'near'),
+  'runner.layer.edukacja.far': runnerLayer('edukacja', 'far'),
+  'runner.layer.edukacja.mid': runnerLayer('edukacja', 'mid'),
+  'runner.layer.edukacja.near': runnerLayer('edukacja', 'near'),
+  'runner.layer.biznes.far': runnerLayer('biznes', 'far'),
+  'runner.layer.biznes.mid': runnerLayer('biznes', 'mid'),
+  'runner.layer.biznes.near': runnerLayer('biznes', 'near'),
+
   // --- efekty ---
   'fx.dust': generated,
+  'fx.ray': generated,
+  'fx.mote': generated,
+  'fx.streak': generated,
   'fx.spark': generated,
   'fx.fragment': generated,
 } as const satisfies Record<string, AssetEntry>;
@@ -117,6 +143,18 @@ export const PAINTING_RASTER = { width: 960, height: 640 } as const;
 export function statueImageKey(world: 'kultura' | 'edukacja' | 'biznes'): AssetKey {
   return `hotel.statue.image.${world}`;
 }
+
+/** Klucz warstwy tła biegu danego świata (wpis w manifeście). */
+export function runnerLayerKey(world: RunnerWorld, layer: RunnerLayer): AssetKey {
+  return `runner.layer.${world}.${layer}`;
+}
+
+/** Klucz kafla (obraz + jego lustrzane odbicie) budowanego w BootScene z warstwy — do tileSprite. */
+export function runnerLayerTileKey(world: RunnerWorld, layer: RunnerLayer): string {
+  return `${runnerLayerKey(world, layer)}.tile`;
+}
+
+export const RUNNER_LAYERS: readonly RunnerLayer[] = ['far', 'mid', 'near'];
 
 export function fileAssetPath(key: AssetKey): string | undefined {
   const entry: AssetEntry = ASSET_MANIFEST[key];

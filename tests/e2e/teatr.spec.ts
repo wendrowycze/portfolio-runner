@@ -67,6 +67,8 @@ test('hub → pełny case „Teatr jest nasz” → odrestaurowany obraz, zero b
   await page.keyboard.press('KeyE');
   await expect(page.locator('body')).toHaveAttribute('data-scene', 'runner', { timeout: 15_000 });
   await expect(page.locator('body')).toHaveAttribute('data-case-id', 'teatr-jest-nasz');
+  // Tło biegu z trzech warstw z API (kafle obrazu dryfują w scenerii i składają się w finale).
+  await expect(page.locator('body')).toHaveAttribute('data-bg', 'layers');
   await expect(page.locator('#panel-title')).toHaveText(kejs.title);
 
   const screenshots = new Set<string>();
@@ -98,13 +100,14 @@ test('hub → pełny case „Teatr jest nasz” → odrestaurowany obraz, zero b
         break;
       }
       case 'action': {
-        const qte = page.locator('[data-testid="qte"]');
+        // Zrzut w fazie „czekaj”, zanim otworzy się okno (zrzut całej strony trwa i pod obciążeniem
+        // zjadał okno 800 ms). Na otwarcie czekamy obserwatorem DOM, nie odpytywaniem co sekundę.
         if (!screenshots.has('action')) {
           screenshots.add('action');
-          await page.waitForTimeout(900);
+          await page.waitForTimeout(300);
           await shot(page, 'etap3-action');
         }
-        await expect(qte).toHaveAttribute('data-open', 'true', { timeout: 10_000 });
+        await page.locator('[data-testid="qte"][data-open="true"]').waitFor({ timeout: 10_000 });
         await page.keyboard.press('Space');
         break;
       }

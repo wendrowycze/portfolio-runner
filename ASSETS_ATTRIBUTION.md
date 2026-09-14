@@ -23,3 +23,9 @@ Fonty: Press Start 2P i Spectral z Google Fonts (licencja OFL), ładowane przez 
 - Pliki źródłowe: `public/assets/meshy/<id>/render.png` (podgląd) i `model.glb` (model 3D) dla `posag-kultura`, `posag-edukacja`, `posag-biznes`, `kinkiet`.
 - Użyte w grze: `public/assets/hotel/statue-{kultura,edukacja,biznes}.png` — rendery z wyciętym tłem i przycięte (Chromium/canvas), barwione w grze per świat; `sconce-meshy.png` zapisany, na razie nieużywany.
 - Licencja: treść wygenerowana na koncie właściciela projektu — do użytku w portfolio.
+
+## Warstwy tła biegu (stan po 2026-09-10, wieczór)
+
+- Generator: Gamma (`generate_image`, konto Arka), trzy obrazy na świat: daleki plan (pełny kadr), środkowy i bliski (obiekty na tle magenta `#FF00FF` do wycięcia). Adresy w `content/paintings/sources.json` (`_layer-<świat>-<warstwa>`), import workflow'em `paintings-import.yml` do `public/assets/runner/<świat>/<warstwa>.jpg`.
+- Obróbka: `npm run layers` (`scripts/layers.mjs`, Chromium/canvas) — wycięcie magenty do przezroczystości z miękką krawędzią, kolor krawędzi z najbliższego kryjącego piksela, przycięcie do zawartości, zapis WebP 1440 px (`far.webp`, `mid.webp`, `near.webp`), JPG kasowane.
+- Licencja: treść wygenerowana na koncie właściciela projektu — do użytku w portfolio.

@@ -7,7 +7,7 @@ import {
   generateSkyline,
   generateStars,
 } from '../assets/generators/background';
-import { generateFx } from '../assets/generators/fx';
+import { generateAtmosphere, generateFx } from '../assets/generators/fx';
 import { FACADE_IMAGE_PATH, generateHotel, HOTEL_KEYS } from '../assets/generators/hotel';
 import { generateObstacles } from '../assets/generators/obstacles';
 import { generatePlayer } from '../assets/generators/player';
@@ -18,6 +18,9 @@ import {
   fileAssetPath,
   PAINTING_RASTER,
   paintingTextureKey,
+  RUNNER_LAYERS,
+  runnerLayerKey,
+  runnerLayerTileKey,
   statueImageKey,
 } from '../assets/manifest';
 import type { Case } from '../script/types';
@@ -63,10 +66,53 @@ export class BootScene extends Phaser.Scene {
       optional.add(key);
       this.load.image(key, assetUrl(path));
     }
+    // Warstwy tła biegu z API (opcjonalne — brak = paralaksa rysowana kodem).
+    for (const world of ['kultura', 'edukacja', 'biznes'] as const) {
+      for (const layer of RUNNER_LAYERS) {
+        const key = runnerLayerKey(world, layer);
+        const path = fileAssetPath(key);
+        if (path === undefined) continue;
+        optional.add(key);
+        this.load.image(key, assetUrl(path));
+      }
+    }
     this.load.on(Phaser.Loader.Events.FILE_LOAD_ERROR, (file: Phaser.Loader.File) => {
       if (optional.has(file.key)) return;
       console.error(`[assets] nie udało się wczytać ${file.key}`);
     });
+  }
+
+  /**
+   * Z każdej wczytanej warstwy tła buduje kafel „obraz + lustrzane odbicie” (tekstura canvas),
+   * żeby tileSprite zawijał bez szwu. TileSprite nie przyjmuje RenderTexture, stąd canvas.
+   * Warstwa jest „malarska”, więc filtr liniowy.
+   */
+  private buildRunnerLayerTiles(): void {
+    for (const world of ['kultura', 'edukacja', 'biznes'] as const) {
+      for (const layer of RUNNER_LAYERS) {
+        const key = runnerLayerKey(world, layer);
+        if (!this.textures.exists(key)) continue;
+        const source = this.textures.get(key).getSourceImage();
+        if (!(source instanceof HTMLImageElement) && !(source instanceof HTMLCanvasElement)) {
+          continue;
+        }
+        const { width, height } = source;
+        const tile = this.textures.createCanvas(
+          runnerLayerTileKey(world, layer),
+          width * 2,
+          height,
+        );
+        if (tile === null) continue;
+        const ctx = tile.getContext();
+        ctx.drawImage(source, 0, 0);
+        ctx.save();
+        ctx.scale(-1, 1);
+        ctx.drawImage(source, -width * 2, 0);
+        ctx.restore();
+        tile.refresh();
+        tile.setFilter(Phaser.Textures.FilterMode.LINEAR);
+      }
+    }
   }
 
   create(): void {
@@ -87,7 +133,9 @@ export class BootScene extends Phaser.Scene {
     generatePlayer(this);
     generateObstacles(this);
     generateFx(this);
+    generateAtmosphere(this);
     generateHotel(this);
+    this.buildRunnerLayerTiles();
     for (const world of ['kultura', 'edukacja', 'biznes'] as const) {
       const key = statueImageKey(world);
       // Rendery z Meshy to „rzeźby”, nie pixel-art — filtrowanie liniowe jak dla obrazów.

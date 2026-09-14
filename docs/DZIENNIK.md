@@ -237,3 +237,29 @@ P1 „Hotel jako przestrzeń”, P2 „Ekran startowy” (bez zapisu postępu), 
 ## 2026-09-10 — Meshy: posągi z modeli 3D
 
 Arek chciał użyć Meshy. Domena `meshy.ai` jest zablokowana sieciowo w środowisku sesji, więc generowanie robi **GitHub Actions** (`meshy-generate.yml`, sekret `MESHY_API_KEY` dodany przez Arka; sesja nie może zakładać sekretów — zabezpieczenia blokują bezpośrednie użycie tokena GitHuba poza wbudowanymi narzędziami). API v2 przyjmuje wyłącznie `art_style: realistic` (400 dla `sculpture`) — charakter rzeźby idzie w prompcie. Pierwsze zamówienie: trzy popiersia (Kultura: marmur z wieńcem, Edukacja: minimalistyczny marmur z książką, Biznes: art-deco brąz) i barokowy kinkiet. Wynik: podglądowe rendery 512×512 (szara „glina” na białym tle) i modele GLB (~1 MB każdy) w `public/assets/meshy/`. Rendery mają wycięte tło (próg bieli z miękką krawędzią) i są przycięte do zawartości — `public/assets/hotel/statue-<świat>.png`; w hotelu stoją na cokole przy końcu korytarza, barwione per świat (marmur / biały / brąz), filtr liniowy (rzeźba, nie pixel-art), fallback: popiersie rysowane kodem. Kinkiet z Meshy zapisany, nieużywany (kinkiety rysowane kodem trzymają płomień w stałym miejscu). Kolejne zamówienia = dopisanie wpisu do `content/meshy/requests.json` i uruchomienie workflow (wejście `only` ogranicza do wybranych id).
+
+---
+
+## 2026-09-10 — Tła biegu z trzech warstw, które składają się w obraz; bogatsze wnętrza; atmosfera
+
+Prośba Arka: „bardziej zaawansowane wnętrza oraz budynek, efekty FX, tła biegu bardziej złożone i składające się w obraz — wygenerować obraz o trzech warstwach, pokroić i złączyć w logiczną całość”.
+
+### Tła biegu (`src/runner/Parallax.ts`, `PaintingShards.ts`)
+
+- **Trzy warstwy per świat z API (Gamma)**: daleki plan (Kultura: rzymskie kopuły pod maureskowym niebem; Edukacja: marmurowa biblioteka z ciepłym światłem; Biznes: blueprintowe miasto z konstelacjami), środkowy (kolumnada z łukami / białe arkady z lampami / kolumny i zębatki z rysunkiem technicznym) i bliski (rekwizyty świata: latarnia, wieniec, amfora, afisze, znicz / ławka, globus, książki, tablica, kwiat / biurko, serwer, kabel, antena, puchar, umowa). Środkowy i bliski są generowane na tle magenta, wycinane do przezroczystości lokalnie (`npm run layers`, Chromium/canvas: alfa z odległości od magenty na rampie 24..255 — dla mieszanki „kolor × magenta” to niemal dokładne krycie, więc rozmycia nie zostają różowe; kolor krawędzi z najbliższego kryjącego piksela; przycięcie pionowe do zawartości; WebP 1440 px, razem ~1 MB na trzy światy).
+- **Bezszwowe zawijanie**: BootScene skleja z każdej warstwy kafel „obraz + lustrzane odbicie” jako teksturę canvas (TileSprite nie przyjmuje RenderTexture — pierwsza próba dała zieloną kratkę „brak tekstury”). Mnożniki prędkości: 0.06 / 0.35 / 0.7; ziemia nadal rysowana kodem (postać i przeszkody stoją na niej), barwiona per świat. Brak plików = poprzednia paralaksa rysowana kodem (`data-bg="code"` vs `"layers"`).
+- **Tło składa się w obraz**: sześć kafli obrazu case'a dryfuje w warstwach (wyblakłe, sepiowe, lekko unoszą się), rozłożone równomiernie na cyklu 2,2 szerokości ekranu (`shardLayout`, czysta funkcja z testem). Zebrany fragment rozjaśnia „swój” kafel w scenerii. Finał nie rozrzuca już kafli z listy pozycji — bierze te, które akurat są w kadrze (spoza kadru „wchodzą” w kadr), i zlatuje nimi na siatkę. Efekt: obraz był w tle przez cały bieg.
+- Manifest: wpisy `runner.layer.<świat>.<warstwa>` (pliki), klucze kafli `…tile`.
+
+### Atmosfera biegu (`src/runner/Atmosphere.ts`)
+
+Snopy światła (klin z gradientem, blend ADD, kołyszą się), pyłki kurzu (miękkie kropki, interpolacja alfy 0→0.55→0), smugi prędkości, gdy świat pędzi ponad tempo bazowe (narracja trzymanym klawiszem). Kolor per świat (złoto / ciepła biel / turkus). W finale atmosfera gaśnie. `prefers-reduced-motion`: mniej cząsteczek, bez kołysania, bez smug.
+
+### Wnętrza hotelu (`src/assets/generators/hotel.ts`, `src/hotel/Floor.ts`)
+
+Sześć mebli w dwóch wersjach (pixel + malarska, przenikają razem ze ścianą): żyrandol, okno ostrołukowe z księżycem, regał, panel art déco (promienie), kotara, pilaster. Kultura: kotary przy drzwiach, żyrandole między obrazami, pilaster przy windzie. Edukacja: okna z księżycem zamiast kinkietów, snopy księżycowego światła na podłogę (ADD), regały przy windzie i posągu. Biznes: panele art déco nad drzwiami, mosiężne pilastry. Na każdym piętrze pyłki kurzu w powietrzu. Budynek (fasada, winda, układ pięter) bez zmian — Arek ocenia najpierw wnętrza i tła.
+
+### Uwagi
+
+- Gamma: 9 obrazów × 70 kredytów = 630; zostało 390.
+- Testy e2e pilota sprawdzają `data-bg="layers"`.
