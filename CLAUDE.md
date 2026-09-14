@@ -46,6 +46,13 @@ Dodatkowo, jeśli dodane zostaną skrypty pomocnicze, warto trzymać się nazewn
 - Commit po każdym etapie, konwencja wiadomości: `etap-N: krótki opis po polsku`.
 - Pracuj etapami z `docs/03_PLAN_ETAPOW.md` sekwencyjnie. Zaczynaj w Plan Mode tam, gdzie odpowiedni prompt w `prompts/` tego wymaga (Etapy 0, 2, 3) — przedstaw plan i czekaj na akceptację przed pisaniem kodu. Po każdym etapie zatrzymaj się na akceptację, chyba że Arek napisze "leć dalej".
 
+## Pilnowanie zadań w tle (zasada twarda, ustalona przez Arka)
+
+- NIGDY nie ustawiaj cyklicznego „check-inu” w stylu „co godzinę sprawdź, czy PR jest scalony / czy CI zielone”. To budzenie kosztuje przy każdym cyklu tyle, co przeczytanie całej rozmowy od nowa (rzędu 13 tys. tokenów za jedno sprawdzenie, ok. 1,2 mln tokenów za dobę pilnowania jednego PR-a) i prawie zawsze kończy się komunikatem „bez zmian”.
+- Po wypchnięciu zmian i otwarciu PR-a po prostu zakończ turę. Zdarzenia z GitHuba (wynik CI, komentarz recenzji, scalenie, konflikt) i tak przychodzą same jako powiadomienia — reaguj dopiero na nie.
+- Jeśli naprawdę trzeba na coś poczekać (np. na wynik wdrożenia), zrób to w obrębie jednej tury: pojedyncza pętla w tle przez kilka minut, nie seria budzeń.
+- Jeśli w wyjątkowej sytuacji cykliczne budzenie jest konieczne, MUSI je wykonywać model niższy niż Fable 5 (Fable jest limitowany) — ustaw zadaniu cyklicznemu tańszy model, np. Haiku, i najrzadszy sensowny interwał.
+
 ## Konwencje kodu
 
 - TypeScript strict, zero `any` (użyj `unknown` + zawężanie typu albo generyków). Nie wyłączaj reguł ESLint inline bez bardzo dobrego powodu wpisanego jako komentarz obok.
